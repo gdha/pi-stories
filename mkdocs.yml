@@ -1,0 +1,4 @@
+site_name: 'Raspberry PI k3s stories'
+theme:
+  name: 'readthedocs'
+
