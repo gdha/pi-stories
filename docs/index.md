@@ -28,9 +28,9 @@ Syntax highlighted code block
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
-### Jekyll Themes
+### Mkdocs Themes with GitHub Pages
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/gdha/pi-stories/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+Read [how to set-up the site with GitHub pages](https://www.it3.be/2020/08/14/using-mkdocs-with-gh-pages/)
 
 ### Support or Contact
 

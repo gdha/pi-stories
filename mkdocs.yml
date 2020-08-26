@@ -1,11 +1,17 @@
 site_name: 'Raspberry PI k3s stories'
+dev_addr: '127.0.0.1:8100'
+docs_dir: docs/
+site_dir: site/
+repo_name: 'gdha/pi-stories'
+repo_url: 'https://github.com/gdha/pi-stories'
+copyright: 'Copyright 2020 - CC0 1.0 Universal'
+
 theme:
   name: 'readthedocs'
-  dev_addr: '127.0.0.1:8100'
 markdown_extensions:
-    - toc:
-        permalink: True
-        separator: "_"
+  - toc:
+      permalink: True
+      separator: "_"
 nav:
-        - WELCOME: 'index.md'
-        - PI4 STORIES: 'pi-stories.md'
+  - WELCOME: 'index.md'
+  - PI4 STORIES: 'pi-stories.md'
