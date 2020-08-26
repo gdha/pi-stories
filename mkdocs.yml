@@ -1,4 +1,11 @@
 site_name: 'Raspberry PI k3s stories'
 theme:
   name: 'readthedocs'
-
+  dev_addr: '127.0.0.1:8100'
+markdown_extensions:
+    - toc:
+        permalink: True
+        separator: "_"
+nav:
+        - WELCOME: 'index.md'
+        - PI4 STORIES: 'pi-stories.md'
