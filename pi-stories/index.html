@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Raspberry Pi 4 Basic OS Configuration - Raspberry PI k3s stories</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Raspberry Pi 4 Basic OS Configuration";
+    var mkdocs_page_input_path = "pi-stories.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Raspberry PI k3s stories</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">WELCOME</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">PI4 STORIES</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Basic OS Configuration</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_basic_os_configuration">Raspberry Pi 4 cluster Series - Basic OS configuration</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#references">References:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#edit_history">Edit history</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories2/">Raspberry Pi 4 Prepare for kubernetes</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Raspberry PI k3s stories</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>PI4 STORIES &raquo;</li>
+        
+      
+    
+    <li>Raspberry Pi 4 Basic OS Configuration</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories.md"> Edit on gdha/pi-stories</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
+<h2 id="raspberry_pi_4_cluster_series_-_basic_os_configuration">Raspberry Pi 4 cluster Series - Basic OS configuration<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_basic_os_configuration" title="Permanent link">&para;</a></h2>
+<p>Before we can build a PI 4 cluster using kubernetes software of some kind (most likely k3s) we need to buy the required hardware to begin with. In our case we decided to go for 5 Raspberry Pi's type 4 with 4 GB RAM. We leave the exercise to you what size of SD card you want (more GB cost more money, but gives you some room for expansion later on). We also bought some small USB sticks (type SanDisk Ultra Fit USB 3.1 flash drive 128 GB) for building an object oriented file system (but that is for a later series).</p>
+<p>Also, we bought some PI cases with fans built-in to keep the processor cool as we know kubernetes may heat up the processor [1]. We noticed that the temperature of a case with fans is around 40 degrees Celsius where with a metal case only (without fans) it is around 60 degrees Celsius. Decided to buy quickly an extra case with fans as it is worth its money.</p>
+<p>We were charmed with Ubuntu 20 series software and downloaded the Pi4 64-bit version and used the <code>dd</code> command to burn it onto the SD cards [2].
+Link it all together to start a Pi computer one at the time. The first time we hooked the micro-HDMI to a TV-screen so we could watch the first kick off and to see everything looked right. Also, we needed to reset the default password of the built-in account named 'ubuntu'.</p>
+<p>By default the Pi computer is using DHCP for retrieving IP addresses, but we want to assign a static IPv4 address. Therefore, think ahaid and use something like this:</p>
+<pre><code>cat &gt;&gt; /etc/hosts &lt;&lt;EOF
+
+# PI cluster
+192.168.0.201   n1
+192.168.0.202   n2
+192.168.0.203   n3
+192.168.0.204   n4
+192.168.0.205   n5
+EOF
+</code></pre>
+<p>Of course, change the IPv4 addresses to your local taste.</p>
+<p>It is also a good idea to hard-code your local timezone, in our case we choose for Europe/Brussels, e.g.</p>
+<pre><code>timedatectl set-timezone Europe/Brussels
+</code></pre>
+<p>The kubernetes cluster (not yet of course) prefers not having IPv6 active, therefore, disable it via:</p>
+<pre><code>echo "net.ipv6.conf.all.disable_ipv6 = 1" &gt;&gt; /etc/sysctl.conf 
+sysctl -p
+</code></pre>
+<p>And, check the time settings:</p>
+<pre><code>systemctl status systemd-timesyncd
+</code></pre>
+<p>To disable DHCP at next restart execute the following:</p>
+<pre><code>cat &gt; /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg &lt;&lt;EOF
+# network: {config: disabled}
+network:
+    ethernets:
+        eth0:
+            dhcp4: true
+            optional: true
+    version: 2
+EOF
+</code></pre>
+<p>And, lets hide the original netplan yaml file:</p>
+<pre><code>mkdir /etc/netplan/.hide
+mv /etc/netplan/50-cloud-init.yaml /etc/netplan/.hide
+</code></pre>
+<p>The following steps differ node per node as we will define the hostname and fix the IPv4 address:</p>
+<pre><code>hostnamectl set-hostname n1
+</code></pre>
+<p>Be careful, to use the correct hostname in above command. To define your permanent IPv4 address create your own netplan configuration as follow:</p>
+<pre><code>cat &gt; /etc/netplan/01-netcfg.yaml &lt;&lt;EOF
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      dhcp4: no
+      # IP address/subnet mask
+      addresses: [192.168.0.201/24]
+      # default gateway
+      gateway4: 192.168.0.1
+      nameservers:
+        # name server this host refers
+        addresses: [192.168.0.1,8.8.8.8]
+      dhcp6: no
+EOF
+</code></pre>
+<p>Then, edit the file <code>/etc/netplan/01-netcfg.yaml</code> to adjust the correct IPv4 address of the node and also modify the gateway IPv4 address to your needs.</p>
+<p>On your laptop (or control server) we also add the IPv4 addresses of our Pi systems to the <code>/etc/hosts</code> file and to make your live easy copy your public OpenSSH keys to the ubuntu account like:</p>
+<pre><code>ssh-copy-id ubuntu@n[1-5]
+</code></pre>
+<p>Reboot this Pi computer and try to login via your laptop using <code>ssh ubuntu@n1</code></p>
+<p>OK so far for the first part, but just want to share picture of our setup with 5 Raspberry Pi's 4 nodes n[1-5]:
+<img alt="" src="../img/my-pi-cluster.jpg" /></p>
+<h3 id="references">References:<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
+<p>[1] <a href="https://joy-it.net/en/products/RB-ALUcase+07FAN">Joy-it Armor case "Block Active" for Raspberry Pi 4</a></p>
+<p>[2] <a href="https://ubuntu.com/download/raspberry-pi">Download your Ubuntu Pi image</a></p>
+<h3 id="edit_history">Edit history<a class="headerlink" href="#edit_history" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Initial post on 01/Jul/2020</li>
+<li>Updated title on 09/Sep/2020</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../pi-stories2/" class="btn btn-neutral float-right" title="Raspberry Pi 4 Prepare for kubernetes">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="WELCOME"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright 2020 - CC0 1.0 Universal</p>
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../pi-stories2/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
