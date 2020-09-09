@@ -1,6 +1,6 @@
 # PI4 Stories
 
-## Raspberry Pi 4 cluster Series part 1
+## Raspberry Pi 4 cluster Series - Basic OS configuration
 
 Before we can build a PI 4 cluster using kubernetes software of some kind (most likely k3s) we need to buy the required hardware to begin with. In our case we decided to go for 5 Raspberry Pi's type 4 with 4 GB RAM. We leave the exercise to you what size of SD card you want (more GB cost more money, but gives you some room for expansion later on). We also bought some small USB sticks (type SanDisk Ultra Fit USB 3.1 flash drive 128 GB) for building an object oriented file system (but that is for a later series).
 
@@ -99,4 +99,5 @@ OK so far for the first part, but just want to share picture of our setup with 5
 
 ### Edit history
 
-- Initial post on 01 July 2020
+- Initial post on 01/Jul/2020
+- Updated title on 09/Sep/2020
