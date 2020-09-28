@@ -17,3 +17,4 @@ nav:
   - PI4 STORIES:
     - 'Raspberry Pi 4 Basic OS Configuration': 'pi-stories.md'
     - 'Raspberry Pi 4 Prepare for kubernetes': 'pi-stories2.md'
+    - 'Raspberry Pi 4 Installing k3s software': 'pi-stories3.md'
