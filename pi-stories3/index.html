@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Raspberry Pi 4 Installing k3s software - Raspberry PI k3s stories</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Raspberry Pi 4 Installing k3s software";
+    var mkdocs_page_input_path = "pi-stories3.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Raspberry PI k3s stories</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">WELCOME</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">PI4 STORIES</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories/">Raspberry Pi 4 Basic OS Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories2/">Raspberry Pi 4 Prepare for kubernetes</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Installing k3s software</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_installing_k3s_software">Raspberry Pi 4 cluster Series - Installing k3s software</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#why_k3s">Why k3s?</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#run_the_ansible_playbook_siteyml">Run the ansible playbook site.yml</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#k3s_is_up_and_running">k3s is up and running?</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#references">References</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#edit_history">Edit history</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Raspberry PI k3s stories</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>PI4 STORIES &raquo;</li>
+        
+      
+    
+    <li>Raspberry Pi 4 Installing k3s software</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories3.md"> Edit on gdha/pi-stories</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
+<h2 id="raspberry_pi_4_cluster_series_-_installing_k3s_software">Raspberry Pi 4 cluster Series - Installing k3s software<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_installing_k3s_software" title="Permanent link">&para;</a></h2>
+<h3 id="why_k3s">Why k3s?<a class="headerlink" href="#why_k3s" title="Permanent link">&para;</a></h3>
+<p><a href="https://rancher.com/docs/k3s/latest/en/">K3s</a> is a fully compliant Kubernetes distribution in a single binary perfectly suitable for smaller edge devices such as the Raspberry PI4. Simply said, you can do almost exactly the same as with its big sister kubernetes (k8s). For these kind of devices it is the perfect match.</p>
+<p>To get ks3 installed with ansible clone the playbook <a href="https://github.com/gdha/k3s-ansible">k3s-ansible playbook</a>[1].</p>
+<p>K3s is a product from Rancher Labs and can be installed in different ways, such as with <a href="https://github.com/alexellis/k3sup">k3sup</a> (read the nice article "<a href="https://ma.ttias.be/deploying-highly-available-k3s-k3sup/">Deploying a highly-available K3s with K3sup</a>") or with a <a href="https://github.com/rancher/k3s-ansible">fork of k3s-ansible</a> sources. We choose for the latter and made some customisation to fork of k3s-ansible playbook [1].</p>
+<p>Do check the <code>inventory/my-cluster/hosts.ini</code> file and add you preferences. Also, do not forget to adjust the attributes yaml file <code>inventory/my-cluster/group_vars/all.yml</code>. Especially, check the <em>k3s_version</em> you want to install. To find the latest stable release of k3s see the <a href="https://github.com/rancher/k3s/releases">github release page of ks3s</a>.</p>
+<h3 id="run_the_ansible_playbook_siteyml">Run the ansible playbook site.yml<a class="headerlink" href="#run_the_ansible_playbook_siteyml" title="Permanent link">&para;</a></h3>
+<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ ansible-playbook site.yml -i inventory/my-cluster/hosts.ini
+[WARNING]: While constructing a mapping from /home/gdha/projects/k3s-ansible/roles/ubuntu/tasks/main.yml, line 4, column 5, found a duplicate dict key (backrefs). Using
+last defined value only.
+
+PLAY [k3s_cluster] ********************************************************************************************************************************************************
+
+TASK [Gathering Facts] ****************************************************************************************************************************************************
+Wednesday 23 September 2020  16:16:13 +0200 (0:00:00.102)       0:00:00.102 *** 
+ok: [192.168.0.202]
+ok: [192.168.0.204]
+ok: [192.168.0.203]
+ok: [192.168.0.201]
+ok: [192.168.0.205]
+
+TASK [prereq : Set SELinux to disabled state] *****************************************************************************************************************************
+Wednesday 23 September 2020  16:16:24 +0200 (0:00:10.334)       0:00:10.437 *** 
+skipping: [192.168.0.201]
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+TASK [prereq : Enable IPv4 forwarding] ************************************************************************************************************************************
+Wednesday 23 September 2020  16:16:24 +0200 (0:00:00.913)       0:00:11.350 *** 
+ok: [192.168.0.203]
+ok: [192.168.0.201]
+ok: [192.168.0.202]
+ok: [192.168.0.204]
+ok: [192.168.0.205]
+
+TASK [prereq : Enable IPv6 forwarding] ************************************************************************************************************************************
+Wednesday 23 September 2020  16:16:26 +0200 (0:00:01.658)       0:00:13.009 *** 
+ok: [192.168.0.201]
+ok: [192.168.0.202]
+ok: [192.168.0.203]
+ok: [192.168.0.204]
+ok: [192.168.0.205]
+
+TASK [prereq : Add br_netfilter to /etc/modules-load.d/] ******************************************************************************************************************
+Wednesday 23 September 2020  16:16:28 +0200 (0:00:01.781)       0:00:14.790 *** 
+skipping: [192.168.0.201]
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+TASK [prereq : Load br_netfilter] *****************************************************************************************************************************************
+Wednesday 23 September 2020  16:16:29 +0200 (0:00:00.905)       0:00:15.696 *** 
+skipping: [192.168.0.201]
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+TASK [prereq : Set bridge-nf-call-iptables (just to be sure)] *************************************************************************************************************
+Wednesday 23 September 2020  16:16:30 +0200 (0:00:00.909)       0:00:16.605 *** 
+skipping: [192.168.0.201] =&gt; (item=net.bridge.bridge-nf-call-iptables) 
+skipping: [192.168.0.201] =&gt; (item=net.bridge.bridge-nf-call-ip6tables) 
+skipping: [192.168.0.202] =&gt; (item=net.bridge.bridge-nf-call-iptables) 
+skipping: [192.168.0.202] =&gt; (item=net.bridge.bridge-nf-call-ip6tables) 
+skipping: [192.168.0.203] =&gt; (item=net.bridge.bridge-nf-call-iptables) 
+skipping: [192.168.0.203] =&gt; (item=net.bridge.bridge-nf-call-ip6tables) 
+skipping: [192.168.0.204] =&gt; (item=net.bridge.bridge-nf-call-iptables) 
+skipping: [192.168.0.204] =&gt; (item=net.bridge.bridge-nf-call-ip6tables) 
+skipping: [192.168.0.205] =&gt; (item=net.bridge.bridge-nf-call-iptables) 
+skipping: [192.168.0.205] =&gt; (item=net.bridge.bridge-nf-call-ip6tables) 
+
+TASK [prereq : Add /usr/local/bin to sudo secure_path] ********************************************************************************************************************
+Wednesday 23 September 2020  16:16:31 +0200 (0:00:00.939)       0:00:17.544 *** 
+skipping: [192.168.0.201]
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+TASK [download : Delete k3s if already present] ***************************************************************************************************************************
+Wednesday 23 September 2020  16:16:32 +0200 (0:00:01.169)       0:00:18.714 *** 
+changed: [192.168.0.201]
+changed: [192.168.0.203]
+changed: [192.168.0.202]
+changed: [192.168.0.204]
+changed: [192.168.0.205]
+
+TASK [download : Download k3s binary x64] *********************************************************************************************************************************
+Wednesday 23 September 2020  16:16:34 +0200 (0:00:01.707)       0:00:20.422 *** 
+skipping: [192.168.0.201]
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+TASK [download : Download k3s binary arm64] *******************************************************************************************************************************
+Wednesday 23 September 2020  16:16:34 +0200 (0:00:00.943)       0:00:21.365 *** 
+changed: [192.168.0.202]
+changed: [192.168.0.204]
+changed: [192.168.0.201]
+changed: [192.168.0.205]
+changed: [192.168.0.203]
+
+TASK [download : Download k3s binary armhf] *******************************************************************************************************************************
+Wednesday 23 September 2020  16:17:34 +0200 (0:00:59.059)       0:01:20.425 *** 
+skipping: [192.168.0.201]
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+TASK [raspbian : Test for Raspbian] ***************************************************************************************************************************************
+Wednesday 23 September 2020  16:17:34 +0200 (0:00:00.940)       0:01:21.365 *** 
+ok: [192.168.0.201]
+ok: [192.168.0.202]
+ok: [192.168.0.203]
+ok: [192.168.0.204]
+ok: [192.168.0.205]
+
+TASK [raspbian : Activating cgroup support] *******************************************************************************************************************************
+Wednesday 23 September 2020  16:17:36 +0200 (0:00:01.165)       0:01:22.531 *** 
+skipping: [192.168.0.201]
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+TASK [raspbian : Flush iptables before changing to iptables-legacy] *******************************************************************************************************
+Wednesday 23 September 2020  16:17:36 +0200 (0:00:00.796)       0:01:23.327 *** 
+skipping: [192.168.0.201]
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+TASK [raspbian : Changing to iptables-legacy] *****************************************************************************************************************************
+Wednesday 23 September 2020  16:17:37 +0200 (0:00:00.795)       0:01:24.123 *** 
+skipping: [192.168.0.201]
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+TASK [raspbian : Changing to ip6tables-legacy] ****************************************************************************************************************************
+Wednesday 23 September 2020  16:17:38 +0200 (0:00:00.798)       0:01:24.922 *** 
+skipping: [192.168.0.201]
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+TASK [raspbian : Rebooting] ***********************************************************************************************************************************************
+Wednesday 23 September 2020  16:17:39 +0200 (0:00:00.940)       0:01:25.862 *** 
+skipping: [192.168.0.201]
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+TASK [ubuntu : Enable cgroup via boot commandline if not already enabled for Ubuntu on ARM] *******************************************************************************
+Wednesday 23 September 2020  16:17:40 +0200 (0:00:00.800)       0:01:26.663 *** 
+ok: [192.168.0.203]
+ok: [192.168.0.202]
+ok: [192.168.0.201]
+ok: [192.168.0.204]
+ok: [192.168.0.205]
+
+PLAY [master] *************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ****************************************************************************************************************************************************
+Wednesday 23 September 2020  16:17:42 +0200 (0:00:01.887)       0:01:28.550 *** 
+ok: [192.168.0.201]
+
+TASK [k3s/master : Copy K3s service file] *********************************************************************************************************************************
+Wednesday 23 September 2020  16:17:49 +0200 (0:00:07.512)       0:01:36.063 *** 
+ok: [192.168.0.201]
+
+TASK [k3s/master : Enable and check K3s service] **************************************************************************************************************************
+Wednesday 23 September 2020  16:17:51 +0200 (0:00:02.229)       0:01:38.293 *** 
+changed: [192.168.0.201]
+
+TASK [k3s/master : Wait for node-token] ***********************************************************************************************************************************
+Wednesday 23 September 2020  16:18:11 +0200 (0:00:19.552)       0:01:57.846 *** 
+ok: [192.168.0.201]
+
+TASK [k3s/master : Register node-token file access mode] ******************************************************************************************************************
+Wednesday 23 September 2020  16:18:13 +0200 (0:00:01.661)       0:01:59.508 *** 
+ok: [192.168.0.201]
+
+TASK [k3s/master : Change file access node-token] *************************************************************************************************************************
+Wednesday 23 September 2020  16:18:14 +0200 (0:00:01.250)       0:02:00.758 *** 
+changed: [192.168.0.201]
+
+TASK [k3s/master : Read node-token from master] ***************************************************************************************************************************
+Wednesday 23 September 2020  16:18:15 +0200 (0:00:01.036)       0:02:01.794 *** 
+ok: [192.168.0.201]
+
+TASK [k3s/master : Store Master node-token] *******************************************************************************************************************************
+Wednesday 23 September 2020  16:18:16 +0200 (0:00:01.293)       0:02:03.087 *** 
+ok: [192.168.0.201]
+
+TASK [k3s/master : Restore node-token file access] ************************************************************************************************************************
+Wednesday 23 September 2020  16:18:17 +0200 (0:00:00.277)       0:02:03.365 *** 
+changed: [192.168.0.201]
+
+TASK [k3s/master : Create directory .kube] ********************************************************************************************************************************
+Wednesday 23 September 2020  16:18:18 +0200 (0:00:01.079)       0:02:04.445 *** 
+ok: [192.168.0.201]
+
+TASK [k3s/master : Copy config file to user home directory] ***************************************************************************************************************
+Wednesday 23 September 2020  16:18:19 +0200 (0:00:01.083)       0:02:05.528 *** 
+changed: [192.168.0.201]
+
+TASK [k3s/master : Replace https://localhost:6443 by https://master-ip:6443] **********************************************************************************************
+Wednesday 23 September 2020  16:18:20 +0200 (0:00:01.586)       0:02:07.115 *** 
+changed: [192.168.0.201]
+
+TASK [k3s/master : Create kubectl symlink] ********************************************************************************************************************************
+Wednesday 23 September 2020  16:18:22 +0200 (0:00:02.239)       0:02:09.354 *** 
+ok: [192.168.0.201]
+
+TASK [k3s/master : Create crictl symlink] *********************************************************************************************************************************
+Wednesday 23 September 2020  16:18:23 +0200 (0:00:00.973)       0:02:10.328 *** 
+ok: [192.168.0.201]
+
+PLAY [node] ***************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ****************************************************************************************************************************************************
+Wednesday 23 September 2020  16:18:25 +0200 (0:00:01.351)       0:02:11.680 *** 
+ok: [192.168.0.203]
+ok: [192.168.0.205]
+ok: [192.168.0.202]
+ok: [192.168.0.204]
+
+TASK [k3s/node : Copy K3s service file] ***********************************************************************************************************************************
+Wednesday 23 September 2020  16:18:35 +0200 (0:00:09.865)       0:02:21.546 *** 
+ok: [192.168.0.202]
+ok: [192.168.0.203]
+ok: [192.168.0.204]
+ok: [192.168.0.205]
+
+TASK [k3s/node : Enable and check K3s service] ****************************************************************************************************************************
+Wednesday 23 September 2020  16:18:37 +0200 (0:00:02.715)       0:02:24.261 *** 
+changed: [192.168.0.202]
+changed: [192.168.0.204]
+changed: [192.168.0.205]
+changed: [192.168.0.203]
+
+TASK [k3s/node : Create directory .kube] **********************************************************************************************************************************
+Wednesday 23 September 2020  16:18:46 +0200 (0:00:08.523)       0:02:32.785 *** 
+ok: [192.168.0.202]
+ok: [192.168.0.203]
+ok: [192.168.0.204]
+ok: [192.168.0.205]
+
+TASK [k3s/node : Create kubectl/crictl symlinks] **************************************************************************************************************************
+Wednesday 23 September 2020  16:18:48 +0200 (0:00:01.660)       0:02:34.446 *** 
+ok: [192.168.0.202] =&gt; (item=kubectl)
+ok: [192.168.0.203] =&gt; (item=kubectl)
+ok: [192.168.0.204] =&gt; (item=kubectl)
+ok: [192.168.0.202] =&gt; (item=crictl)
+ok: [192.168.0.205] =&gt; (item=kubectl)
+ok: [192.168.0.203] =&gt; (item=crictl)
+ok: [192.168.0.204] =&gt; (item=crictl)
+ok: [192.168.0.205] =&gt; (item=crictl)
+
+TASK [k3s/node : fetch the ~/.kube/config file] ***************************************************************************************************************************
+Wednesday 23 September 2020  16:18:50 +0200 (0:00:02.746)       0:02:37.192 *** 
+skipping: [192.168.0.202]
+skipping: [192.168.0.203]
+skipping: [192.168.0.204]
+skipping: [192.168.0.205]
+
+PLAY RECAP ****************************************************************************************************************************************************************
+192.168.0.201              : ok=21   changed=7    unreachable=0    failed=0    skipped=12   rescued=0    ignored=0   
+192.168.0.202              : ok=12   changed=3    unreachable=0    failed=0    skipped=13   rescued=0    ignored=0   
+192.168.0.203              : ok=12   changed=3    unreachable=0    failed=0    skipped=13   rescued=0    ignored=0   
+192.168.0.204              : ok=12   changed=3    unreachable=0    failed=0    skipped=13   rescued=0    ignored=0   
+192.168.0.205              : ok=12   changed=3    unreachable=0    failed=0    skipped=13   rescued=0    ignored=0   
+
+Wednesday 23 September 2020  16:18:51 +0200 (0:00:00.630)       0:02:37.823 *** 
+=============================================================================== 
+download : Download k3s binary arm64 ------------------------------------------------------------------------------------------------------------------------------ 59.06s
+k3s/master : Enable and check K3s service ------------------------------------------------------------------------------------------------------------------------- 19.55s
+Gathering Facts --------------------------------------------------------------------------------------------------------------------------------------------------- 10.33s
+Gathering Facts ---------------------------------------------------------------------------------------------------------------------------------------------------- 9.87s
+k3s/node : Enable and check K3s service ---------------------------------------------------------------------------------------------------------------------------- 8.52s
+Gathering Facts ---------------------------------------------------------------------------------------------------------------------------------------------------- 7.51s
+k3s/node : Create kubectl/crictl symlinks -------------------------------------------------------------------------------------------------------------------------- 2.75s
+k3s/node : Copy K3s service file ----------------------------------------------------------------------------------------------------------------------------------- 2.72s
+k3s/master : Replace https://localhost:6443 by https://master-ip:6443 ---------------------------------------------------------------------------------------------- 2.24s
+k3s/master : Copy K3s service file --------------------------------------------------------------------------------------------------------------------------------- 2.23s
+ubuntu : Enable cgroup via boot commandline if not already enabled for Ubuntu on ARM ------------------------------------------------------------------------------- 1.89s
+prereq : Enable IPv6 forwarding ------------------------------------------------------------------------------------------------------------------------------------ 1.78s
+download : Delete k3s if already present --------------------------------------------------------------------------------------------------------------------------- 1.71s
+k3s/master : Wait for node-token ----------------------------------------------------------------------------------------------------------------------------------- 1.66s
+k3s/node : Create directory .kube ---------------------------------------------------------------------------------------------------------------------------------- 1.66s
+prereq : Enable IPv4 forwarding ------------------------------------------------------------------------------------------------------------------------------------ 1.66s
+k3s/master : Copy config file to user home directory --------------------------------------------------------------------------------------------------------------- 1.59s
+k3s/master : Create crictl symlink --------------------------------------------------------------------------------------------------------------------------------- 1.35s
+k3s/master : Read node-token from master --------------------------------------------------------------------------------------------------------------------------- 1.29s
+k3s/master : Register node-token file access mode ------------------------------------------------------------------------------------------------------------------ 1.25s
+</code></pre>
+
+<h3 id="k3s_is_up_and_running">k3s is up and running?<a class="headerlink" href="#k3s_is_up_and_running" title="Permanent link">&para;</a></h3>
+<p>Wow the installation went rather fast - an exciting moment - is k3s working fine?</p>
+<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ k3s --version
+k3s version v1.19.2+k3s1 (d38505b1)
+
+gdha@n5:~/projects/k3s-ansible$ k3s kubectl cluster-info
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
+</code></pre>
+
+<p>Ok - k3s needs the cluster configuration file via variable <code>KUBECONFIG</code> or the file <code>~/kube/config</code>. We are on a worker node (n5) and choose as master node n1, therefore, the cluster configuration was created and resides on the master node. Or, we copy this to each node or decide only the work from the master node. It is a much better choice to copy the configuration to each node instead.</p>
+<p>To do so first copy the cluster configuration file from the master node (n1) to this node (n5):</p>
+<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ scp n1:.kube/config ~/.kube/
+config                                                                                                                                   100% 2793     2.0MB/s   00:00    
+</code></pre>
+
+<p>Now see if we have more luck with a kubernetes command to get all the nodes in this cluster and dumping the cluster-info?</p>
+<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ kubectl get nodes
+NAME   STATUS   ROLES    AGE   VERSION
+n2     Ready    &lt;none&gt;   49d   v1.19.2+k3s1
+n5     Ready    &lt;none&gt;   49d   v1.19.2+k3s1
+n4     Ready    &lt;none&gt;   49d   v1.19.2+k3s1
+n3     Ready    &lt;none&gt;   49d   v1.19.2+k3s1
+n1     Ready    master   49d   v1.19.2+k3s1
+
+gdha@n5:~/projects/k3s-ansible$ k3s kubectl cluster-info
+Kubernetes master is running at https://192.168.0.201:6443
+CoreDNS is running at https://192.168.0.201:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+Metrics-server is running at https://192.168.0.201:6443/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+</code></pre>
+
+<p>Yes, that works fine, so lets copy the configuration file to the other nodes as well:</p>
+<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ scp ~/.kube/config n2:~/.kube/
+config                                                                                                                                   100% 2793     1.9MB/s   00:00    
+gdha@n5:~/projects/k3s-ansible$ scp ~/.kube/config n3:~/.kube/
+config                                                                                                                                   100% 2793     1.7MB/s   00:00    
+gdha@n5:~/projects/k3s-ansible$ scp ~/.kube/config n4:~/.kube/
+config                                                          
+</code></pre>
+
+<p>And finally, to conclude this story, what pods are running within a basic k3s setup?</p>
+<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ kubectl get pods -A
+NAMESPACE     NAME                                     READY   STATUS      RESTARTS   AGE
+kube-system   helm-install-traefik-p7jkh               0/1     Completed   0          4d22h
+kube-system   svclb-traefik-kxxn4                      2/2     Running     2          4d22h
+kube-system   svclb-traefik-r9q6r                      2/2     Running     2          4d22h
+kube-system   svclb-traefik-qlgn9                      2/2     Running     2          4d22h
+kube-system   traefik-5dd496474-4fwdm                  1/1     Running     1          4d22h
+kube-system   local-path-provisioner-7ff9579c6-l6t6s   1/1     Running     1          4d22h
+kube-system   svclb-traefik-n6srr                      2/2     Running     2          4d22h
+kube-system   coredns-66c464876b-vqrd6                 1/1     Running     1          4d22h
+kube-system   metrics-server-7b4f8b595-bldsd           1/1     Running     1          4d22h
+kube-system   svclb-traefik-74k9f                      2/2     Running     2          4d22h
+</code></pre>
+
+<h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
+<p>[1] <a href="https://github.com/gdha/k3s-ansible">Ansible k3s-ansible playbook</a></p>
+<p>[2] <a href="https://ma.ttias.be/deploying-highly-available-k3s-k3sup/">Deploying a highly-available K3s with K3sup</a></p>
+<h3 id="edit_history">Edit history<a class="headerlink" href="#edit_history" title="Permanent link">&para;</a></h3>
+<ul>
+<li>initial post on 28/Sep/2020</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../pi-stories2/" class="btn btn-neutral" title="Raspberry Pi 4 Prepare for kubernetes"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright 2020 - CC0 1.0 Universal</p>
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../pi-stories2/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
