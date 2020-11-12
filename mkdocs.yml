@@ -18,3 +18,5 @@ nav:
     - 'Raspberry Pi 4 Basic OS Configuration': 'pi-stories.md'
     - 'Raspberry Pi 4 Prepare for kubernetes': 'pi-stories2.md'
     - 'Raspberry Pi 4 Installing k3s software': 'pi-stories3.md'
+    - 'Raspberry Pi 4 Install awesome kubectl aliases': 'pi-stories4.md'
+    - 'Raspberry Pi 4 Installing cert-manager on our cluster': 'pi-stories5.md'
