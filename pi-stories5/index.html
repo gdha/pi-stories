@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Raspberry Pi 4 Installing cert-manager on our cluster - Raspberry PI k3s stories</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Raspberry Pi 4 Installing cert-manager on our cluster";
+    var mkdocs_page_input_path = "pi-stories5.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Raspberry PI k3s stories</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">WELCOME</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">PI4 STORIES</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories/">Raspberry Pi 4 Basic OS Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories2/">Raspberry Pi 4 Prepare for kubernetes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories3/">Raspberry Pi 4 Installing k3s software</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories4/">Raspberry Pi 4 Install awesome kubectl aliases</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Installing cert-manager on our cluster</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_installing_cert-manager_on_the_k3s_cluster">Raspberry Pi 4 cluster Series - Installing cert-manager on the k3s cluster</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#installling_cert-manager">Installling cert-manager</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Raspberry PI k3s stories</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>PI4 STORIES &raquo;</li>
+        
+      
+    
+    <li>Raspberry Pi 4 Installing cert-manager on our cluster</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories5.md"> Edit on gdha/pi-stories</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
+<h2 id="raspberry_pi_4_cluster_series_-_installing_cert-manager_on_the_k3s_cluster">Raspberry Pi 4 cluster Series - Installing cert-manager on the k3s cluster<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_installing_cert-manager_on_the_k3s_cluster" title="Permanent link">&para;</a></h2>
+<p>As certificates are crucial in a kuberbetes cluster one of the first pods that one should install is <a href="https://cert-manager.io/docs/">cert-manager</a>.</p>
+<h3 id="installling_cert-manager">Installling cert-manager<a class="headerlink" href="#installling_cert-manager" title="Permanent link">&para;</a></h3>
+<p>Installaion is extremelt easy with the following command:</p>
+<pre><code class="bash">kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.4/cert-manager.yaml
+</code></pre>
+
+<p>In the time of writing this article the current version was v1.0.4 - you can change that to the <a href="https://github.com/jetstack/cert-manager/releases">latest release</a> available of course. Here follows an example of the instalaltion of cert-manager:</p>
+<pre><code class="bash">$ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.4/cert-manager.yaml
+customresourcedefinition.apiextensions.k8s.io/certificaterequests.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/certificates.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/challenges.acme.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/clusterissuers.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/issuers.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/orders.acme.cert-manager.io created
+namespace/cert-manager created
+serviceaccount/cert-manager-cainjector created
+serviceaccount/cert-manager created
+serviceaccount/cert-manager-webhook created
+clusterrole.rbac.authorization.k8s.io/cert-manager-cainjector created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-issuers created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-clusterissuers created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-certificates created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-orders created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-challenges created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-ingress-shim created
+clusterrole.rbac.authorization.k8s.io/cert-manager-view created
+clusterrole.rbac.authorization.k8s.io/cert-manager-edit created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-cainjector created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-issuers created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-clusterissuers created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-certificates created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-orders created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-challenges created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-ingress-shim created
+role.rbac.authorization.k8s.io/cert-manager-cainjector:leaderelection created
+role.rbac.authorization.k8s.io/cert-manager:leaderelection created
+role.rbac.authorization.k8s.io/cert-manager-webhook:dynamic-serving created
+rolebinding.rbac.authorization.k8s.io/cert-manager-cainjector:leaderelection created
+rolebinding.rbac.authorization.k8s.io/cert-manager:leaderelection created
+rolebinding.rbac.authorization.k8s.io/cert-manager-webhook:dynamic-serving created
+service/cert-manager created
+service/cert-manager-webhook created
+deployment.apps/cert-manager-cainjector created
+deployment.apps/cert-manager created
+deployment.apps/cert-manager-webhook created
+mutatingwebhookconfiguration.admissionregistration.k8s.io/cert-manager-webhook created
+validatingwebhookconfiguration.admissionregistration.k8s.io/cert-manager-webhook created
+</code></pre>
+
+<p>Just after previous command check if the cert-manager pods are created:</p>
+<pre><code class="bash">$ kubectl get pods -A
+NAMESPACE      NAME                                       READY   STATUS              RESTARTS   AGE
+kube-system    helm-install-traefik-p7jkh                 0/1     Completed           0          49d
+kube-system    metrics-server-7b4f8b595-bldsd             1/1     Running             3          49d
+kube-system    local-path-provisioner-7ff9579c6-l6t6s     1/1     Running             3          49d
+kube-system    svclb-traefik-r9q6r                        2/2     Running             6          49d
+kube-system    svclb-traefik-n6srr                        2/2     Running             6          49d
+kube-system    svclb-traefik-kxxn4                        2/2     Running             6          49d
+kube-system    coredns-66c464876b-vqrd6                   1/1     Running             3          49d
+kube-system    svclb-traefik-74k9f                        2/2     Running             6          49d
+kube-system    svclb-traefik-qlgn9                        2/2     Running             6          49d
+kube-system    traefik-5dd496474-4fwdm                    1/1     Running             3          49d
+cert-manager   cert-manager-86548b886-4xrbj               0/1     ContainerCreating   0          9s
+cert-manager   cert-manager-cainjector-6d59c8d4f7-b2vdc   0/1     ContainerCreating   0          9s
+cert-manager   cert-manager-webhook-578954cdd-lg5m4       0/1     ContainerCreating   0          9s
+</code></pre>
+
+<p>After a minute or so check again with the wide option to see on which worker nodes the cert-managers pods are running:</p>
+<pre><code class="bash">$ kubectl get pods -n cert-manager -o wide
+NAME                                       READY   STATUS    RESTARTS   AGE   IP           NODE   NOMINATED NODE   READINESS GATES
+cert-manager-cainjector-6d59c8d4f7-b2vdc   1/1     Running   0          21m   10.42.1.17   n5     &lt;none&gt;           &lt;none&gt;
+cert-manager-webhook-578954cdd-lg5m4       1/1     Running   0          21m   10.42.0.19   n1     &lt;none&gt;           &lt;none&gt;
+cert-manager-86548b886-4xrbj               1/1     Running   0          21m   10.42.5.10   n4     &lt;none&gt;           &lt;none&gt;
+</code></pre>
+
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://cert-manager.io/docs/">cert-manager documentation</a></li>
+<li><a href="https://github.com/jetstack/cert-manager">cert-manager sources</a></li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../pi-stories4/" class="btn btn-neutral" title="Raspberry Pi 4 Install awesome kubectl aliases"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright 2020 - CC0 1.0 Universal</p>
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../pi-stories4/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
