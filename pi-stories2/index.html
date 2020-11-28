@@ -142,7 +142,7 @@
 <h3 id="compile_arm_side_libraries_for_interfacing_to_raspberry_pi_gpu">Compile ARM side libraries for interfacing to Raspberry Pi GPU<a class="headerlink" href="#compile_arm_side_libraries_for_interfacing_to_raspberry_pi_gpu" title="Permanent link">&para;</a></h3>
 <p>Download the source code from <a href="http://github.com/raspberrypi/userland">2</a>. Compile and install these binaries on the host from where you will use the playbook. In my case its was host n5 (do not forget to install <code>ansible</code>).</p>
 <h3 id="run_the_ansible_playbook_provisionyml">Run the ansible playbook provision.yml<a class="headerlink" href="#run_the_ansible_playbook_provisionyml" title="Permanent link">&para;</a></h3>
-<pre><code class="bash">$ ansible-playbook provision.yml -k --vault-password-file .my_password
+<pre><code class="language-bash">$ ansible-playbook provision.yml -k --vault-password-file .my_password
 SSH password: 
 
 PLAY [all] *************************************************************************************************************************************
@@ -543,7 +543,6 @@ n4                         : ok=38   changed=8    unreachable=0    failed=0    s
 n5                         : ok=37   changed=5    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
 
 </code></pre>
-
 <h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
 <p>[1] <a href="https://github.com/gdha/pi4-cluster-ansible-roles">Ansible pi4-cluster-ansible-roles playbook</a></p>
 <p>[2] <a href="http://github.com/raspberrypi/userland">Source code for ARM side libraries for interfacing to Raspberry Pi GPU</a></p>

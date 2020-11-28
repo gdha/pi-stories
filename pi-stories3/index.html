@@ -126,7 +126,7 @@
 <p>K3s is a product from Rancher Labs and can be installed in different ways, such as with <a href="https://github.com/alexellis/k3sup">k3sup</a> (read the nice article "<a href="https://ma.ttias.be/deploying-highly-available-k3s-k3sup/">Deploying a highly-available K3s with K3sup</a>") or with a <a href="https://github.com/rancher/k3s-ansible">fork of k3s-ansible</a> sources. We choose for the latter and made some customisation to fork of k3s-ansible playbook [1].</p>
 <p>Do check the <code>inventory/my-cluster/hosts.ini</code> file and add you preferences. Also, do not forget to adjust the attributes yaml file <code>inventory/my-cluster/group_vars/all.yml</code>. Especially, check the <em>k3s_version</em> you want to install. To find the latest stable release of k3s see the <a href="https://github.com/rancher/k3s/releases">github release page of ks3s</a>.</p>
 <h3 id="run_the_ansible_playbook_siteyml">Run the ansible playbook site.yml<a class="headerlink" href="#run_the_ansible_playbook_siteyml" title="Permanent link">&para;</a></h3>
-<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ ansible-playbook site.yml -i inventory/my-cluster/hosts.ini
+<pre><code class="language-bash">gdha@n5:~/projects/k3s-ansible$ ansible-playbook site.yml -i inventory/my-cluster/hosts.ini
 [WARNING]: While constructing a mapping from /home/gdha/projects/k3s-ansible/roles/ubuntu/tasks/main.yml, line 4, column 5, found a duplicate dict key (backrefs). Using
 last defined value only.
 
@@ -425,10 +425,9 @@ k3s/master : Create crictl symlink ---------------------------------------------
 k3s/master : Read node-token from master --------------------------------------------------------------------------------------------------------------------------- 1.29s
 k3s/master : Register node-token file access mode ------------------------------------------------------------------------------------------------------------------ 1.25s
 </code></pre>
-
 <h3 id="k3s_is_up_and_running">k3s is up and running?<a class="headerlink" href="#k3s_is_up_and_running" title="Permanent link">&para;</a></h3>
 <p>Wow the installation went rather fast - an exciting moment - is k3s working fine?</p>
-<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ k3s --version
+<pre><code class="language-bash">gdha@n5:~/projects/k3s-ansible$ k3s --version
 k3s version v1.19.2+k3s1 (d38505b1)
 
 gdha@n5:~/projects/k3s-ansible$ k3s kubectl cluster-info
@@ -436,15 +435,13 @@ gdha@n5:~/projects/k3s-ansible$ k3s kubectl cluster-info
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 The connection to the server localhost:8080 was refused - did you specify the right host or port?
 </code></pre>
-
 <p>Ok - k3s needs the cluster configuration file via variable <code>KUBECONFIG</code> or the file <code>~/kube/config</code>. We are on a worker node (n5) and choose as master node n1, therefore, the cluster configuration was created and resides on the master node. Or, we copy this to each node or decide only the work from the master node. It is a much better choice to copy the configuration to each node instead.</p>
 <p>To do so first copy the cluster configuration file from the master node (n1) to this node (n5):</p>
-<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ scp n1:.kube/config ~/.kube/
+<pre><code class="language-bash">gdha@n5:~/projects/k3s-ansible$ scp n1:.kube/config ~/.kube/
 config                                                                                                                                   100% 2793     2.0MB/s   00:00    
 </code></pre>
-
 <p>Now see if we have more luck with a kubernetes command to get all the nodes in this cluster and dumping the cluster-info?</p>
-<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ kubectl get nodes
+<pre><code class="language-bash">gdha@n5:~/projects/k3s-ansible$ kubectl get nodes
 NAME   STATUS   ROLES    AGE   VERSION
 n2     Ready    &lt;none&gt;   49d   v1.19.2+k3s1
 n5     Ready    &lt;none&gt;   49d   v1.19.2+k3s1
@@ -459,18 +456,16 @@ Metrics-server is running at https://192.168.0.201:6443/api/v1/namespaces/kube-s
 
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 </code></pre>
-
 <p>Yes, that works fine, so lets copy the configuration file to the other nodes as well:</p>
-<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ scp ~/.kube/config n2:~/.kube/
+<pre><code class="language-bash">gdha@n5:~/projects/k3s-ansible$ scp ~/.kube/config n2:~/.kube/
 config                                                                                                                                   100% 2793     1.9MB/s   00:00    
 gdha@n5:~/projects/k3s-ansible$ scp ~/.kube/config n3:~/.kube/
 config                                                                                                                                   100% 2793     1.7MB/s   00:00    
 gdha@n5:~/projects/k3s-ansible$ scp ~/.kube/config n4:~/.kube/
 config                                                          
 </code></pre>
-
 <p>And finally, to conclude this story, what pods are running within a basic k3s setup?</p>
-<pre><code class="bash">gdha@n5:~/projects/k3s-ansible$ kubectl get pods -A
+<pre><code class="language-bash">gdha@n5:~/projects/k3s-ansible$ kubectl get pods -A
 NAMESPACE     NAME                                     READY   STATUS      RESTARTS   AGE
 kube-system   helm-install-traefik-p7jkh               0/1     Completed   0          4d22h
 kube-system   svclb-traefik-kxxn4                      2/2     Running     2          4d22h
@@ -483,7 +478,6 @@ kube-system   coredns-66c464876b-vqrd6                 1/1     Running     1    
 kube-system   metrics-server-7b4f8b595-bldsd           1/1     Running     1          4d22h
 kube-system   svclb-traefik-74k9f                      2/2     Running     2          4d22h
 </code></pre>
-
 <h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
 <p>[1] <a href="https://github.com/gdha/k3s-ansible">Ansible k3s-ansible playbook</a></p>
 <p>[2] <a href="https://ma.ttias.be/deploying-highly-available-k3s-k3sup/">Deploying a highly-available K3s with K3sup</a></p>

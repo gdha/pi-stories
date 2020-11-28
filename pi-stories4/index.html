@@ -124,20 +124,17 @@
 <ul>
 <li>Source the completion script in your <code>~/.bashrc</code> file:</li>
 </ul>
-<pre><code class="bash">echo 'source &lt;(kubectl completion bash)' &gt;&gt;~/.bashrc
+<pre><code class="language-bash">echo 'source &lt;(kubectl completion bash)' &gt;&gt;~/.bashrc
 </code></pre>
-
 <ul>
 <li>Add the completion script to the <code>/etc/bash_completion.d</code> directory:</li>
 </ul>
-<pre><code class="bash">kubectl completion bash &gt;/etc/bash_completion.d/kubectl
+<pre><code class="language-bash">kubectl completion bash &gt;/etc/bash_completion.d/kubectl
 </code></pre>
-
 <p>If you have an alias for kubectl, you can extend shell completion to work with that alias:</p>
-<pre><code class="bash">echo 'alias k=kubectl' &gt;&gt;~/.bashrc
+<pre><code class="language-bash">echo 'alias k=kubectl' &gt;&gt;~/.bashrc
 echo 'complete -F __start_kubectl k' &gt;&gt;~/.bashrc
 </code></pre>
-
 <p>Above information come from <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">kubernetes kubectl page</a>. If you are alone then go for the first option, if more users require these autocompletion then go for the latter option.</p>
 <h3 id="kubectl_aliases">Kubectl aliases<a class="headerlink" href="#kubectl_aliases" title="Permanent link">&para;</a></h3>
 <p>Kubectl commands can be long and hard to type over and over again, therefore, why not apply the <a href="https://github.com/ahmetb/kubectl-aliases">kubectl-aliases github project</a>.</p>

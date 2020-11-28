@@ -117,11 +117,10 @@
 <p>As certificates are crucial in a kuberbetes cluster one of the first pods that one should install is <a href="https://cert-manager.io/docs/">cert-manager</a>.</p>
 <h3 id="installling_cert-manager">Installling cert-manager<a class="headerlink" href="#installling_cert-manager" title="Permanent link">&para;</a></h3>
 <p>Installaion is extremelt easy with the following command:</p>
-<pre><code class="bash">kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.4/cert-manager.yaml
+<pre><code class="language-bash">kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.4/cert-manager.yaml
 </code></pre>
-
 <p>In the time of writing this article the current version was v1.0.4 - you can change that to the <a href="https://github.com/jetstack/cert-manager/releases">latest release</a> available of course. Here follows an example of the instalaltion of cert-manager:</p>
-<pre><code class="bash">$ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.4/cert-manager.yaml
+<pre><code class="language-bash">$ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.4/cert-manager.yaml
 customresourcedefinition.apiextensions.k8s.io/certificaterequests.cert-manager.io created
 customresourcedefinition.apiextensions.k8s.io/certificates.cert-manager.io created
 customresourcedefinition.apiextensions.k8s.io/challenges.acme.cert-manager.io created
@@ -162,9 +161,8 @@ deployment.apps/cert-manager-webhook created
 mutatingwebhookconfiguration.admissionregistration.k8s.io/cert-manager-webhook created
 validatingwebhookconfiguration.admissionregistration.k8s.io/cert-manager-webhook created
 </code></pre>
-
 <p>Just after previous command check if the cert-manager pods are created:</p>
-<pre><code class="bash">$ kubectl get pods -A
+<pre><code class="language-bash">$ kubectl get pods -A
 NAMESPACE      NAME                                       READY   STATUS              RESTARTS   AGE
 kube-system    helm-install-traefik-p7jkh                 0/1     Completed           0          49d
 kube-system    metrics-server-7b4f8b595-bldsd             1/1     Running             3          49d
@@ -180,15 +178,13 @@ cert-manager   cert-manager-86548b886-4xrbj               0/1     ContainerCreat
 cert-manager   cert-manager-cainjector-6d59c8d4f7-b2vdc   0/1     ContainerCreating   0          9s
 cert-manager   cert-manager-webhook-578954cdd-lg5m4       0/1     ContainerCreating   0          9s
 </code></pre>
-
 <p>After a minute or so check again with the wide option to see on which worker nodes the cert-managers pods are running:</p>
-<pre><code class="bash">$ kubectl get pods -n cert-manager -o wide
+<pre><code class="language-bash">$ kubectl get pods -n cert-manager -o wide
 NAME                                       READY   STATUS    RESTARTS   AGE   IP           NODE   NOMINATED NODE   READINESS GATES
 cert-manager-cainjector-6d59c8d4f7-b2vdc   1/1     Running   0          21m   10.42.1.17   n5     &lt;none&gt;           &lt;none&gt;
 cert-manager-webhook-578954cdd-lg5m4       1/1     Running   0          21m   10.42.0.19   n1     &lt;none&gt;           &lt;none&gt;
 cert-manager-86548b886-4xrbj               1/1     Running   0          21m   10.42.5.10   n4     &lt;none&gt;           &lt;none&gt;
 </code></pre>
-
 <h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="https://cert-manager.io/docs/">cert-manager documentation</a></li>
