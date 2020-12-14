@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Raspberry Pi 4 YAML everywhere -what about correctness? - Raspberry PI k3s stories</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Raspberry Pi 4 YAML everywhere -what about correctness?";
+    var mkdocs_page_input_path = "pi-stories7.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Raspberry PI k3s stories</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">WELCOME</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">PI4 STORIES</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories/">Raspberry Pi 4 Basic OS Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories2/">Raspberry Pi 4 Prepare for kubernetes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories3/">Raspberry Pi 4 Installing k3s software</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories4/">Raspberry Pi 4 Install awesome kubectl aliases</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories5/">Raspberry Pi 4 Installing cert-manager on our cluster</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories6/">Raspberry Pi 4 Upgrading k3s software on your cluster</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 YAML everywhere -what about correctness?</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_yaml_everywhere_-_what_about_correctness">Raspberry Pi 4 cluster Series - YAML everywhere - what about correctness?</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#installling_the_go_language_binaries">Installling the Go Language binaries</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#compiling_the_kubelinter_code">Compiling the KubeLinter code</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#installing_kube-linter_as_usrlocalbinkube-linter">Installing kube-linter as /usr/local/bin/kube-linter</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#testing_it_out_on_a_real_example">Testing it out on a real example</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Raspberry PI k3s stories</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>PI4 STORIES &raquo;</li>
+        
+      
+    
+    <li>Raspberry Pi 4 YAML everywhere -what about correctness?</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories7.md"> Edit on gdha/pi-stories</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
+<h2 id="raspberry_pi_4_cluster_series_-_yaml_everywhere_-_what_about_correctness">Raspberry Pi 4 cluster Series - YAML everywhere - what about correctness?<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_yaml_everywhere_-_what_about_correctness" title="Permanent link">&para;</a></h2>
+<p>When you dive deep into Kubernetes you will notice you cannot go around <a href="https://blog.stackpath.com/yaml/">YAML</a> [1] language. You hate it or love it, however, you better get used to it as it is part of the core of kubernetes.</p>
+<p>Writing YAML code from scratch is not a real pleasure, therefore, having a linter would be nice to avoid the low hanging fruit errors. We found a kubernetes linter tool called "<a href="https://github.com/stackrox/kube-linter">KubeLinter</a>" written in the Go language, however, there is no binary available for the Raspberry Pi4 architecture aarch64 on the <a href="https://github.com/stackrox/kube-linter/releases">release page of kube-linter</a>.</p>
+<p>Therefore, we decided to build it ourselves from the sources.</p>
+<h3 id="installling_the_go_language_binaries">Installling the Go Language binaries<a class="headerlink" href="#installling_the_go_language_binaries" title="Permanent link">&para;</a></h3>
+<p>On our node <em>n1</em> we installed the Go Language with the commands:</p>
+<pre><code class="language-bash">$ sudo apt  install golang-go
+$ sudo apt install make 
+</code></pre>
+<h3 id="compiling_the_kubelinter_code">Compiling the KubeLinter code<a class="headerlink" href="#compiling_the_kubelinter_code" title="Permanent link">&para;</a></h3>
+<p>Download the code from the <a href="https://github.com/gdha/kube-linter">Kube-Linter Github page</a> and according the "<a href="https://docs.kubelinter.io/#/?id=building-from-source">Building from source</a>" documentation it would be as easy as <code>make build</code> to generate the binary:</p>
+<pre><code class="language-bash">$ git clone git@github.com:gdha/kube-linter.git
+$ cd kube-linter
+$ make build
+...
+all modules verified
++ /home/gdha/projects/kube-linter/.gobin/packr
+go install github.com/gobuffalo/packr/packr
+packr
+Compiling Go source in ./cmd/kube-linter to bin/darwin/kube-linter
+# golang.stackrox.io/kube-linter/cmd/kube-linter
+/usr/lib/go-1.13/pkg/tool/linux_arm64/link: running gcc failed: exit status 1
+/usr/bin/ld: unrecognized -a option `gezero_size'
+collect2: error: ld returned 1 exit status
+
+make: *** [Makefile:100: build] Error 2
+</code></pre>
+<p>As usual it didn't work as expected. Mind the <code>bin/darwin/kube-linter</code> compile line mentions <strong>darwin</strong> and that is not our architecture for RPI4.</p>
+<p>We figured out that by tweaking the <a href="https://github.com/gdha/kube-linter/blob/main/Makefile#L100">Makefile</a> [2] we could build the kube-linter to an executable.</p>
+<h3 id="installing_kube-linter_as_usrlocalbinkube-linter">Installing kube-linter as /usr/local/bin/kube-linter<a class="headerlink" href="#installing_kube-linter_as_usrlocalbinkube-linter" title="Permanent link">&para;</a></h3>
+<p>We update the <a href="https://github.com/gdha/kube-linter/blob/main/Makefile#L134">Makefile</a> with an install rule for our binary so that we do not have to add the PATH to out <code>.bashrc</code> file.</p>
+<p>Just run <code>make install</code> to copy the compiled binary to <code>/usr/local/bin/kube-linter</code>. To verify it works try the command:</p>
+<pre><code class="language-bash">$ kube-linter version
+0.1.4-10-g5c30a676d3-dirty
+</code></pre>
+<h3 id="testing_it_out_on_a_real_example">Testing it out on a real example<a class="headerlink" href="#testing_it_out_on_a_real_example" title="Permanent link">&para;</a></h3>
+<p>In a previous post we discussed and explained the rolling upgrade of the k3s kubernetes software on our pods. [3]</p>
+<p>Therefore, what kind of information will the <code>kube-linter</code> produce on these YAML files?</p>
+<pre><code class="language-bash">$ kube-linter lint ../k3s-upgrade-controller/
+../k3s-upgrade-controller/system-upgrade-controller.yaml: (object: system-upgrade/system-upgrade-controller apps/v1, Kind=Deployment) container &quot;system-upgrade-controller&quot; does not have a read-only root file system (check: no-read-only-root-fs, remediation: Set readOnlyRootFilesystem to true in your container's securityContext.)
+
+../k3s-upgrade-controller/system-upgrade-controller.yaml: (object: system-upgrade/system-upgrade-controller apps/v1, Kind=Deployment) container &quot;system-upgrade-controller&quot; is not set to runAsNonRoot (check: run-as-non-root, remediation: Set runAsUser to a non-zero number, and runAsNonRoot to true, in your pod or container securityContext. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.)
+
+../k3s-upgrade-controller/system-upgrade-controller.yaml: (object: system-upgrade/system-upgrade-controller apps/v1, Kind=Deployment) container &quot;system-upgrade-controller&quot; has cpu request 0 (check: unset-cpu-requirements, remediation: Set your container's CPU requests and limits depending on its requirements. See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
+
+../k3s-upgrade-controller/system-upgrade-controller.yaml: (object: system-upgrade/system-upgrade-controller apps/v1, Kind=Deployment) container &quot;system-upgrade-controller&quot; has cpu limit 0 (check: unset-cpu-requirements, remediation: Set your container's CPU requests and limits depending on its requirements. See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
+
+../k3s-upgrade-controller/system-upgrade-controller.yaml: (object: system-upgrade/system-upgrade-controller apps/v1, Kind=Deployment) container &quot;system-upgrade-controller&quot; has memory request 0 (check: unset-memory-requirements, remediation: Set your container's memory requests and limits depending on its requirements. See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
+
+../k3s-upgrade-controller/system-upgrade-controller.yaml: (object: system-upgrade/system-upgrade-controller apps/v1, Kind=Deployment) container &quot;system-upgrade-controller&quot; has memory limit 0 (check: unset-memory-requirements, remediation: Set your container's memory requests and limits depending on its requirements. See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
+
+Error: found 6 lint errors
+</code></pre>
+<p>The recommendations are perhaps not really perfect for this example as we do need a writable file system to be able to perform an update and <code>root</code> permissions will be required as well. However, the test itself was successful as it produces a meaningfull output.</p>
+<p>For a more profound usage of <code>kube-linter</code> see the "<a href="https://docs.kubelinter.io/#/">KubeLinter documentation</a>" [4].</p>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<p>[1] <a href="https://blog.stackpath.com/yaml/">YAML Ain't Markup Language</a></p>
+<p>[2] <a href="https://github.com/gdha/kube-linter">Kube-Linter GitHub fork</a></p>
+<p>[3] <a href="https://github.com/gdha/k3s-upgrade-controller/blob/main/system-upgrade-controller.yaml">CRD system-upgrade-controller</a></p>
+<p>[4] <a href="https://docs.kubelinter.io/#/">KubeLinter Documenation</a></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../pi-stories6/" class="btn btn-neutral" title="Raspberry Pi 4 Upgrading k3s software on your cluster"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright 2020 - CC0 1.0 Universal</p>
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../pi-stories6/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
