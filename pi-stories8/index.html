@@ -9,7 +9,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Raspberry Pi 4 Install awesome kubectl aliases - Raspberry PI k3s stories</title>
+  <title>Raspberry Pi 4 Keep your Operating System updated - Raspberry PI k3s stories</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -18,8 +18,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Raspberry Pi 4 Install awesome kubectl aliases";
-    var mkdocs_page_input_path = "pi-stories4.md";
+    var mkdocs_page_name = "Raspberry Pi 4 Keep your Operating System updated";
+    var mkdocs_page_input_path = "pi-stories8.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -59,21 +59,7 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../pi-stories3/">Raspberry Pi 4 Installing k3s software</a>
                     </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Install awesome kubectl aliases</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_install_awesome_kubectl_aliases">Raspberry Pi 4 cluster Series - Install awesome kubectl aliases</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#enable_kubectl_autocompletion">Enable kubectl autocompletion</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#kubectl_aliases">Kubectl aliases</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#edit_history">Edit history</a>
-    </li>
-    </ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories4/">Raspberry Pi 4 Install awesome kubectl aliases</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../pi-stories5/">Raspberry Pi 4 Installing cert-manager on our cluster</a>
                     </li>
@@ -81,7 +67,11 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../pi-stories7/">Raspberry Pi 4 YAML everywhere -what about correctness?</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories8/">Raspberry Pi 4 Keep your Operating System updated</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Keep your Operating System updated</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_keep_your_operating_system_updated">Raspberry Pi 4 cluster Series - Keep your Operating System updated</a>
+    </li>
+    </ul>
                     </li>
                 </ul>
       </div>
@@ -109,10 +99,10 @@
         
       
     
-    <li>Raspberry Pi 4 Install awesome kubectl aliases</li>
+    <li>Raspberry Pi 4 Keep your Operating System updated</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories4.md"> Edit on gdha/pi-stories</a>
+        <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories8.md"> Edit on gdha/pi-stories</a>
       
     </li>
   </ul>
@@ -123,34 +113,74 @@
             <div class="section">
               
                 <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
-<h2 id="raspberry_pi_4_cluster_series_-_install_awesome_kubectl_aliases">Raspberry Pi 4 cluster Series - Install awesome kubectl aliases<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_install_awesome_kubectl_aliases" title="Permanent link">&para;</a></h2>
-<p>The article "<a href="https://medium.com/better-programming/awesome-kubernetes-command-line-hacks-8bd3604e394f">Awesome Kubernetes Command-Line Hacks</a>" points out some interesting items to take in account. In summary activate the autocompletion and generate the kubectl aliases to make your life better.</p>
-<h3 id="enable_kubectl_autocompletion">Enable kubectl autocompletion<a class="headerlink" href="#enable_kubectl_autocompletion" title="Permanent link">&para;</a></h3>
-<p>Enable kubectl autocompletion is one of the first things you have to do to make your life a bit easier. There are two ways in which you can do this:</p>
-<ul>
-<li>Source the completion script in your <code>~/.bashrc</code> file:</li>
-</ul>
-<pre><code class="language-bash">echo 'source &lt;(kubectl completion bash)' &gt;&gt;~/.bashrc
+<h2 id="raspberry_pi_4_cluster_series_-_keep_your_operating_system_updated">Raspberry Pi 4 cluster Series - Keep your Operating System updated<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_keep_your_operating_system_updated" title="Permanent link">&para;</a></h2>
+<p>When you login on one of your nodes you often see a message like the following:</p>
+<pre><code class="language-bash">Welcome to Ubuntu 20.04.1 LTS (GNU/Linux 5.4.0-1026-raspi aarch64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Thu 28 Jan 2021 12:05:56 PM CET
+
+  System load:              0.55
+  Usage of /:               18.3% of 28.40GB
+  Memory usage:             14%
+  Swap usage:               0%
+  Temperature:              34.6 C
+  Processes:                157
+  Users logged in:          1
+  IPv4 address for cni0:    10.42.1.1
+  IPv4 address for docker0: 172.17.0.1
+  IPv4 address for eth0:    192.168.0.205
+
+ * Introducing self-healing high availability clusters in MicroK8s.
+   Simple, hardened, Kubernetes for production, from RaspberryPi to DC.
+
+     https://microk8s.io/high-availability
+
+62 updates can be installed immediately.
+0 of these updates are security updates.
+To see these additional updates run: apt list --upgradable
+
+
+Last login: Thu Jan 28 12:01:54 2021 from 192.168.0.41
 </code></pre>
-<ul>
-<li>Add the completion script to the <code>/etc/bash_completion.d</code> directory:</li>
-</ul>
-<pre><code class="language-bash">kubectl completion bash &gt;/etc/bash_completion.d/kubectl
+<p>Pay attention to the amount of packages ready to update:</p>
+<pre><code class="language-bash">See line &quot;62 updates can be installed immediately&quot;
 </code></pre>
-<p>If you have an alias for kubectl, you can extend shell completion to work with that alias:</p>
-<pre><code class="language-bash">echo 'alias k=kubectl' &gt;&gt;~/.bashrc
-echo 'complete -F __start_kubectl k' &gt;&gt;~/.bashrc
+<p>Doing that for a bunch of systems is tiring/boring so let get this done via ansible.
+First we need to download package information from all configured sources.</p>
+<pre><code class="language-bash">$ ansible pi -m shell -b -a &quot;apt update&quot;
+n1 | SUCCESS | rc=0 &gt;&gt;
+Hit:1 http://ports.ubuntu.com/ubuntu-ports focal InRelease
+Get:2 http://ports.ubuntu.com/ubuntu-ports focal-updates InRelease [114 kB]
+Get:3 http://ports.ubuntu.com/ubuntu-ports focal-backports InRelease [101 kB]
+Get:4 http://ports.ubuntu.com/ubuntu-ports focal-security InRelease [109 kB]
+Fetched 324 kB in 2s (187 kB/s)
+Reading package lists...
+Building dependency tree...
+Reading state information...
+49 packages can be upgraded. Run 'apt list --upgradable' to see them.
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+...
+
+n5 | SUCCESS | rc=0 &gt;&gt;
+Hit:1 http://ports.ubuntu.com/ubuntu-ports focal InRelease
+Get:2 http://ports.ubuntu.com/ubuntu-ports focal-updates InRelease [114 kB]
+Get:3 http://ports.ubuntu.com/ubuntu-ports focal-backports InRelease [101 kB]
+Get:4 http://ports.ubuntu.com/ubuntu-ports focal-security InRelease [109 kB]
+Fetched 324 kB in 2s (196 kB/s)
+Reading package lists...
+Building dependency tree...
+Reading state information...
+58 packages can be upgraded. Run 'apt list --upgradable' to see them.
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts
 </code></pre>
-<p>Above information come from <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">kubernetes kubectl page</a>. If you are alone then go for the first option, if more users require these autocompletion then go for the latter option.</p>
-<h3 id="kubectl_aliases">Kubectl aliases<a class="headerlink" href="#kubectl_aliases" title="Permanent link">&para;</a></h3>
-<p>Kubectl commands can be long and hard to type over and over again, therefore, why not apply the <a href="https://github.com/ahmetb/kubectl-aliases">kubectl-aliases github project</a>.</p>
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
-<p>[1] <a href="https://medium.com/better-programming/awesome-kubernetes-command-line-hacks-8bd3604e394f">Awesome Kubernetes Command-Line Hacks</a></p>
-<p>[2] <a href="https://github.com/ahmetb/kubectl-aliases">kubectl-aliases GitHub Source</a></p>
-<h2 id="edit_history">Edit history<a class="headerlink" href="#edit_history" title="Permanent link">&para;</a></h2>
-<ul>
-<li>initial post on 30/Sep/2020</li>
-</ul>
+<p>And, finally, to automate the installation of the packages:</p>
+<pre><code class="language-bash">$ ansible pi -m shell -b -a &quot;apt --yes upgrade&quot;
+</code></pre>
               
             </div>
           </div>
@@ -158,10 +188,8 @@ echo 'complete -F __start_kubectl k' &gt;&gt;~/.bashrc
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../pi-stories5/" class="btn btn-neutral float-right" title="Raspberry Pi 4 Installing cert-manager on our cluster">Next <span class="icon icon-circle-arrow-right"></span></a>
       
-      
-        <a href="../pi-stories3/" class="btn btn-neutral" title="Raspberry Pi 4 Installing k3s software"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../pi-stories7/" class="btn btn-neutral" title="Raspberry Pi 4 YAML everywhere -what about correctness?"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -189,10 +217,8 @@ echo 'complete -F __start_kubectl k' &gt;&gt;~/.bashrc
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../pi-stories3/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../pi-stories7/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
-      
-        <span style="margin-left: 15px"><a href="../pi-stories5/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
