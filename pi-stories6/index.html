@@ -426,8 +426,8 @@ node/n4 labeled
 node/n3 labeled
 </code></pre>
 <p>If we want to upgrade again just edit the plan [4]  again with the correct version of k3s and replace the plan with the command:</p>
-<p><code>`bash
-$ kubectl replace -f ./k3s-upgrade-plan.yaml</code></p>
+<pre><code class="language-bash">$ kubectl replace -f ./k3s-upgrade-plan.yaml
+</code></pre>
 <p>To start the k3s version upgrade overwrite the label k3s-upgrade again with keyword <em>enabled</em>.</p>
 <h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <p>[1] <a href="https://support.rancher.com/hc/en-us/articles/360052567151-Rancher-Operational-Advisory-Attention-All-Rancher-K3s-Customers-DB-bug-requires-upgrade#are-you-running-k3s-clusters-if-so-please-read-further-0-0">Rancher Operational Advisory: Attention All Rancher K3s Customers, DB bug requires upgrade</a></p>
