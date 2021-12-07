@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Raspberry Pi 4 Issues after upgrading k3s - Raspberry PI k3s stories</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Raspberry Pi 4 Issues after upgrading k3s";
+    var mkdocs_page_input_path = "pi-stories10.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Raspberry PI k3s stories</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">WELCOME</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">PI4 STORIES</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories1/">Raspberry Pi 4 Basic OS Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories2/">Raspberry Pi 4 Prepare for kubernetes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories3/">Raspberry Pi 4 Installing k3s software</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories4/">Raspberry Pi 4 Install awesome kubectl aliases</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories5/">Raspberry Pi 4 Installing cert-manager on our cluster</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories6/">Raspberry Pi 4 Upgrading k3s software on your cluster</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories7/">Raspberry Pi 4 YAML everywhere -what about correctness?</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories8/">Raspberry Pi 4 Keep your Operating System updated</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pi-stories9/">Raspberry Pi 4 Installation of Longhorn</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Issues after upgrading k3s</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_issues_after_upgrading_k3s">Raspberry Pi 4 cluster Series - Issues after upgrading k3s</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#fixing_the_cert-manager_issue">Fixing the cert-manager issue</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#references">References</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Raspberry PI k3s stories</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>PI4 STORIES &raquo;</li>
+        
+      
+    
+    <li>Raspberry Pi 4 Issues after upgrading k3s</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories10.md"> Edit on gdha/pi-stories</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
+<h2 id="raspberry_pi_4_cluster_series_-_issues_after_upgrading_k3s">Raspberry Pi 4 cluster Series - Issues after upgrading k3s<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_issues_after_upgrading_k3s" title="Permanent link">&para;</a></h2>
+<p>We upgrade our k3s version v1.20.4+k3s1 to v1.22.4+k3s1 according the procedure ligned out in [1].</p>
+<p>However, we noticed that after the k3s upgrade their where some issues with our cluster as seen with command <code>kubectl get pods -A</code></p>
+<ul>
+<li>cert-manager      cert-manager-cainjector-6d59c8d4f7-hjszd                          0/1     CrashLoopBackOff    39 (102s ago)   270d</li>
+<li>longhorn-system   longhorn-driver-deployer-666c84fbb7-2lqqm                         0/1     CrashLoopBackOff    43 (3m13s ago)   3h28m</li>
+<li>graphite          graphite-0                                                        0/1     ContainerCreating   0                167m</li>
+</ul>
+<h3 id="fixing_the_cert-manager_issue">Fixing the cert-manager issue<a class="headerlink" href="#fixing_the_cert-manager_issue" title="Permanent link">&para;</a></h3>
+<p>The first thing you need to do when you have issues with apod is looking at the logs, therefore, we execute the following:</p>
+<pre><code class="language-bash">$ k logs -n cert-manager cert-manager-cainjector-6d59c8d4f7-hjszd
+I1207 13:08:09.495826       1 start.go:89] &quot;starting&quot; version=&quot;v1.0.4&quot; revision=&quot;4d870e49b43960fad974487a262395e65da1373e&quot;
+I1207 13:08:11.316015       1 request.go:645] Throttling request took 1.036581941s, request: GET:https://10.43.0.1:443/apis/admissionregistration.k8s.io/v1?timeout=32s
+I1207 13:08:12.316195       1 request.go:645] Throttling request took 2.035257813s, request: GET:https://10.43.0.1:443/apis/node.k8s.io/v1beta1?timeout=32s
+E1207 13:08:12.325362       1 start.go:158] cert-manager/ca-injector &quot;msg&quot;=&quot;error registering core-only controllers&quot; &quot;error&quot;=&quot;no matches for kind \&quot;MutatingWebhookConfiguration\&quot; in version \&quot;admissionregistration.k8s.io/v1beta1\&quot;&quot;
+</code></pre>
+<p>From above output we can see that the cert-manager version is v1.0.4. The best thing to do is going to see the documentation [2] of cert-manager whether there are known issues or other items of interest. At the page [2] we read the following sentence "Following their deprecation in version 1.4, the cert-manager API versions v1alpha2, v1alpha3, and v1beta1 are no longer served." - okay - we need to upgrade cert-manager to fix this.</p>
+<p>We did found an excellent article [3] that serverd our purposes. We simply have to look at the GitHub page of cert-manager releases [4] to find the latest stable version of cert-manager (today 07 December 2021 it was v1.6.1).</p>
+<p>Then we just downloaded the yaml file of cert-manager for arm (as this is a pi cluster) with a simple trick described oon [3]:</p>
+<pre><code class="language-bash">curl -sL \
+https://github.com/jetstack/cert-manager/releases/download/v1.6.1/cert-manager.yaml |\
+sed -r 's/(image:.*):(v.*)$/\1-arm:\2/g' &gt; cert-manager-arm.yaml
+</code></pre>
+<p>Finally, we can upgrade our cert-manager pods with the command:</p>
+<pre><code class="language-bash">$ kubectl replace -f cert-manager-arm.yaml
+customresourcedefinition.apiextensions.k8s.io/certificaterequests.cert-manager.io replaced
+customresourcedefinition.apiextensions.k8s.io/certificates.cert-manager.io replaced
+customresourcedefinition.apiextensions.k8s.io/challenges.acme.cert-manager.io replaced
+customresourcedefinition.apiextensions.k8s.io/clusterissuers.cert-manager.io replaced
+customresourcedefinition.apiextensions.k8s.io/issuers.cert-manager.io replaced
+customresourcedefinition.apiextensions.k8s.io/orders.acme.cert-manager.io replaced
+namespace/cert-manager replaced
+serviceaccount/cert-manager-cainjector replaced
+serviceaccount/cert-manager replaced
+serviceaccount/cert-manager-webhook replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-cainjector replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-issuers replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-clusterissuers replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-certificates replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-orders replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-challenges replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-ingress-shim replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-view replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-edit replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-approve:cert-manager-io replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-certificatesigningrequests replaced
+clusterrole.rbac.authorization.k8s.io/cert-manager-webhook:subjectaccessreviews replaced
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-cainjector replaced
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-issuers replaced
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-clusterissuers replaced
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-certificates replaced
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-orders replaced
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-challenges replaced
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-ingress-shim replaced
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-approve:cert-manager-io replaced
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-certificatesigningrequests replaced
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-webhook:subjectaccessreviews replaced
+role.rbac.authorization.k8s.io/cert-manager-cainjector:leaderelection replaced
+role.rbac.authorization.k8s.io/cert-manager:leaderelection replaced
+role.rbac.authorization.k8s.io/cert-manager-webhook:dynamic-serving replaced
+rolebinding.rbac.authorization.k8s.io/cert-manager-cainjector:leaderelection replaced
+rolebinding.rbac.authorization.k8s.io/cert-manager:leaderelection replaced
+rolebinding.rbac.authorization.k8s.io/cert-manager-webhook:dynamic-serving replaced
+service/cert-manager replaced
+service/cert-manager-webhook replaced
+deployment.apps/cert-manager-cainjector replaced
+deployment.apps/cert-manager replaced
+deployment.apps/cert-manager-webhook replaced
+mutatingwebhookconfiguration.admissionregistration.k8s.io/cert-manager-webhook replaced
+validatingwebhookconfiguration.admissionregistration.k8s.io/cert-manager-webhook replaced
+
+$ kubectl get pods -n cert-manager
+NAME                                       READY   STATUS    RESTARTS   AGE
+cert-manager-5d4dc99cfc-mfmrp              1/1     Running   0          161m
+cert-manager-cainjector-598fcd9fdd-sn9cs   1/1     Running   0          161m
+cert-manager-webhook-746ff5ffb9-wmnvp      1/1     Running   0          161m
+</code></pre>
+<h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
+<p>[1] <a href="https://gdha.github.io/pi-stories/pi-stories6/">Raspberry Pi 4 cluster Series - Upgrading k3s software on your cluster</a></p>
+<p>[2] <a href="https://cert-manager.io/docs/installation/upgrading/remove-deprecated-apis/">Removing Deprecated API Resources in cert-manager</a></p>
+<p>[3] <a href="https://bryanbende.com/development/2021/07/01/k3s-raspberry-pi-cert-manager">K3s on Raspberry Pi - cert-manager</a></p>
+<p>[4] <a href="https://github.com/jetstack/cert-manager/releases">GitHub Cert-manager release page</a></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../pi-stories9/" class="btn btn-neutral" title="Raspberry Pi 4 Installation of Longhorn"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright 2021 - CC0 1.0 Universal</p>
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../pi-stories9/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
