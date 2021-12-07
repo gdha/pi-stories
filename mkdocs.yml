@@ -4,7 +4,7 @@ docs_dir: docs/
 site_dir: site/
 repo_name: 'gdha/pi-stories'
 repo_url: 'https://github.com/gdha/pi-stories'
-copyright: 'Copyright 2020 - CC0 1.0 Universal'
+copyright: 'Copyright 2021 - CC0 1.0 Universal'
 
 theme:
   name: 'readthedocs'
@@ -24,3 +24,6 @@ nav:
     - 'Raspberry Pi 4 YAML everywhere -what about correctness?': 'pi-stories7.md'
     - 'Raspberry Pi 4 Keep your Operating System updated': 'pi-stories8.md'
     - 'Raspberry Pi 4 Installation of Longhorn': 'pi-stories9.md'
+    - 'Raspberry Pi 4 Issues after upgrading k3s': 'pi-stories10.md'
+
+
