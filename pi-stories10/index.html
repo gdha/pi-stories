@@ -133,7 +133,7 @@
 </ul>
 <h3 id="fixing_the_cert-manager_issue">Fixing the cert-manager issue<a class="headerlink" href="#fixing_the_cert-manager_issue" title="Permanent link">&para;</a></h3>
 <p>The first thing you need to do when you have issues with apod is looking at the logs, therefore, we execute the following:</p>
-<pre><code class="language-bash">$ k logs -n cert-manager cert-manager-cainjector-6d59c8d4f7-hjszd
+<pre><code class="language-bash">$ kubectl logs -n cert-manager cert-manager-cainjector-6d59c8d4f7-hjszd
 I1207 13:08:09.495826       1 start.go:89] &quot;starting&quot; version=&quot;v1.0.4&quot; revision=&quot;4d870e49b43960fad974487a262395e65da1373e&quot;
 I1207 13:08:11.316015       1 request.go:645] Throttling request took 1.036581941s, request: GET:https://10.43.0.1:443/apis/admissionregistration.k8s.io/v1?timeout=32s
 I1207 13:08:12.316195       1 request.go:645] Throttling request took 2.035257813s, request: GET:https://10.43.0.1:443/apis/node.k8s.io/v1beta1?timeout=32s
@@ -142,8 +142,10 @@ E1207 13:08:12.325362       1 start.go:158] cert-manager/ca-injector &quot;msg&q
 <p>From above output we can see that the cert-manager version is v1.0.4. The best thing to do is going to see the documentation [2] of cert-manager whether there are known issues or other items of interest. At the page [2] we read the following sentence "Following their deprecation in version 1.4, the cert-manager API versions v1alpha2, v1alpha3, and v1beta1 are no longer served." - okay - we need to upgrade cert-manager to fix this.</p>
 <p>We did found an excellent article [3] that serverd our purposes. We simply have to look at the GitHub page of cert-manager releases [4] to find the latest stable version of cert-manager (today 07 December 2021 it was v1.6.1).</p>
 <p>Then we just downloaded the yaml file of cert-manager for arm (as this is a pi cluster) with a simple trick described oon [3]:</p>
-<pre><code class="language-bash">curl -sL \
-https://github.com/jetstack/cert-manager/releases/download/v1.6.1/cert-manager.yaml |\
+<pre><code class="language-bash">VER=$(curl -s &quot;https://github.com/jetstack/cert-manager/releases/latest&quot; | cut -d\&quot; -f2 | awk -F '/' '{print $NF}')
+
+curl -sL \
+https://github.com/jetstack/cert-manager/releases/download/${VER}/cert-manager.yaml |\
 sed -r 's/(image:.*):(v.*)$/\1-arm:\2/g' &gt; cert-manager-arm.yaml
 </code></pre>
 <p>Finally, we can upgrade our cert-manager pods with the command:</p>
