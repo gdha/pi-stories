@@ -15,7 +15,7 @@ However, we noticed that after the k3s upgrade their where some issues with our 
 The first thing you need to do when you have issues with apod is looking at the logs, therefore, we execute the following:
 
 ```bash
-$ k logs -n cert-manager cert-manager-cainjector-6d59c8d4f7-hjszd
+$ kubectl logs -n cert-manager cert-manager-cainjector-6d59c8d4f7-hjszd
 I1207 13:08:09.495826       1 start.go:89] "starting" version="v1.0.4" revision="4d870e49b43960fad974487a262395e65da1373e"
 I1207 13:08:11.316015       1 request.go:645] Throttling request took 1.036581941s, request: GET:https://10.43.0.1:443/apis/admissionregistration.k8s.io/v1?timeout=32s
 I1207 13:08:12.316195       1 request.go:645] Throttling request took 2.035257813s, request: GET:https://10.43.0.1:443/apis/node.k8s.io/v1beta1?timeout=32s
@@ -29,8 +29,10 @@ We did found an excellent article [3] that serverd our purposes. We simply have 
 Then we just downloaded the yaml file of cert-manager for arm (as this is a pi cluster) with a simple trick described oon [3]:
 
 ```bash
+VER=$(curl -s "https://github.com/jetstack/cert-manager/releases/latest" | cut -d\" -f2 | awk -F '/' '{print $NF}')
+
 curl -sL \
-https://github.com/jetstack/cert-manager/releases/download/v1.6.1/cert-manager.yaml |\
+https://github.com/jetstack/cert-manager/releases/download/${VER}/cert-manager.yaml |\
 sed -r 's/(image:.*):(v.*)$/\1-arm:\2/g' > cert-manager-arm.yaml
 ```
 
