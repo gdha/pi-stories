@@ -50,6 +50,18 @@ deployment.apps/system-upgrade-controller   1/1     1            1           17s
 NAME                                                   DESIRED   CURRENT   READY   AGE
 replicaset.apps/system-upgrade-controller-556df575dd   1         1         1       18s
 ```
+
+### How to Upgrade the CRD
+
+```bash
+$ curl -s "https://api.github.com/repos/rancher/system-upgrade-controller/releases/latest" | awk -F '"' '/tag_name/{print $4}'
+v0.9.1
+
+$ wget https://raw.githubusercontent.com/rancher/system-upgrade-controller/v0.9.1/manifests/system-upgrade-controller.yaml
+
+$ kubectl replace -f ./system-upgrade-controller.yaml
+```
+
 ## Making a k3s upgrade plan
 
 Before making a plan we need to decide to which k3s version we need to upgrade, therefore, check out the [GitHub release page of k3s](https://github.com/rancher/k3s/releases). The latest release of this writing was v1.19.4+k3s1 (30 November 2020).
