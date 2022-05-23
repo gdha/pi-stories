@@ -25,5 +25,6 @@ nav:
     - 'Raspberry Pi 4 Keep your Operating System updated': 'pi-stories8.md'
     - 'Raspberry Pi 4 Installation of Longhorn': 'pi-stories9.md'
     - 'Raspberry Pi 4 Issues after upgrading k3s': 'pi-stories10.md'
+    - 'Raspberry Pi 4 Replacing internal traefik with Metallb': 'pi-stories11.md'
 
 
