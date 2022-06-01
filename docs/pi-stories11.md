@@ -76,8 +76,36 @@ config:
 
 To see IP assignments, try `kubectl get services`.
 ```
+To verify if our IP range was properly accepted by our helm command we could run:
 
-To verify the load-balancer is working we could execute:
+```bash
+$ kubectl get configmap metallb -n kube-system -o yaml
+apiVersion: v1
+data:
+  config: |
+    address-pools:
+    - addresses:
+      - 192.168.0.240-192.168.0.250
+      name: default
+      protocol: layer2
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: metallb
+    meta.helm.sh/release-namespace: kube-system
+  creationTimestamp: "2022-05-23T10:38:34Z"
+  labels:
+    app.kubernetes.io/instance: metallb
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: metallb
+    app.kubernetes.io/version: v0.12.1
+    helm.sh/chart: metallb-0.12.1
+  name: metallb
+  namespace: kube-system
+  resourceVersion: "3256248"
+  uid: 774b05a7-7ad7-4de3-a9e1-2a636f988ed1
+```
+Where we can see clearly the IP range was accepted, and to verify the load-balancer is working we could execute [4]:
 
 ```bash
 $ kubectl get svc -n ingress-nginx
@@ -86,7 +114,14 @@ ingress-nginx-controller-admission   ClusterIP      10.43.197.96    <none>      
 ingress-nginx-controller             LoadBalancer   10.43.159.135   192.168.0.240   80:31719/TCP,443:32502/TCP   11d
 ```
 
-Okay, so far so good.
+Okay, so far so good. However, is the external IP address of our ingress-nginx-controller really open for a connection? To test execute:
+
+```bash
+$ nc -vz 192.168.0.240 80
+Connection to 192.168.0.240 80 port [tcp/http] succeeded!
+$ nc -vz 192.168.0.240 443
+Connection to 192.168.0.240 443 port [tcp/https] succeeded!
+```
 
 ### Install traefik2 as replacement for the internal traefik of k3s
 
@@ -168,3 +203,4 @@ Now, we are ready to do some more tests with our new load-balancer and traefik.
 
 [3] [Configuring Traefik 2 Ingress for Kubernetes](https://techno-tim.github.io/posts/k3s-traefik-rancher/)
 
+[4] [Kube by example - metallb](https://kubebyexample.com/en/learning-paths/metallb/intro)
