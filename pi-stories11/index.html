@@ -170,13 +170,45 @@ config:
 
 To see IP assignments, try `kubectl get services`.
 </code></pre>
-<p>To verify the load-balancer is working we could execute:</p>
+<p>To verify if our IP range was properly accepted by our helm command we could run:</p>
+<pre><code class="language-bash">$ kubectl get configmap metallb -n kube-system -o yaml
+apiVersion: v1
+data:
+  config: |
+    address-pools:
+    - addresses:
+      - 192.168.0.240-192.168.0.250
+      name: default
+      protocol: layer2
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: metallb
+    meta.helm.sh/release-namespace: kube-system
+  creationTimestamp: &quot;2022-05-23T10:38:34Z&quot;
+  labels:
+    app.kubernetes.io/instance: metallb
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: metallb
+    app.kubernetes.io/version: v0.12.1
+    helm.sh/chart: metallb-0.12.1
+  name: metallb
+  namespace: kube-system
+  resourceVersion: &quot;3256248&quot;
+  uid: 774b05a7-7ad7-4de3-a9e1-2a636f988ed1
+</code></pre>
+<p>Where we can see clearly the IP range was accepted, and to verify the load-balancer is working we could execute [4]:</p>
 <pre><code class="language-bash">$ kubectl get svc -n ingress-nginx
 NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)                      AGE
 ingress-nginx-controller-admission   ClusterIP      10.43.197.96    &lt;none&gt;          443/TCP                      11d
 ingress-nginx-controller             LoadBalancer   10.43.159.135   192.168.0.240   80:31719/TCP,443:32502/TCP   11d
 </code></pre>
-<p>Okay, so far so good.</p>
+<p>Okay, so far so good. However, is the external IP address of our ingress-nginx-controller really open for a connection? To test execute:</p>
+<pre><code class="language-bash">$ nc -vz 192.168.0.240 80
+Connection to 192.168.0.240 80 port [tcp/http] succeeded!
+$ nc -vz 192.168.0.240 443
+Connection to 192.168.0.240 443 port [tcp/https] succeeded!
+</code></pre>
 <h3 id="install_traefik2_as_replacement_for_the_internal_traefik_of_k3s">Install traefik2 as replacement for the internal traefik of k3s<a class="headerlink" href="#install_traefik2_as_replacement_for_the_internal_traefik_of_k3s" title="Permanent link">&para;</a></h3>
 <p>Execute the following commands:</p>
 <pre><code class="language-bash">$ helm repo add traefik https://helm.traefik.io/traefik
@@ -233,6 +265,7 @@ Now, we are ready to do some more tests with our new load-balancer and traefik.<
 <p>[1] <a href="https://metallb.universe.tf/installation/">Metallb</a></p>
 <p>[2] <a href="https://www.fullstaq.com/knowledge-hub/blogs/setting-up-your-own-k3s-home-cluster">Setting up your own k3s home cluster</a></p>
 <p>[3] <a href="https://techno-tim.github.io/posts/k3s-traefik-rancher/">Configuring Traefik 2 Ingress for Kubernetes</a></p>
+<p>[4] <a href="https://kubebyexample.com/en/learning-paths/metallb/intro">Kube by example - metallb</a></p>
               
             </div>
           </div><footer>
