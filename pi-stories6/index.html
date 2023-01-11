@@ -164,7 +164,7 @@ n1     Ready    master   117d   v1.19.2+k3s1
 <p>Here we see that node <em>n1</em> was already labelled 'master', however, if that was not yet the case we could realize this by:</p>
 <pre><code class="language-bash">kubectl label node n1 node-role.kubernetes.io/master=true
 </code></pre>
-<p>Edit the plan to update the k3s version (See variable $VERSION): <code>vi ./k3s-upgrade-plan.yaml</code></p>
+<p>Edit the plan to update the k3s version (use latest stable release found on <a href="https://github.com/rancher/k3s/releases">GitHub release page of k3s</a>): <code>vi ./k3s-upgrade-plan.yaml</code></p>
 <p>Apply the plan:</p>
 <pre><code class="language-bash">$ kubectl apply -f ./k3s-upgrade-plan.yaml 
 plan.upgrade.cattle.io/k3s-server created
