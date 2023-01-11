@@ -121,12 +121,12 @@ n5     Ready    &lt;none&gt;   117d   v1.19.2+k3s1
 </code></pre>
 <h2 id="crd_installation">CRD installation<a class="headerlink" href="#crd_installation" title="Permanent link">&para;</a></h2>
 <p>We will follow the procedure described in [2] and are required first to install a kubernetes Custom Resource Definition (CRD) [3] followed by creating a Plan.</p>
-<p>To find the latest version of the system upgrade controller use the following command:</p>
-<pre><code class="language-bash">curl -s &quot;https://api.github.com/repos/rancher/system-upgrade-controller/releases/latest&quot; | awk -F '&quot;' '/tag_name/{print $4}'
-v0.6.2
+<p>To find the latest version of the system upgrade controller use the following command (sources of Rancher [6]):</p>
+<pre><code class="language-bash">VERSION=$(curl -s &quot;https://api.github.com/repos/rancher/system-upgrade-controller/releases/latest&quot; | awk -F '&quot;' '/tag_name/{print $4}')
+echo $VERSION
 </code></pre>
 <p>To download the CRD locally run the following command:</p>
-<pre><code class="language-bash">$ wget https://raw.githubusercontent.com/rancher/system-upgrade-controller/v0.6.2/manifests/system-upgrade-controller.yaml
+<pre><code class="language-bash">$ wget https://raw.githubusercontent.com/rancher/system-upgrade-controller/${VERSION}/manifests/system-upgrade-controller.yaml
 </code></pre>
 <p>Now get it applied by:</p>
 <pre><code class="language-bash">$ kubectl apply -f ./system-upgrade-controller.yaml 
@@ -147,10 +147,10 @@ NAME                                                   DESIRED   CURRENT   READY
 replicaset.apps/system-upgrade-controller-556df575dd   1         1         1       18s
 </code></pre>
 <h3 id="how_to_upgrade_the_crd">How to Upgrade the CRD<a class="headerlink" href="#how_to_upgrade_the_crd" title="Permanent link">&para;</a></h3>
-<pre><code class="language-bash">$ curl -s &quot;https://api.github.com/repos/rancher/system-upgrade-controller/releases/latest&quot; | awk -F '&quot;' '/tag_name/{print $4}'
-v0.9.1
+<pre><code class="language-bash">VERSION=$(curl -s &quot;https://api.github.com/repos/rancher/system-upgrade-controller/releases/latest&quot; | awk -F '&quot;' '/tag_name/{print $4}')
+echo $VERSION
 
-$ wget https://raw.githubusercontent.com/rancher/system-upgrade-controller/v0.9.1/manifests/system-upgrade-controller.yaml
+$ wget https://raw.githubusercontent.com/rancher/system-upgrade-controller/${VERSION}/manifests/system-upgrade-controller.yaml
 
 $ kubectl replace -f ./system-upgrade-controller.yaml
 </code></pre>
@@ -164,6 +164,7 @@ n1     Ready    master   117d   v1.19.2+k3s1
 <p>Here we see that node <em>n1</em> was already labelled 'master', however, if that was not yet the case we could realize this by:</p>
 <pre><code class="language-bash">kubectl label node n1 node-role.kubernetes.io/master=true
 </code></pre>
+<p>Edit the plan to update the k3s version (See variable $VERSION): <code>vi ./k3s-upgrade-plan.yaml</code></p>
 <p>Apply the plan:</p>
 <pre><code class="language-bash">$ kubectl apply -f ./k3s-upgrade-plan.yaml 
 plan.upgrade.cattle.io/k3s-server created
@@ -433,6 +434,7 @@ node/n3 labeled
 <p>[3] <a href="https://github.com/gdha/k3s-upgrade-controller/blob/main/system-upgrade-controller.yaml">CRD system-upgrade-controller</a></p>
 <p>[4] <a href="https://github.com/gdha/k3s-upgrade-controller/blob/main/k3s-upgrade-plan.yaml">k3s Upgrade Plan</a></p>
 <p>[5] <a href="https://github.com/gdha/k3s-upgrade-controller">GitHub Sources of our k3s upgrade controller</a></p>
+<p>[6] <a href="https://github.com/rancher/system-upgrade-controller">GitHub rancher/system-upgrade-controller</a></p>
               
             </div>
           </div><footer>
