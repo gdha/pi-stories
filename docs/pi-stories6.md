@@ -80,7 +80,7 @@ Here we see that node *n1* was already labelled 'master', however, if that was n
 kubectl label node n1 node-role.kubernetes.io/master=true
 ```
 
-Edit the plan to update the k3s version (See variable $VERSION): `vi ./k3s-upgrade-plan.yaml`
+Edit the plan to update the k3s version (use latest stable release found on [GitHub release page of k3s](https://github.com/rancher/k3s/releases)): `vi ./k3s-upgrade-plan.yaml`
 
 Apply the plan:
 
