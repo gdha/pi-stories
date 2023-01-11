@@ -17,17 +17,17 @@ n5     Ready    <none>   117d   v1.19.2+k3s1
 
 We will follow the procedure described in [2] and are required first to install a kubernetes Custom Resource Definition (CRD) [3] followed by creating a Plan.
 
-To find the latest version of the system upgrade controller use the following command:
+To find the latest version of the system upgrade controller use the following command (sources of Rancher [6]):
 
 ```bash
-curl -s "https://api.github.com/repos/rancher/system-upgrade-controller/releases/latest" | awk -F '"' '/tag_name/{print $4}'
-v0.6.2
+VERSION=$(curl -s "https://api.github.com/repos/rancher/system-upgrade-controller/releases/latest" | awk -F '"' '/tag_name/{print $4}')
+echo $VERSION
 ```
 
 To download the CRD locally run the following command:
 
 ```bash
-$ wget https://raw.githubusercontent.com/rancher/system-upgrade-controller/v0.6.2/manifests/system-upgrade-controller.yaml
+$ wget https://raw.githubusercontent.com/rancher/system-upgrade-controller/${VERSION}/manifests/system-upgrade-controller.yaml
 ```
 
 Now get it applied by:
@@ -54,10 +54,10 @@ replicaset.apps/system-upgrade-controller-556df575dd   1         1         1    
 ### How to Upgrade the CRD
 
 ```bash
-$ curl -s "https://api.github.com/repos/rancher/system-upgrade-controller/releases/latest" | awk -F '"' '/tag_name/{print $4}'
-v0.9.1
+VERSION=$(curl -s "https://api.github.com/repos/rancher/system-upgrade-controller/releases/latest" | awk -F '"' '/tag_name/{print $4}')
+echo $VERSION
 
-$ wget https://raw.githubusercontent.com/rancher/system-upgrade-controller/v0.9.1/manifests/system-upgrade-controller.yaml
+$ wget https://raw.githubusercontent.com/rancher/system-upgrade-controller/${VERSION}/manifests/system-upgrade-controller.yaml
 
 $ kubectl replace -f ./system-upgrade-controller.yaml
 ```
@@ -79,6 +79,8 @@ Here we see that node *n1* was already labelled 'master', however, if that was n
 ```bash
 kubectl label node n1 node-role.kubernetes.io/master=true
 ```
+
+Edit the plan to update the k3s version (See variable $VERSION): `vi ./k3s-upgrade-plan.yaml`
 
 Apply the plan:
 
@@ -377,3 +379,6 @@ To start the k3s version upgrade overwrite the label k3s-upgrade again with keyw
 [4] [k3s Upgrade Plan](https://github.com/gdha/k3s-upgrade-controller/blob/main/k3s-upgrade-plan.yaml)
 
 [5] [GitHub Sources of our k3s upgrade controller](https://github.com/gdha/k3s-upgrade-controller)
+
+[6] [GitHub rancher/system-upgrade-controller](https://github.com/rancher/system-upgrade-controller)
+
