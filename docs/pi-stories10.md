@@ -93,6 +93,10 @@ cert-manager-cainjector-598fcd9fdd-sn9cs   1/1     Running   0          161m
 cert-manager-webhook-746ff5ffb9-wmnvp      1/1     Running   0          161m
 ```
 
+### Fixing longhorn
+
+The easiest way to fix longhorn is to remove and do a fresh install [5].
+
 ### References
 
 [1] [Raspberry Pi 4 cluster Series - Upgrading k3s software on your cluster](https://gdha.github.io/pi-stories/pi-stories6/)
@@ -102,3 +106,11 @@ cert-manager-webhook-746ff5ffb9-wmnvp      1/1     Running   0          161m
 [3] [K3s on Raspberry Pi - cert-manager](https://bryanbende.com/development/2021/07/01/k3s-raspberry-pi-cert-manager)
 
 [4] [GitHub Cert-manager release page](https://github.com/jetstack/cert-manager/releases)
+
+[5] [Installation of longhorn](https://gdha.github.io/pi-stories/pi-stories9/)
+
+
+### Edit history
+
+- Added "Fixing longhorn" (24/Jan/2023)
+
