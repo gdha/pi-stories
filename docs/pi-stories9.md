@@ -152,7 +152,7 @@ Events:       <none>
 ```
 ### Use the longhorn UI
 
-In previous command we saw that the IP address where the longhorn-ingress is running is in our case 192.168.0.201 and to test the connectivity we can use `curl`:
+As we have setup metallb with traefik [5] the longhorn-ingress is running is now available at IP address 192.168.0.230 and to test the connectivity we can use `curl`:
 
 ```bash
 $ curl -v 192.168.0.230:80
@@ -230,6 +230,7 @@ And, the details of one node:
 
 [4] [Accessing Loghorn through UI](https://longhorn.io/docs/1.1.0/deploy/accessing-the-ui/longhorn-ingress/)
 
+[5] [Replacing internal traefik with Metallb](https://gdha.github.io/pi-stories/pi-stories11/)
 
 ### Edit history
 
