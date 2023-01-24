@@ -10,7 +10,7 @@ Installaion is extremelt easy with the following command:
 ```bash
 kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
 ```
-In the time of writing this article the current version was v1.0.4 - you can change that to the [latest release](https://github.com/jetstack/cert-manager/releases) available of course. Here follows an example of the instalaltion of cert-manager:
+In the time of writing this article the current version was v1.11.0 - you can change that to the [latest release](https://github.com/jetstack/cert-manager/releases) available of course. Here follows an example of the instalaltion of cert-manager:
 
 ```bash
 gdha@n1:~$ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
@@ -96,6 +96,6 @@ cert-manager-86548b886-4xrbj               1/1     Running   0          21m   10
  - [cert-manager documentation](https://cert-manager.io/docs/)
  - [cert-manager sources](https://github.com/jetstack/cert-manager)
 
-### Last updates
+### Edit history
 
 - 24/Jan/2023: update with the installation of version v1.11.0
