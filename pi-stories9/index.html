@@ -244,7 +244,7 @@ Annotations:  nginx.ingress.kubernetes.io/auth-realm: Authentication Required
 Events:       &lt;none&gt;
 </code></pre>
 <h3 id="use_the_longhorn_ui">Use the longhorn UI<a class="headerlink" href="#use_the_longhorn_ui" title="Permanent link">&para;</a></h3>
-<p>In previous command we saw that the IP address where the longhorn-ingress is running is in our case 192.168.0.201 and to test the connectivity we can use <code>curl</code>:</p>
+<p>As we have setup metallb with traefik [5] the longhorn-ingress is running is now available at IP address 192.168.0.230 and to test the connectivity we can use <code>curl</code>:</p>
 <pre><code class="language-bash">$ curl -v 192.168.0.230:80
 *   Trying 192.168.0.230:80...
 * TCP_NODELAY set
@@ -308,6 +308,7 @@ Events:       &lt;none&gt;
 <p>[2] <a href="https://longhorn.io/">Longhorn</a></p>
 <p>[3] <a href="https://longhorn.io/docs/1.1.0/advanced-resources/default-disk-and-node-config/">Adding Node Tags to New Nodes</a></p>
 <p>[4] <a href="https://longhorn.io/docs/1.1.0/deploy/accessing-the-ui/longhorn-ingress/">Accessing Loghorn through UI</a></p>
+<p>[5] <a href="https://gdha.github.io/pi-stories/pi-stories11/">Replacing internal traefik with Metallb</a></p>
 <h3 id="edit_history">Edit history<a class="headerlink" href="#edit_history" title="Permanent link">&para;</a></h3>
 <ul>
 <li>update for longhorn version 2.4.0 (24/Jan/2023)</li>
