@@ -22,13 +22,14 @@ If we want to use `helm` to performt the installation of longhorn we first need 
 $ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
 $ chmod 700 get_helm.sh
 $ ./get_helm.sh 
-Downloading https://get.helm.sh/helm-v3.5.3-linux-arm64.tar.gz
+Helm v3.11.0 is available. Changing from version v3.7.1.
+Downloading https://get.helm.sh/helm-v3.11.0-linux-arm64.tar.gz
 Verifying checksum... Done.
 Preparing to install helm into /usr/local/bin
 helm installed into /usr/local/bin/helm
 ```
 
-Alright, now we have the `helm` executable available on our local system (e.g.node n1). We can now download the helm longhorn chart repository:
+Alright, now we have the `helm` executable available on our local system (e.g. node n1). We can now download the helm longhorn chart repository:
 
 ```bash
 $ helm repo add longhorn https://charts.longhorn.io
@@ -45,10 +46,10 @@ Information on how we can actually do this can be found at ["Adding Node Tags to
 
 
 ```bash
-$ helm install longhorn longhorn/longhorn --namespace longhorn-system \
-  --set defaultSettings.defaultDataPath="/app/longhorn/"
+$ helm install longhorn longhorn/longhorn --namespace longhorn-system  
+  --set defaultSettings.defaultDataPath="/app/longhorn/" --create-namespace
 NAME: longhorn
-LAST DEPLOYED: Wed Apr 14 09:23:52 2021
+LAST DEPLOYED: Tue Jan 24 14:38:41 2023
 NAMESPACE: longhorn-system
 STATUS: deployed
 REVISION: 1
@@ -79,77 +80,135 @@ secret/basic-auth created
 $ kubectl -n longhorn-system get secret basic-auth -o yaml
 apiVersion: v1
 data:
-  auth: Z2RoYTokYXByMSRLTU1hQWpiSiROVENtRWI2Qm05dDdvSmJXV1RlWVcuCg==
+  auth: Z2RoYTokYXByMSRSTW11bU5oRSQyd3ZCMzNFM0hyLjY4aGZvL2xkVGsuCg==
 kind: Secret
 metadata:
-  creationTimestamp: "2021-04-09T15:38:05Z"
-  managedFields:
-  - apiVersion: v1
-    fieldsType: FieldsV1
-    fieldsV1:
-      f:data:
-        .: {}
-        f:auth: {}
-      f:type: {}
-    manager: kubectl-create
-    operation: Update
-    time: "2021-04-09T15:38:05Z"
+  creationTimestamp: "2023-01-24T13:40:16Z"
   name: basic-auth
   namespace: longhorn-system
-  resourceVersion: "763254"
-  uid: 0a88e170-071d-4813-934f-9dec352be01d
+  resourceVersion: "13336"
+  uid: eeb2bd1f-9cae-4460-916d-b26c7eb97b7e
 type: Opaque
 ```
 Then we paste the following set of yaml command lines into kubectl to create the longhorn-ingress:
 
 ```bash
-$ echo "
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+$ cat longhorn-ingress.yaml
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required '
+      nginx.ingress.kubernetes.io/auth-secret: basic-auth
+      nginx.ingress.kubernetes.io/auth-type: basic
+      nginx.ingress.kubernetes.io/proxy-body-size: 10000m
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    creationTimestamp: "2022-02-01T11:41:47Z"
+    generation: 4
+    name: longhorn-ingress
+    namespace: longhorn-system
+    resourceVersion: "3312028"
+    uid: bb838795-97d8-44e7-a3f1-4f74dd0854ee
+  spec:
+    rules:
+    - http:
+        paths:
+        - backend:
+            service:
+              name: longhorn-frontend
+              port:
+                number: 80
+          path: /
+          pathType: ImplementationSpecific
+  status:
+    loadBalancer: {}
+kind: List
 metadata:
-  name: longhorn-ingress
-  namespace: longhorn-system
-  annotations:
-    # type of authentication
-    nginx.ingress.kubernetes.io/auth-type: basic
-    # prevent the controller from redirecting (308) to HTTPS
-    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
-    # name of the secret that contains the user/password definitions
-    nginx.ingress.kubernetes.io/auth-secret: basic-auth
-    # message to display with an appropriate context why the authentication is required
-    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required '
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        backend:
-          serviceName: longhorn-frontend
-          servicePort: 80
-" | kubectl -n longhorn-system create -f -
-ingress.networking.k8s.io/longhorn-ingress created
+  resourceVersion: ""
 
-$ kubectl -n longhorn-system get ingress
-NAME               CLASS    HOSTS   ADDRESS         PORTS   AGE
-longhorn-ingress   <none>   *       192.168.0.201   80      11s
+
+$ kubectl create -f longhorn-ingress.yaml
+
+$ kubectl describe ingress -n longhorn-system
+Name:             longhorn-ingress
+Labels:           <none>
+Namespace:        longhorn-system
+Address:          
+Ingress Class:    traefik
+Default backend:  <default>
+Rules:
+  Host        Path  Backends
+  ----        ----  --------
+  *           
+              /   longhorn-frontend:80 (10.42.3.5:8000,10.42.4.6:8000)
+Annotations:  nginx.ingress.kubernetes.io/auth-realm: Authentication Required 
+              nginx.ingress.kubernetes.io/auth-secret: basic-auth
+              nginx.ingress.kubernetes.io/auth-type: basic
+              nginx.ingress.kubernetes.io/proxy-body-size: 10000m
+              nginx.ingress.kubernetes.io/ssl-redirect: false
+Events:       <none>
 ```
 ### Use the longhorn UI
 
 In previous command we saw that the IP address where the longhorn-ingress is running is in our case 192.168.0.201 and to test the connectivity we can use `curl`:
 
 ```bash
-$ curl -v http://192.168.0.201/
-*   Trying 192.168.0.201:80...
+$ curl -v 192.168.0.230:80
+*   Trying 192.168.0.230:80...
 * TCP_NODELAY set
-* Connected to 192.168.0.201 (192.168.0.201) port 80 (#0)
+* Connected to 192.168.0.230 (192.168.0.230) port 80 (#0)
 > GET / HTTP/1.1
-> Host: 192.168.0.201
+> Host: 192.168.0.230
 > User-Agent: curl/7.68.0
 > Accept: */*
-...
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Cache-Control: max-age=0
+< Content-Type: text/html
+< Date: Tue, 24 Jan 2023 16:11:19 GMT
+< Etag: W/"63adbe68-401"
+< Last-Modified: Thu, 29 Dec 2022 16:20:56 GMT
+< Server: nginx/1.21.5
+< Vary: Accept-Encoding
+< Transfer-Encoding: chunked
+< 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!--[if lte IE 10]>
+      <script
+        src="https://as.alipayobjects.com/g/component/??console-polyfill/0.2.2/index.js,media-match/2.0.2/media.match.min.js"></script>
+  <![endif]-->
+  <style>
+    ::-webkit-scrollbar {
+      width: 10px; 
+      height: 1px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+      background: #535353;
+    }
+  </style>
+<link href="./styles.css?e0c09a3f2aae9c069d0c" rel="stylesheet"></head>
+
+<body>
+  <div id="root"></div>
+<script type="text/javascript" src="./runtime~main.6d7bda24.js?e0c09a3f2aae9c069d0c"></script><script type="text/javascript" src="./styles.985bf912.async.js?e0c09a3f2aae9c069d0c"></script><script type="text/javascript" src="./main.c5723e73.async.js?e0c09a3f2aae9c069d0c"></script></body>
+
+</html>
+* Connection #0 to host 192.168.0.230 left intact
 ```
 
-However, we a browser pointing to `http://192.168.0.201/#/dashboard` we get a better overview:
+However, we a browser pointing to `http://192.168.0.230/#/dashboard` we get a better overview:
 
 ![](img/longhorn-dashboard.png)
 
@@ -170,3 +229,8 @@ And, the details of one node:
 [3] [Adding Node Tags to New Nodes](https://longhorn.io/docs/1.1.0/advanced-resources/default-disk-and-node-config/)
 
 [4] [Accessing Loghorn through UI](https://longhorn.io/docs/1.1.0/deploy/accessing-the-ui/longhorn-ingress/)
+
+
+### Edit history
+
+- update for longhorn version 2.4.0 (24/Jan/2023)
