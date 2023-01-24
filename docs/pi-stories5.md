@@ -2,28 +2,29 @@
 
 ## Raspberry Pi 4 cluster Series - Installing cert-manager on the k3s cluster
 
-As certificates are crucial in a kuberbetes cluster one of the first pods that one should install is [cert-manager](https://cert-manager.io/docs/).
+As certificates are crucial in a kuberbetes cluster one of the first pods that one should install is [cert-manager](https://cert-manager.io/docs/installation/).
 
 ### Installling cert-manager
 
 Installaion is extremelt easy with the following command:
 ```bash
-kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.4/cert-manager.yaml
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
 ```
 In the time of writing this article the current version was v1.0.4 - you can change that to the [latest release](https://github.com/jetstack/cert-manager/releases) available of course. Here follows an example of the instalaltion of cert-manager:
 
 ```bash
-$ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.4/cert-manager.yaml
-customresourcedefinition.apiextensions.k8s.io/certificaterequests.cert-manager.io created
-customresourcedefinition.apiextensions.k8s.io/certificates.cert-manager.io created
-customresourcedefinition.apiextensions.k8s.io/challenges.acme.cert-manager.io created
-customresourcedefinition.apiextensions.k8s.io/clusterissuers.cert-manager.io created
-customresourcedefinition.apiextensions.k8s.io/issuers.cert-manager.io created
-customresourcedefinition.apiextensions.k8s.io/orders.acme.cert-manager.io created
+gdha@n1:~$ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
 namespace/cert-manager created
+customresourcedefinition.apiextensions.k8s.io/clusterissuers.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/challenges.acme.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/certificaterequests.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/issuers.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/certificates.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/orders.acme.cert-manager.io created
 serviceaccount/cert-manager-cainjector created
 serviceaccount/cert-manager created
 serviceaccount/cert-manager-webhook created
+configmap/cert-manager-webhook created
 clusterrole.rbac.authorization.k8s.io/cert-manager-cainjector created
 clusterrole.rbac.authorization.k8s.io/cert-manager-controller-issuers created
 clusterrole.rbac.authorization.k8s.io/cert-manager-controller-clusterissuers created
@@ -33,6 +34,9 @@ clusterrole.rbac.authorization.k8s.io/cert-manager-controller-challenges created
 clusterrole.rbac.authorization.k8s.io/cert-manager-controller-ingress-shim created
 clusterrole.rbac.authorization.k8s.io/cert-manager-view created
 clusterrole.rbac.authorization.k8s.io/cert-manager-edit created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-approve:cert-manager-io created
+clusterrole.rbac.authorization.k8s.io/cert-manager-controller-certificatesigningrequests created
+clusterrole.rbac.authorization.k8s.io/cert-manager-webhook:subjectaccessreviews created
 clusterrolebinding.rbac.authorization.k8s.io/cert-manager-cainjector created
 clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-issuers created
 clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-clusterissuers created
@@ -40,6 +44,9 @@ clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-certificate
 clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-orders created
 clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-challenges created
 clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-ingress-shim created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-approve:cert-manager-io created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-controller-certificatesigningrequests created
+clusterrolebinding.rbac.authorization.k8s.io/cert-manager-webhook:subjectaccessreviews created
 role.rbac.authorization.k8s.io/cert-manager-cainjector:leaderelection created
 role.rbac.authorization.k8s.io/cert-manager:leaderelection created
 role.rbac.authorization.k8s.io/cert-manager-webhook:dynamic-serving created
@@ -88,3 +95,7 @@ cert-manager-86548b886-4xrbj               1/1     Running   0          21m   10
 
  - [cert-manager documentation](https://cert-manager.io/docs/)
  - [cert-manager sources](https://github.com/jetstack/cert-manager)
+
+### Last updates
+
+- 24/Jan/2023: update with the installation of version v1.11.0
