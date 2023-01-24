@@ -60,6 +60,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#k3s_is_up_and_running">k3s is up and running?</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#remove_k3s_cleanup_nodes">Remove k3s (cleanup nodes)</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#references">References</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#edit_history">Edit history</a>
@@ -420,9 +422,13 @@ k3s/master : Register node-token file access mode ------------------------------
 <h3 id="k3s_is_up_and_running">k3s is up and running?<a class="headerlink" href="#k3s_is_up_and_running" title="Permanent link">&para;</a></h3>
 <p>Wow the installation went rather fast - an exciting moment - is k3s working fine?</p>
 <pre><code class="language-bash">gdha@n5:~/projects/k3s-ansible$ k3s --version
-k3s version v1.19.2+k3s1 (d38505b1)
+k3s version v1.26.0+k3s2 (f0ec6a4c)
+go version go1.19.4
 
 gdha@n5:~/projects/k3s-ansible$ k3s kubectl cluster-info
+ubernetes control plane is running at https://127.0.0.1:6443
+CoreDNS is running at https://127.0.0.1:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+Metrics-server is running at https://127.0.0.1:6443/api/v1/namespaces/kube-system/services/https:metrics-server:https/proxy
 
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 The connection to the server localhost:8080 was refused - did you specify the right host or port?
@@ -434,12 +440,12 @@ config                                                                          
 </code></pre>
 <p>Now see if we have more luck with a kubernetes command to get all the nodes in this cluster and dumping the cluster-info?</p>
 <pre><code class="language-bash">gdha@n5:~/projects/k3s-ansible$ kubectl get nodes
-NAME   STATUS   ROLES    AGE   VERSION
-n2     Ready    &lt;none&gt;   49d   v1.19.2+k3s1
-n5     Ready    &lt;none&gt;   49d   v1.19.2+k3s1
-n4     Ready    &lt;none&gt;   49d   v1.19.2+k3s1
-n3     Ready    &lt;none&gt;   49d   v1.19.2+k3s1
-n1     Ready    master   49d   v1.19.2+k3s1
+NAME   STATUS   ROLES                  AGE     VERSION
+n4     Ready    &lt;none&gt;                 9m39s   v1.26.0+k3s2
+n2     Ready    &lt;none&gt;                 9m39s   v1.26.0+k3s2
+n3     Ready    &lt;none&gt;                 9m39s   v1.26.0+k3s2
+n5     Ready    &lt;none&gt;                 9m24s   v1.26.0+k3s2
+n1     Ready    control-plane,master   10m     v1.26.0+k3s2
 
 gdha@n5:~/projects/k3s-ansible$ k3s kubectl cluster-info
 Kubernetes master is running at https://192.168.0.201:6443
@@ -458,23 +464,184 @@ config
 </code></pre>
 <p>And finally, to conclude this story, what pods are running within a basic k3s setup?</p>
 <pre><code class="language-bash">gdha@n5:~/projects/k3s-ansible$ kubectl get pods -A
-NAMESPACE     NAME                                     READY   STATUS      RESTARTS   AGE
-kube-system   helm-install-traefik-p7jkh               0/1     Completed   0          4d22h
-kube-system   svclb-traefik-kxxn4                      2/2     Running     2          4d22h
-kube-system   svclb-traefik-r9q6r                      2/2     Running     2          4d22h
-kube-system   svclb-traefik-qlgn9                      2/2     Running     2          4d22h
-kube-system   traefik-5dd496474-4fwdm                  1/1     Running     1          4d22h
-kube-system   local-path-provisioner-7ff9579c6-l6t6s   1/1     Running     1          4d22h
-kube-system   svclb-traefik-n6srr                      2/2     Running     2          4d22h
-kube-system   coredns-66c464876b-vqrd6                 1/1     Running     1          4d22h
-kube-system   metrics-server-7b4f8b595-bldsd           1/1     Running     1          4d22h
-kube-system   svclb-traefik-74k9f                      2/2     Running     2          4d22h
+NAMESPACE     NAME                                      READY   STATUS    RESTARTS   AGE
+kube-system   local-path-provisioner-5d56847996-mdlw9   1/1     Running   0          10m
+kube-system   coredns-5c6b6c5476-h2p6s                  1/1     Running   0          10m
+kube-system   metrics-server-7b67f64457-bk84t           1/1     Running   0          10m
+</code></pre>
+<h3 id="remove_k3s_cleanup_nodes">Remove k3s (cleanup nodes)<a class="headerlink" href="#remove_k3s_cleanup_nodes" title="Permanent link">&para;</a></h3>
+<p>In case you want to get rid of <strong>k3s</strong> then just run the <code>reset.yml</code> file with ansible-playbook:</p>
+<pre><code class="language-bash">$ ansible-playbook reset.yml -i inventory/my-cluster/hosts.ini
+
+PLAY [k3s_cluster] ****************************************************************************************************************************************
+
+TASK [Gathering Facts] ************************************************************************************************************************************
+Tuesday 24 January 2023  10:15:20 +0100 (0:00:00.153)       0:00:00.153 ******* 
+ok: [192.168.0.205]
+ok: [192.168.0.204]
+ok: [192.168.0.201]
+ok: [192.168.0.203]
+ok: [192.168.0.202]
+
+TASK [reset : Disable services] ***************************************************************************************************************************
+Tuesday 24 January 2023  10:15:30 +0100 (0:00:09.803)       0:00:09.957 ******* 
+ok: [192.168.0.205] =&gt; (item=k3s)
+ok: [192.168.0.204] =&gt; (item=k3s)
+ok: [192.168.0.202] =&gt; (item=k3s)
+changed: [192.168.0.201] =&gt; (item=k3s)
+ok: [192.168.0.201] =&gt; (item=k3s-node)
+ok: [192.168.0.203] =&gt; (item=k3s)
+changed: [192.168.0.205] =&gt; (item=k3s-node)
+changed: [192.168.0.204] =&gt; (item=k3s-node)
+changed: [192.168.0.203] =&gt; (item=k3s-node)
+changed: [192.168.0.202] =&gt; (item=k3s-node)
+
+TASK [reset : pkill -9 -f &quot;k3s/data/[^/]+/bin/containerd-shim-runc&quot;] **************************************************************************************
+Tuesday 24 January 2023  10:15:40 +0100 (0:00:10.608)       0:00:20.565 ******* 
+changed: [192.168.0.205]
+changed: [192.168.0.204]
+changed: [192.168.0.202]
+changed: [192.168.0.201]
+changed: [192.168.0.203]
+
+TASK [reset : Umount k3s filesystems] *********************************************************************************************************************
+Tuesday 24 January 2023  10:15:45 +0100 (0:00:04.298)       0:00:24.864 ******* 
+included: /home/gdha/projects/k3s-ansible/roles/reset/tasks/umount_with_childeren.yml for 192.168.0.201, 192.168.0.202, 192.168.0.203, 192.168.0.204, 192.168.0.205
+included: /home/gdha/projects/k3s-ansible/roles/reset/tasks/umount_with_childeren.yml for 192.168.0.201, 192.168.0.202, 192.168.0.203, 192.168.0.204, 192.168.0.205
+included: /home/gdha/projects/k3s-ansible/roles/reset/tasks/umount_with_childeren.yml for 192.168.0.201, 192.168.0.202, 192.168.0.203, 192.168.0.204, 192.168.0.205
+included: /home/gdha/projects/k3s-ansible/roles/reset/tasks/umount_with_childeren.yml for 192.168.0.201, 192.168.0.202, 192.168.0.203, 192.168.0.204, 192.168.0.205
+
+TASK [reset : Get the list of mounted filesystems] ********************************************************************************************************
+Tuesday 24 January 2023  10:15:46 +0100 (0:00:00.838)       0:00:25.702 ******* 
+changed: [192.168.0.201]
+changed: [192.168.0.205]
+changed: [192.168.0.202]
+changed: [192.168.0.203]
+changed: [192.168.0.204]
+
+TASK [reset : Umount filesystem] **************************************************************************************************************************
+Tuesday 24 January 2023  10:15:48 +0100 (0:00:02.230)       0:00:27.933 ******* 
+changed: [192.168.0.201] =&gt; (item=/run/k3s/containerd/io.containerd.grpc.v1.cri/sandboxes/a9f438036d703b39a747ef7615057b32310f437f97c4b82afe93a2e96a14b051/shm)
+changed: [192.168.0.202] =&gt; (item=/run/k3s/containerd/io.containerd.grpc.v1.cri/sandboxes/4086374a4e4dbd65831b95c5b0edc6f0a7d41fb6372c2f03b5e577ef695d1f36/shm)
+...
+TASK [reset : Get the list of mounted filesystems] ********************************************************************************************************
+Tuesday 24 January 2023  10:16:29 +0100 (0:00:41.594)       0:01:09.527 ******* 
+changed: [192.168.0.201]
+changed: [192.168.0.205]
+changed: [192.168.0.202]
+changed: [192.168.0.203]
+changed: [192.168.0.204]
+
+TASK [reset : Umount filesystem] **************************************************************************************************************************
+Tuesday 24 January 2023  10:16:32 +0100 (0:00:02.237)       0:01:11.764 ******* 
+changed: [192.168.0.201] =&gt; (item=/var/lib/kubelet/pods/11aece04-899a-4312-b2ee-52fc334fff7a/volumes/kubernetes.io~projected/kube-api-access-672xr)
+changed: [192.168.0.205] =&gt; (item=/var/lib/kubelet/pods/8eb78e3d-c429-40b2-b40e-8cdd6cb4ac2a/volumes/kubernetes.io~projected/kube-api-access-5hqn7)
+...
+TASK [reset : Get the list of mounted filesystems] ********************************************************************************************************
+Tuesday 24 January 2023  10:16:48 +0100 (0:00:16.830)       0:01:28.595 ******* 
+changed: [192.168.0.201]
+changed: [192.168.0.202]
+changed: [192.168.0.203]
+changed: [192.168.0.204]
+ok: [192.168.0.205]
+
+TASK [reset : Umount filesystem] **************************************************************************************************************************
+Tuesday 24 January 2023  10:16:52 +0100 (0:00:03.382)       0:01:31.978 ******* 
+changed: [192.168.0.202] =&gt; (item=/run/netns/cni-a04edc88-c0e2-9e73-e490-e574240e46ad)
+changed: [192.168.0.203] =&gt; (item=/run/netns/cni-1383df7a-2708-4359-52ff-1c83d7909765)
+changed: [192.168.0.204] =&gt; (item=/run/netns/cni-4b65f454-42dd-0e3c-b67e-2d0111e17669)
+changed: [192.168.0.201] =&gt; (item=/run/netns/cni-6600c459-286b-161e-3466-90a461c7fe3d)
+changed: [192.168.0.202] =&gt; (item=/run/netns/cni-a02f0dd6-800b-b560-7a44-5e7d5cfac9e2)
+changed: [192.168.0.203] =&gt; (item=/run/netns/cni-b69e3eb5-c128-c70f-f7f9-e3790103730d)
+changed: [192.168.0.201] =&gt; (item=/run/netns/cni-c9d8c3d1-0d36-41ba-11e7-f621b2dfe11b)
+changed: [192.168.0.201] =&gt; (item=/run/netns/cni-7d3cdeef-d898-48b7-e305-68d43e59d0b0)
+changed: [192.168.0.202] =&gt; (item=/run/netns/cni-c9e0d034-a5bb-6306-64f6-24d17b0dd1f1)
+changed: [192.168.0.202] =&gt; (item=/run/netns/cni-a0393025-d663-28f3-3bf8-3cf3620f9076)
+changed: [192.168.0.202] =&gt; (item=/run/netns/cni-1322e940-a422-2c2f-3a0d-1bcbb9aef2f9)
+changed: [192.168.0.202] =&gt; (item=/run/netns/cni-84cfb60a-24e1-013b-c727-b43a659785c0)
+
+TASK [reset : Get the list of mounted filesystems] ********************************************************************************************************
+Tuesday 24 January 2023  10:17:03 +0100 (0:00:11.126)       0:01:43.104 ******* 
+ok: [192.168.0.201]
+ok: [192.168.0.205]
+ok: [192.168.0.202]
+ok: [192.168.0.203]
+ok: [192.168.0.204]
+
+TASK [reset : Umount filesystem] **************************************************************************************************************************
+Tuesday 24 January 2023  10:17:05 +0100 (0:00:02.246)       0:01:45.351 ******* 
+
+TASK [reset : Remove service files, binaries and data] ****************************************************************************************************
+Tuesday 24 January 2023  10:17:06 +0100 (0:00:00.405)       0:01:45.757 ******* 
+ok: [192.168.0.205] =&gt; (item=/etc/systemd/system/k3s.service)
+changed: [192.168.0.201] =&gt; (item=/etc/systemd/system/k3s.service)
+ok: [192.168.0.202] =&gt; (item=/etc/systemd/system/k3s.service)
+ok: [192.168.0.203] =&gt; (item=/etc/systemd/system/k3s.service)
+ok: [192.168.0.204] =&gt; (item=/etc/systemd/system/k3s.service)
+changed: [192.168.0.205] =&gt; (item=/etc/systemd/system/k3s-node.service)
+ok: [192.168.0.201] =&gt; (item=/etc/systemd/system/k3s-node.service)
+ok: [192.168.0.205] =&gt; (item=/etc/rancher/k3s)
+changed: [192.168.0.201] =&gt; (item=/etc/rancher/k3s)
+changed: [192.168.0.203] =&gt; (item=/etc/systemd/system/k3s-node.service)
+changed: [192.168.0.202] =&gt; (item=/etc/systemd/system/k3s-node.service)
+changed: [192.168.0.204] =&gt; (item=/etc/systemd/system/k3s-node.service)
+ok: [192.168.0.203] =&gt; (item=/etc/rancher/k3s)
+ok: [192.168.0.204] =&gt; (item=/etc/rancher/k3s)
+ok: [192.168.0.202] =&gt; (item=/etc/rancher/k3s)
+changed: [192.168.0.201] =&gt; (item=/var/lib/rancher/k3s)
+changed: [192.168.0.201] =&gt; (item=/var/lib/kubelet)
+changed: [192.168.0.201] =&gt; (item=/usr/local/bin/k3s)
+changed: [192.168.0.202] =&gt; (item=/var/lib/rancher/k3s)
+changed: [192.168.0.202] =&gt; (item=/var/lib/kubelet)
+changed: [192.168.0.202] =&gt; (item=/usr/local/bin/k3s)
+changed: [192.168.0.204] =&gt; (item=/var/lib/rancher/k3s)
+changed: [192.168.0.204] =&gt; (item=/var/lib/kubelet)
+changed: [192.168.0.204] =&gt; (item=/usr/local/bin/k3s)
+changed: [192.168.0.203] =&gt; (item=/var/lib/rancher/k3s)
+changed: [192.168.0.203] =&gt; (item=/var/lib/kubelet)
+changed: [192.168.0.203] =&gt; (item=/usr/local/bin/k3s)
+changed: [192.168.0.205] =&gt; (item=/var/lib/rancher/k3s)
+changed: [192.168.0.205] =&gt; (item=/var/lib/kubelet)
+changed: [192.168.0.205] =&gt; (item=/usr/local/bin/k3s)
+
+TASK [reset : daemon_reload] ******************************************************************************************************************************
+Tuesday 24 January 2023  10:19:15 +0100 (0:02:09.797)       0:03:55.555 ******* 
+ok: [192.168.0.205]
+ok: [192.168.0.201]
+ok: [192.168.0.203]
+ok: [192.168.0.204]
+ok: [192.168.0.202]
+
+PLAY RECAP ************************************************************************************************************************************************
+192.168.0.201              : ok=16   changed=9    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+192.168.0.202              : ok=16   changed=9    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+192.168.0.203              : ok=16   changed=9    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+192.168.0.204              : ok=16   changed=9    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+192.168.0.205              : ok=15   changed=7    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
+
+Tuesday 24 January 2023  10:19:23 +0100 (0:00:07.744)       0:04:03.299 ******* 
+=============================================================================== 
+reset : Remove service files, binaries and data -------------------------------------------------------------------------------------------------- 129.80s
+reset : Umount filesystem ------------------------------------------------------------------------------------------------------------------------- 41.59s
+reset : Umount filesystem ------------------------------------------------------------------------------------------------------------------------- 16.83s
+reset : Umount filesystem ------------------------------------------------------------------------------------------------------------------------- 11.13s
+reset : Disable services -------------------------------------------------------------------------------------------------------------------------- 10.61s
+Gathering Facts ------------------------------------------------------------------------------------------------------------------------------------ 9.80s
+reset : daemon_reload ------------------------------------------------------------------------------------------------------------------------------ 7.74s
+reset : pkill -9 -f &quot;k3s/data/[^/]+/bin/containerd-shim-runc&quot; -------------------------------------------------------------------------------------- 4.30s
+reset : Get the list of mounted filesystems -------------------------------------------------------------------------------------------------------- 3.38s
+reset : Get the list of mounted filesystems -------------------------------------------------------------------------------------------------------- 2.25s
+reset : Get the list of mounted filesystems -------------------------------------------------------------------------------------------------------- 2.24s
+reset : Get the list of mounted filesystems -------------------------------------------------------------------------------------------------------- 2.23s
+reset : Umount k3s filesystems --------------------------------------------------------------------------------------------------------------------- 0.84s
+reset : Umount filesystem -------------------------------------------------------------------------------------------------------------------------- 0.41s
 </code></pre>
 <h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
 <p>[1] <a href="https://github.com/gdha/k3s-ansible">Ansible k3s-ansible playbook</a></p>
 <p>[2] <a href="https://ma.ttias.be/deploying-highly-available-k3s-k3sup/">Deploying a highly-available K3s with K3sup</a></p>
 <h3 id="edit_history">Edit history<a class="headerlink" href="#edit_history" title="Permanent link">&para;</a></h3>
 <ul>
+<li>added running reset (remove k3s) on 24/Jan/2023</li>
 <li>initial post on 28/Sep/2020</li>
 </ul>
               
@@ -489,7 +656,7 @@ kube-system   svclb-traefik-74k9f                      2/2     Running     2    
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-      <p>Copyright 2022 - CC0 1.0 Universal</p>
+      <p>Copyright 2023 - CC0 1.0 Universal</p>
   </div>
 
   Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
