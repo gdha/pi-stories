@@ -2,9 +2,11 @@
 
 ## Raspberry Pi 4 cluster Series - Replacing internal traefik with Metallb
 
-The problem with have is that with our home pi4 cluster we don't have a decnt external load-balancer.
+The problem with have is that with our home pi4 cluster we don't have a decent external load-balancer.
 Therefore, it is hard to access pods via an external IP address, such as the ones we have on our hosts (in
 our case in the range of 192.168.0.200-254).
+
+To read some more in-depth learnings from metallb and ingresses read the blog [Ingresses and Load Balancers in Kubernetes with MetalLB and nginx-ingress](https://www.adaltas.com/en/2022/09/08/kubernetes-metallb-nginx/)
 
 The steps we need to perform are...
 
