@@ -17,7 +17,6 @@ You will find in the `pi4-graphite` directory a Dockerfile which will be used to
 ```bash
 To build the docker image on your Pi4 system execute the following command:
 
-```bash
 $ ./build.sh v1.2
 Login Succeeded
 Building graphite:v1.2
@@ -57,5 +56,5 @@ created
 
 Open a browser with URL http://n1:30080 to see the result of the tests:
 
-<img alt="graphite browser" src="img/graphite-diceroll.png" width="400">
+![](img/graphite-diceroll.png)
 
