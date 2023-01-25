@@ -58,3 +58,58 @@ Open a browser with URL http://n1:30080 to see the result of the tests:
 
 ![](img/graphite.png)
 
+### Deploy temperature2celsius pods
+
+The purpose of this pod is to demonstrate that we can send information to our graphite application. We choose to send the temperatire in Celsius once a minute.
+
+Start with cloning our github repository:
+
+```bash
+git clone https://github.com/gdha/pi4-temperature2graphite.git
+cd pi4-temperature2graphite
+```
+
+To build the image use the `build.sh` script and it pushes the image to ghcr.io/gdha/pi4-temperature2graphite:v1.7 (which is also the latest).
+
+To bring the pods alive on our kubernetes cluster go to the `kubernetes` directory and execute:
+
+```bash
+$ kubectl apply -f celsius-namespace.yaml
+namespace/celsius created
+
+ kubectl apply -f celsius-secret.yaml
+secret/celsius created
+
+$ kubectl apply -f ghcr-secret.yaml 
+secret/dockerconfigjson-github-com created
+
+$ kubectl apply -f celsius-rbac.yaml 
+erviceaccount/celsius-sa created
+clusterrole.rbac.authorization.k8s.io/celsius-cluster-role created
+rolebinding.rbac.authorization.k8s.io/celsius-cluster-role-binding-ns-celsius created
+rolebinding.rbac.authorization.k8s.io/celsius-cluster-role-binding-ns-graphite created
+
+$ kubectl apply -f celsius-deployment.yaml
+deployment.apps/celsius created
+
+$ kubectl get pods -n celsius -w
+NAME                       READY   STATUS              RESTARTS   AGE
+celsius-6ffb4f4bcc-jl579   0/1     ContainerCreating   0          16s
+celsius-6ffb4f4bcc-kh4dh   0/1     ContainerCreating   0          16s
+celsius-6ffb4f4bcc-qzt8w   0/1     ContainerCreating   0          16s
+celsius-6ffb4f4bcc-nfgnx   0/1     ContainerCreating   0          16s
+celsius-6ffb4f4bcc-nptk6   0/1     ContainerCreating   0          16s
+celsius-6ffb4f4bcc-kh4dh   1/1     Running             0          81s
+celsius-6ffb4f4bcc-nfgnx   1/1     Running             0          83s
+celsius-6ffb4f4bcc-nptk6   1/1     Running             0          84s
+celsius-6ffb4f4bcc-jl579   1/1     Running             0          86s
+celsius-6ffb4f4bcc-qzt8w   1/1     Running             0          89s
+
+$ kubectl logs -n celsius celsius-6ffb4f4bcc-qzt8w
+INFO[0000] Acquiring lock file /var/lib/rancher/k3s/data/.lock 
+INFO[0000] Preparing data dir /var/lib/rancher/k3s/data/8c4262cf7fdd652cccb03a99a99fdffc96d9ad41d7e57af9eb08c7ac2867c72a 
+```
+
+After a couple of minutes you can check the graphite site again:
+
+![](img/graphite-celsius.png)
