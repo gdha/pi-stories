@@ -15,7 +15,7 @@ Our [k3s-ansible](https://github.com/gdha/k3s-ansible) project was updated with:
 ```bash
 $ cat inventory/my-cluster/group_vars/all.yml
 ---
-k3s_version: v1.23.6+k3s1
+k3s_version: v1.26.0+k3s2
 ansible_user: gdha
 systemd_dir: /etc/systemd/system
 master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
@@ -46,6 +46,17 @@ NAME    	URL
 longhorn	https://charts.longhorn.io       
 kiwigrid	https://kiwigrid.github.io       
 metallb 	https://metallb.github.io/metallb
+
+$ cat metallb-values.yaml
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: loadbalancer-pool
+  namespace: kube-system
+spec:
+  addresses:
+  - 192.168.0.230-192.168.0.250
+
 
 $ helm install metallb metallb/metallb --namespace kube-system -f metallb-values.yaml 
 NAME: metallb
@@ -275,4 +286,4 @@ Now, we are ready to do some more tests with our new load-balancer and traefik.
 
 ### Edit History
 
-- update with new metallb and NGINC Ingress Controller - 24/Jan/2023
+- update with new metallb and NGINC Ingress Controller - 25/Jan/2023
