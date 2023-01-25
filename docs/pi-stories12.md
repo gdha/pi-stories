@@ -56,5 +56,5 @@ created
 
 Open a browser with URL http://n1:30080 to see the result of the tests:
 
-![](img/graphite-diceroll.png)
+![](img/graphite.png)
 
