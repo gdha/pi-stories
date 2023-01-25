@@ -68,6 +68,52 @@ Start with cloning our github repository:
 git clone https://github.com/gdha/pi4-temperature2graphite.git
 cd pi4-temperature2graphite
 ```
+The `Dockerfile` content is:
+
+```bash
+ Dockerfile to create the container used to send the temperature of the RPI4
+# to the graphite pod
+#FROM gdha/rpi-alpine-rootfs/alpine:v1.37
+FROM alpine:latest
+
+LABEL org.opencontainers.image.sourcec=https://github.com/gdha/pi4-temperature2graphite
+LABEL org.opencontainers.image.description "pi4-temperature2graphite build for the ARM64"
+LABEL org.opencontainers.image.licenses "GPL-3.0-or-later"
+LABEL maintainer "Gratien Dhaese <gratien.dhaese@gmail.com>"
+
+COPY entrypoint.sh                                  /entrypoint.sh
+COPY k3s                                            /usr/bin/kubectl
+COPY api_query.sh                                   /api_query.sh
+
+# Update and install dependencies
+RUN  apk add --update nodejs npm curl
+RUN  chmod a+x                                      /entrypoint.sh \
+     && chmod a+x                                   /api_query.sh  \
+     && echo "Europe/Brussels" >                    /etc/timezone  \
+     && chmod 755 /root
+```
+
+And, the center of the image is the `entry.sh` script:
+
+```bash
+!/bin/sh
+
+# As this script runs on Alpine (busybox) we cannot use bash syntax
+#set -e
+HOSTNAME=$(cat /etc/hostname)
+#SERVER=$(/usr/local/bin/kubectl -n graphite describe pod graphite-0 | grep -i node: | cut  -d/ -f2)
+while true
+do
+  # move the SERVER line inside the loop as at each restart the graphite pod gets a new IP address
+  SERVER=$(/usr/bin/kubectl -n graphite get pods -o wide | tail -1 | awk '{print $6}')
+  cpu_temp=$(cat /sys/class/thermal/thermal_zone0/temp)
+  #cpu_temp=$(($cpu_temp/1000))
+  cpu_temp=$(expr $cpu_temp / 1000)
+  echo "carbon.celsius.$HOSTNAME $cpu_temp $(date +%s)" | timeout 2 nc $SERVER 2003 
+  # echo $cpu_temp
+  sleep 60
+done
+```
 
 To build the image use the `build.sh` script and it pushes the image to ghcr.io/gdha/pi4-temperature2graphite:v1.7 (which is also the latest).
 
