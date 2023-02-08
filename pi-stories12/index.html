@@ -76,6 +76,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#deploy_temperature2celsius_pods">Deploy temperature2celsius pods</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#update_history">Update history</a>
+    </li>
         </ul>
     </li>
     </ul>
@@ -158,7 +160,7 @@ created
 cd pi4-temperature2graphite
 </code></pre>
 <p>The <code>Dockerfile</code> content is:</p>
-<pre><code class="language-bash"> Dockerfile to create the container used to send the temperature of the RPI4
+<pre><code class="language-bash"># Dockerfile to create the container used to send the temperature of the RPI4
 # to the graphite pod
 #FROM gdha/rpi-alpine-rootfs/alpine:v1.37
 FROM alpine:latest
@@ -178,12 +180,15 @@ RUN  chmod a+x                                      /entrypoint.sh \
      &amp;&amp; chmod a+x                                   /api_query.sh  \
      &amp;&amp; echo &quot;Europe/Brussels&quot; &gt;                    /etc/timezone  \
      &amp;&amp; chmod 755 /root
+
+ENTRYPOINT [&quot;/entrypoint.sh&quot;]
 </code></pre>
-<p>And, the center of the image is the <code>entry.sh</code> script:</p>
-<pre><code class="language-bash">!/bin/sh
+<p>And, the center of the image is the <code>/entrypoint.sh</code> script:</p>
+<pre><code class="language-bash">#!/bin/sh
 
 # As this script runs on Alpine (busybox) we cannot use bash syntax
 #set -e
+POD=$(echo $HOSTNAME)
 HOSTNAME=$(cat /etc/hostname)
 #SERVER=$(/usr/local/bin/kubectl -n graphite describe pod graphite-0 | grep -i node: | cut  -d/ -f2)
 while true
@@ -194,11 +199,18 @@ do
   #cpu_temp=$(($cpu_temp/1000))
   cpu_temp=$(expr $cpu_temp / 1000)
   echo &quot;carbon.celsius.$HOSTNAME $cpu_temp $(date +%s)&quot; | timeout 2 nc $SERVER 2003 
+  if [[ $? -eq 0 ]] ; then
+    echo $(date '+%F %T') {&quot;caller&quot;:&quot;entrypoint.sh:16&quot;,&quot;pod&quot;:&quot;$POD&quot;,&quot;level&quot;:&quot;info&quot;,&quot;msg&quot;:&quot;temperature $cpu_temp&quot;}
+  else
+    echo $(date '+%F %T') {&quot;caller&quot;:&quot;entrypoint.sh:18&quot;,&quot;pod&quot;:&quot;$POD&quot;,&quot;level&quot;:&quot;error&quot;,&quot;msg&quot;:&quot;cannot connect to server $SERVER&quot;}
+  fi
   # echo $cpu_temp
   sleep 60
 done
 </code></pre>
-<p>To build the image use the <code>build.sh</code> script and it pushes the image to ghcr.io/gdha/pi4-temperature2graphite:v1.7 (which is also the latest).</p>
+<p>To build the image use the <code>build.sh</code> script and it pushes the image to ghcr.io/gdha/pi4-temperature2graphite:v1.7 (which is also the latest). To build version v1.7 we did the following:</p>
+<pre><code class="language-bash">./build v1.7
+</code></pre>
 <p>To bring the pods alive on our kubernetes cluster go to the <code>kubernetes</code> directory and execute:</p>
 <pre><code class="language-bash">$ kubectl apply -f celsius-namespace.yaml
 namespace/celsius created
@@ -237,6 +249,56 @@ INFO[0000] Preparing data dir /var/lib/rancher/k3s/data/8c4262cf7fdd652cccb03a99
 </code></pre>
 <p>After a couple of minutes you can check the graphite site again:</p>
 <p><img alt="" src="../img/graphite-celsius.png" /></p>
+<p>When you would like to replace the <code>pi4-temperature2graphite</code> container in the k3s cluster edit the file <code>kubernetes/celsius-deployment.yaml</code> and update the line containing the image name and replace the old version number with the new one, e.b. v1.8:</p>
+<pre><code class="language-bash">image: ghcr.io/gdha/pi4-temperature2graphite:v1.8
+</code></pre>
+<p>To perform a rolling upgrade execute the command:</p>
+<pre><code class="language-bash">$ kubectl replace -f kuvernetes/celsius-deployment.yaml
+$ kubectl get pods -n celsius -w
+NAME                       READY   STATUS              RESTARTS       AGE
+celsius-6ffb4f4bcc-qzt8w   1/1     Running             3 (134m ago)   14d
+celsius-6ffb4f4bcc-kh4dh   1/1     Running             3 (134m ago)   14d
+celsius-6ffb4f4bcc-nptk6   1/1     Running             3 (134m ago)   14d
+celsius-6ffb4f4bcc-nfgnx   1/1     Running             3 (134m ago)   14d
+celsius-6ffb4f4bcc-jl579   1/1     Terminating         3 (135m ago)   14d
+celsius-779654f68d-9lmq8   0/1     ContainerCreating   0              10s
+celsius-779654f68d-d56q6   0/1     ContainerCreating   0              10s
+celsius-779654f68d-j6m6t   0/1     ContainerCreating   0              10s
+celsius-6ffb4f4bcc-jl579   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-jl579   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-jl579   0/1     Terminating         3              14d
+celsius-779654f68d-9lmq8   1/1     Running             0              50s
+celsius-6ffb4f4bcc-nptk6   1/1     Terminating         3 (135m ago)   14d
+celsius-779654f68d-jbxg8   0/1     Pending             0              0s
+celsius-779654f68d-jbxg8   0/1     Pending             0              0s
+celsius-779654f68d-jbxg8   0/1     ContainerCreating   0              0s
+celsius-779654f68d-j6m6t   1/1     Running             0              54s
+celsius-6ffb4f4bcc-kh4dh   1/1     Terminating         3 (135m ago)   14d
+celsius-779654f68d-q5rf9   0/1     Pending             0              0s
+celsius-779654f68d-q5rf9   0/1     Pending             0              0s
+celsius-779654f68d-q5rf9   0/1     ContainerCreating   0              0s
+celsius-779654f68d-d56q6   1/1     Running             0              57s
+celsius-6ffb4f4bcc-qzt8w   1/1     Terminating         3 (135m ago)   14d
+celsius-6ffb4f4bcc-nptk6   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-nptk6   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-nptk6   0/1     Terminating         3              14d
+celsius-779654f68d-jbxg8   1/1     Running             0              39s
+celsius-6ffb4f4bcc-nfgnx   1/1     Terminating         3 (135m ago)   14d
+celsius-6ffb4f4bcc-kh4dh   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-kh4dh   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-kh4dh   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-qzt8w   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-qzt8w   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-qzt8w   0/1     Terminating         3              14d
+celsius-779654f68d-q5rf9   1/1     Running             0              44s
+celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
+celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
+celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
+</code></pre>
+<h3 id="update_history">Update history<a class="headerlink" href="#update_history" title="Permanent link">&para;</a></h3>
+<ul>
+<li>08/Feb/2023: improved the content of temperature2celsius section</li>
+</ul>
               
             </div>
           </div><footer>
