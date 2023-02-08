@@ -172,13 +172,13 @@ After a couple of minutes you can check the graphite site again:
 
 ![](img/graphite-celsius.png)
 
-When you would like to replace the `pi4-temperature2graphite` container in the k3s cluster edit the file `kubernetes/celsius-deployment.yaml` and update the line containing the image name and replace the old version number with the new one, e.b. v1.8:
+When you would like to replace the `pi4-temperature2graphite` container with a newer version in the k3s cluster edit the file `kubernetes/celsius-deployment.yaml` and update the line containing the image name and replace the old version number with the new one, e.g. v1.8:
 
 ```bash
 image: ghcr.io/gdha/pi4-temperature2graphite:v1.8
 ```
 
-To perform a rolling upgrade execute the command:
+To perform a rolling upgrade and watch the upgrade process execute the commands:
 
 ```bash
 $ kubectl replace -f kuvernetes/celsius-deployment.yaml
@@ -223,6 +223,6 @@ celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 ```
-### Update history
+### Edit history
 
 * 08/Feb/2023: improved the content of temperature2celsius section
