@@ -71,7 +71,7 @@ cd pi4-temperature2graphite
 The `Dockerfile` content is:
 
 ```bash
- Dockerfile to create the container used to send the temperature of the RPI4
+# Dockerfile to create the container used to send the temperature of the RPI4
 # to the graphite pod
 #FROM gdha/rpi-alpine-rootfs/alpine:v1.37
 FROM alpine:latest
@@ -91,15 +91,18 @@ RUN  chmod a+x                                      /entrypoint.sh \
      && chmod a+x                                   /api_query.sh  \
      && echo "Europe/Brussels" >                    /etc/timezone  \
      && chmod 755 /root
+
+ENTRYPOINT ["/entrypoint.sh"]
 ```
 
-And, the center of the image is the `entry.sh` script:
+And, the center of the image is the `/entrypoint.sh` script:
 
 ```bash
-!/bin/sh
+#!/bin/sh
 
 # As this script runs on Alpine (busybox) we cannot use bash syntax
 #set -e
+POD=$(echo $HOSTNAME)
 HOSTNAME=$(cat /etc/hostname)
 #SERVER=$(/usr/local/bin/kubectl -n graphite describe pod graphite-0 | grep -i node: | cut  -d/ -f2)
 while true
@@ -110,12 +113,21 @@ do
   #cpu_temp=$(($cpu_temp/1000))
   cpu_temp=$(expr $cpu_temp / 1000)
   echo "carbon.celsius.$HOSTNAME $cpu_temp $(date +%s)" | timeout 2 nc $SERVER 2003 
+  if [[ $? -eq 0 ]] ; then
+    echo $(date '+%F %T') {"caller":"entrypoint.sh:16","pod":"$POD","level":"info","msg":"temperature $cpu_temp"}
+  else
+    echo $(date '+%F %T') {"caller":"entrypoint.sh:18","pod":"$POD","level":"error","msg":"cannot connect to server $SERVER"}
+  fi
   # echo $cpu_temp
   sleep 60
 done
 ```
 
-To build the image use the `build.sh` script and it pushes the image to ghcr.io/gdha/pi4-temperature2graphite:v1.7 (which is also the latest).
+To build the image use the `build.sh` script and it pushes the image to ghcr.io/gdha/pi4-temperature2graphite:v1.7 (which is also the latest). To build version v1.7 we did the following:
+
+```bash
+./build v1.7
+```
 
 To bring the pods alive on our kubernetes cluster go to the `kubernetes` directory and execute:
 
@@ -159,3 +171,58 @@ INFO[0000] Preparing data dir /var/lib/rancher/k3s/data/8c4262cf7fdd652cccb03a99
 After a couple of minutes you can check the graphite site again:
 
 ![](img/graphite-celsius.png)
+
+When you would like to replace the `pi4-temperature2graphite` container in the k3s cluster edit the file `kubernetes/celsius-deployment.yaml` and update the line containing the image name and replace the old version number with the new one, e.b. v1.8:
+
+```bash
+image: ghcr.io/gdha/pi4-temperature2graphite:v1.8
+```
+
+To perform a rolling upgrade execute the command:
+
+```bash
+$ kubectl replace -f kuvernetes/celsius-deployment.yaml
+$ kubectl get pods -n celsius -w
+NAME                       READY   STATUS              RESTARTS       AGE
+celsius-6ffb4f4bcc-qzt8w   1/1     Running             3 (134m ago)   14d
+celsius-6ffb4f4bcc-kh4dh   1/1     Running             3 (134m ago)   14d
+celsius-6ffb4f4bcc-nptk6   1/1     Running             3 (134m ago)   14d
+celsius-6ffb4f4bcc-nfgnx   1/1     Running             3 (134m ago)   14d
+celsius-6ffb4f4bcc-jl579   1/1     Terminating         3 (135m ago)   14d
+celsius-779654f68d-9lmq8   0/1     ContainerCreating   0              10s
+celsius-779654f68d-d56q6   0/1     ContainerCreating   0              10s
+celsius-779654f68d-j6m6t   0/1     ContainerCreating   0              10s
+celsius-6ffb4f4bcc-jl579   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-jl579   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-jl579   0/1     Terminating         3              14d
+celsius-779654f68d-9lmq8   1/1     Running             0              50s
+celsius-6ffb4f4bcc-nptk6   1/1     Terminating         3 (135m ago)   14d
+celsius-779654f68d-jbxg8   0/1     Pending             0              0s
+celsius-779654f68d-jbxg8   0/1     Pending             0              0s
+celsius-779654f68d-jbxg8   0/1     ContainerCreating   0              0s
+celsius-779654f68d-j6m6t   1/1     Running             0              54s
+celsius-6ffb4f4bcc-kh4dh   1/1     Terminating         3 (135m ago)   14d
+celsius-779654f68d-q5rf9   0/1     Pending             0              0s
+celsius-779654f68d-q5rf9   0/1     Pending             0              0s
+celsius-779654f68d-q5rf9   0/1     ContainerCreating   0              0s
+celsius-779654f68d-d56q6   1/1     Running             0              57s
+celsius-6ffb4f4bcc-qzt8w   1/1     Terminating         3 (135m ago)   14d
+celsius-6ffb4f4bcc-nptk6   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-nptk6   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-nptk6   0/1     Terminating         3              14d
+celsius-779654f68d-jbxg8   1/1     Running             0              39s
+celsius-6ffb4f4bcc-nfgnx   1/1     Terminating         3 (135m ago)   14d
+celsius-6ffb4f4bcc-kh4dh   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-kh4dh   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-kh4dh   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-qzt8w   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-qzt8w   0/1     Terminating         3              14d
+celsius-6ffb4f4bcc-qzt8w   0/1     Terminating         3              14d
+celsius-779654f68d-q5rf9   1/1     Running             0              44s
+celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
+celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
+celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
+```
+### Update history
+
+* 08/Feb/2023: improved the content of temperature2celsius section
