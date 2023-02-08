@@ -76,7 +76,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#deploy_temperature2celsius_pods">Deploy temperature2celsius pods</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#update_history">Update history</a>
+    <li class="toctree-l3"><a class="reference internal" href="#edit_history">Edit history</a>
     </li>
         </ul>
     </li>
@@ -249,10 +249,10 @@ INFO[0000] Preparing data dir /var/lib/rancher/k3s/data/8c4262cf7fdd652cccb03a99
 </code></pre>
 <p>After a couple of minutes you can check the graphite site again:</p>
 <p><img alt="" src="../img/graphite-celsius.png" /></p>
-<p>When you would like to replace the <code>pi4-temperature2graphite</code> container in the k3s cluster edit the file <code>kubernetes/celsius-deployment.yaml</code> and update the line containing the image name and replace the old version number with the new one, e.b. v1.8:</p>
+<p>When you would like to replace the <code>pi4-temperature2graphite</code> container with a newer version in the k3s cluster edit the file <code>kubernetes/celsius-deployment.yaml</code> and update the line containing the image name and replace the old version number with the new one, e.g. v1.8:</p>
 <pre><code class="language-bash">image: ghcr.io/gdha/pi4-temperature2graphite:v1.8
 </code></pre>
-<p>To perform a rolling upgrade execute the command:</p>
+<p>To perform a rolling upgrade and watch the upgrade process execute the commands:</p>
 <pre><code class="language-bash">$ kubectl replace -f kuvernetes/celsius-deployment.yaml
 $ kubectl get pods -n celsius -w
 NAME                       READY   STATUS              RESTARTS       AGE
@@ -295,7 +295,7 @@ celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 </code></pre>
-<h3 id="update_history">Update history<a class="headerlink" href="#update_history" title="Permanent link">&para;</a></h3>
+<h3 id="edit_history">Edit history<a class="headerlink" href="#edit_history" title="Permanent link">&para;</a></h3>
 <ul>
 <li>08/Feb/2023: improved the content of temperature2celsius section</li>
 </ul>
