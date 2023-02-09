@@ -6,7 +6,7 @@ Graphite is an enterprise-ready monitoring tool that runs equally well on cheap 
 
 ### Spin up graphite pod
 
-To start we need the sources to build of graphite pod, therefore, clone our pi4-graphite github repositoryi [1]:
+To start we need the sources to build of graphite pod, therefore, clone our pi4-graphite github repository [1]:
 
 ```bash
 git clone  https://github.com/gdha/pi4-graphite.git
