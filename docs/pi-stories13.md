@@ -9,3 +9,7 @@ Also this story is completely based on [https://rpi4cluster.com/monitoring/k3s-l
 ![](img/grafana-home.png)
 
 ![](img/kubernetes-cluster-grafana.png)
+
+![](img/graphite-celsius.png)
+
+![](img/pi4-celsius-grafana.png)
