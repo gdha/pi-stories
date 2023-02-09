@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Raspberry Pi 4 Install awesome kubectl aliases - Raspberry PI k3s stories</title>
+    <title>Raspberry Pi 4 Setup monitoring - Raspberry PI k3s stories</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Raspberry Pi 4 Install awesome kubectl aliases";
-        var mkdocs_page_input_path = "pi-stories4.md";
+        var mkdocs_page_name = "Raspberry Pi 4 Setup monitoring";
+        var mkdocs_page_input_path = "pi-stories13.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -52,21 +52,7 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories3/">Raspberry Pi 4 Installing k3s software</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Install awesome kubectl aliases</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_install_awesome_kubectl_aliases">Raspberry Pi 4 cluster Series - Install awesome kubectl aliases</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#enable_kubectl_autocompletion">Enable kubectl autocompletion</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#kubectl_aliases">Kubectl aliases</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#edit_history">Edit history</a>
-    </li>
-    </ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories4/">Raspberry Pi 4 Install awesome kubectl aliases</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories5/">Raspberry Pi 4 Installing cert-manager on our cluster</a>
                   </li>
@@ -84,7 +70,9 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories12/">Raspberry Pi 4 Spin up graphite and temperature2celsius pods</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories13/">Raspberry Pi 4 Setup monitoring</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Setup monitoring</a>
+    <ul class="current">
+    </ul>
                   </li>
               </ul>
       </div>
@@ -102,9 +90,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
           <li>PI4 STORIES &raquo;</li>
-      <li>Raspberry Pi 4 Install awesome kubectl aliases</li>
+      <li>Raspberry Pi 4 Setup monitoring</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories4.md">Edit on gdha/pi-stories</a>
+          <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories13.md">Edit on gdha/pi-stories</a>
     </li>
   </ul>
   <hr/>
@@ -112,41 +100,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
-<h2 id="raspberry_pi_4_cluster_series_-_install_awesome_kubectl_aliases">Raspberry Pi 4 cluster Series - Install awesome kubectl aliases<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_install_awesome_kubectl_aliases" title="Permanent link">&para;</a></h2>
-<p>The article "<a href="https://medium.com/better-programming/awesome-kubernetes-command-line-hacks-8bd3604e394f">Awesome Kubernetes Command-Line Hacks</a>" points out some interesting items to take in account. In summary activate the autocompletion and generate the kubectl aliases to make your life better.</p>
-<h3 id="enable_kubectl_autocompletion">Enable kubectl autocompletion<a class="headerlink" href="#enable_kubectl_autocompletion" title="Permanent link">&para;</a></h3>
-<p>Enable kubectl autocompletion is one of the first things you have to do to make your life a bit easier. There are two ways in which you can do this:</p>
-<ul>
-<li>Source the completion script in your <code>~/.bashrc</code> file:</li>
-</ul>
-<pre><code class="language-bash">echo 'source &lt;(kubectl completion bash)' &gt;&gt;~/.bashrc
-</code></pre>
-<ul>
-<li>Add the completion script to the <code>/etc/bash_completion.d</code> directory:</li>
-</ul>
-<pre><code class="language-bash">kubectl completion bash &gt;/etc/bash_completion.d/kubectl
-</code></pre>
-<p>If you have an alias for kubectl, you can extend shell completion to work with that alias:</p>
-<pre><code class="language-bash">echo 'alias k=kubectl' &gt;&gt;~/.bashrc
-echo 'complete -F __start_kubectl k' &gt;&gt;~/.bashrc
-</code></pre>
-<p>Above information come from <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">kubernetes kubectl page</a>. If you are alone then go for the first option, if more users require these autocompletion then go for the latter option.</p>
-<h3 id="kubectl_aliases">Kubectl aliases<a class="headerlink" href="#kubectl_aliases" title="Permanent link">&para;</a></h3>
-<p>Kubectl commands can be long and hard to type over and over again, therefore, why not apply the <a href="https://github.com/ahmetb/kubectl-aliases">kubectl-aliases github project</a>.</p>
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
-<p>[1] <a href="https://medium.com/better-programming/awesome-kubernetes-command-line-hacks-8bd3604e394f">Awesome Kubernetes Command-Line Hacks</a></p>
-<p>[2] <a href="https://github.com/ahmetb/kubectl-aliases">kubectl-aliases GitHub Source</a></p>
-<h2 id="edit_history">Edit history<a class="headerlink" href="#edit_history" title="Permanent link">&para;</a></h2>
-<ul>
-<li>initial post on 30/Sep/2020</li>
-</ul>
+                <p>PI4 Stories</p>
+<h2 id="raspberry_pi_4_cluster_series_-_setup_monitoring">Raspberry Pi 4 cluster Series - Setup monitoring<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_setup_monitoring" title="Permanent link">&para;</a></h2>
+<p>Also this story is completely based on <a href="https://rpi4cluster.com/monitoring/k3s-logging/">https://rpi4cluster.com/monitoring/k3s-logging/</a></p>
+<p><img alt="" src="../img/prometheus.png" /></p>
+<p><img alt="" src="../img/grafana-home.png" /></p>
+<p><img alt="" src="../img/kubernetes-cluster-grafana.png" /></p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../pi-stories3/" class="btn btn-neutral float-left" title="Raspberry Pi 4 Installing k3s software"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../pi-stories5/" class="btn btn-neutral float-right" title="Raspberry Pi 4 Installing cert-manager on our cluster">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../pi-stories12/" class="btn btn-neutral float-left" title="Raspberry Pi 4 Spin up graphite and temperature2celsius pods"><span class="icon icon-circle-arrow-left"></span> Previous</a>
     </div>
 
   <hr/>
@@ -170,10 +134,8 @@ echo 'complete -F __start_kubectl k' &gt;&gt;~/.bashrc
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../pi-stories3/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../pi-stories12/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
-    
-      <span><a href="../pi-stories5/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
