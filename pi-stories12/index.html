@@ -76,6 +76,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#deploy_temperature2celsius_pods">Deploy temperature2celsius pods</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#references">References</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#edit_history">Edit history</a>
     </li>
         </ul>
@@ -112,7 +114,7 @@
 <h2 id="raspberry_pi_4_cluster_series_-_spin_up_graphite_and_temperature2celsius_pods">Raspberry Pi 4 cluster Series - Spin up graphite and temperature2celsius pods<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_spin_up_graphite_and_temperature2celsius_pods" title="Permanent link">&para;</a></h2>
 <p>Graphite is an enterprise-ready monitoring tool that runs equally well on cheap hardware or Cloud infrastructure. Teams use Graphite to track the performance of their websites, applications, business services, and networked servers. It marked the start of a new generation of monitoring tools, making it easier than ever to store, retrieve, share, and visualize time-series data. Info copied from web-site <a href="https://graphiteapp.org/">graphiteapp.org</a>.</p>
 <h3 id="spin_up_graphite_pod">Spin up graphite pod<a class="headerlink" href="#spin_up_graphite_pod" title="Permanent link">&para;</a></h3>
-<p>To start we need the sources to build of graphite pod, therefore, clone our github repository:</p>
+<p>To start we need the sources to build of graphite pod, therefore, clone our pi4-graphite github repositoryi [1]:</p>
 <pre><code class="language-bash">git clone  https://github.com/gdha/pi4-graphite.git
 </code></pre>
 <p>You will find in the <code>pi4-graphite</code> directory a Dockerfile which will be used to create a new container image:</p>
@@ -155,7 +157,7 @@ created
 <p><img alt="" src="../img/graphite.png" /></p>
 <h3 id="deploy_temperature2celsius_pods">Deploy temperature2celsius pods<a class="headerlink" href="#deploy_temperature2celsius_pods" title="Permanent link">&para;</a></h3>
 <p>The purpose of this pod is to demonstrate that we can send information to our graphite application. We choose to send the temperatire in Celsius once a minute.</p>
-<p>Start with cloning our github repository:</p>
+<p>Start with cloning our pi4-temperature2graphite github repository [2]:</p>
 <pre><code class="language-bash">git clone https://github.com/gdha/pi4-temperature2graphite.git
 cd pi4-temperature2graphite
 </code></pre>
@@ -295,8 +297,12 @@ celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 </code></pre>
+<h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
+<p>[1] <a href="https://github.com/gdha/pi4-graphite">pi4-graphite GitHub repository</a></p>
+<p>[2] <a href="https://github.com/gdha/pi4-temperature2graphite">pi4-temperature2graphite GitHub repository</a></p>
 <h3 id="edit_history">Edit history<a class="headerlink" href="#edit_history" title="Permanent link">&para;</a></h3>
 <ul>
+<li>09/Feb/2023: adding the references</li>
 <li>08/Feb/2023: improved the content of temperature2celsius section</li>
 </ul>
               
