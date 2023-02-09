@@ -6,7 +6,7 @@ Graphite is an enterprise-ready monitoring tool that runs equally well on cheap 
 
 ### Spin up graphite pod
 
-To start we need the sources to build of graphite pod, therefore, clone our github repository:
+To start we need the sources to build of graphite pod, therefore, clone our pi4-graphite github repositoryi [1]:
 
 ```bash
 git clone  https://github.com/gdha/pi4-graphite.git
@@ -62,7 +62,7 @@ Open a browser with URL http://n1:30080 to see the result of the tests:
 
 The purpose of this pod is to demonstrate that we can send information to our graphite application. We choose to send the temperatire in Celsius once a minute.
 
-Start with cloning our github repository:
+Start with cloning our pi4-temperature2graphite github repository [2]:
 
 ```bash
 git clone https://github.com/gdha/pi4-temperature2graphite.git
@@ -223,6 +223,13 @@ celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 celsius-6ffb4f4bcc-nfgnx   0/1     Terminating         3 (136m ago)   14d
 ```
+### References
+
+[1] [pi4-graphite GitHub repository](https://github.com/gdha/pi4-graphite)
+
+[2] [pi4-temperature2graphite GitHub repository](https://github.com/gdha/pi4-temperature2graphite)
+
 ### Edit history
 
+* 09/Feb/2023: adding the references
 * 08/Feb/2023: improved the content of temperature2celsius section
