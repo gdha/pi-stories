@@ -11,3 +11,5 @@ $ docker rename condescending_neumann pi
 ```
 
 Later on you can go start up the container image as `docker start -i pi`
+
+You can serve the web pages locally via 'mkdocs serve` and it will tell you which URL link to use in your browser.
