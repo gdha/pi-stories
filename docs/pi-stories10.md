@@ -95,7 +95,22 @@ cert-manager-webhook-746ff5ffb9-wmnvp      1/1     Running   0          161m
 
 ### Fixing longhorn
 
-The easiest way to fix longhorn is to remove and do a fresh install [5].
+The easiest way to fix longhorn is to remove and do a fresh install [5]. We remember we also had the issue when longhorn pods were deleted that the namespace of longhorn stayed in *terminating* status. To remediate this there is a [trick](https://medium.com/@it-craftsman/how-to-fix-kubernetes-namespaces-stuck-in-terminating-state-ea46c5fff045)
+
+### Fixing graphite
+
+The graphite container was setup [6] via the kubernetes yaml files. Therefore, to remove the failing pod just run (inside the kubernetes directory of our [graphite github project](https://github.com/gdha/pi4-graphite)):
+
+```bash
+$ kubectl delete -f *.yaml
+```
+
+And, recreate it again:
+
+```bash
+$ kubectle apply -f *.yaml
+```
+
 
 ### References
 
@@ -109,8 +124,9 @@ The easiest way to fix longhorn is to remove and do a fresh install [5].
 
 [5] [Installation of longhorn](https://gdha.github.io/pi-stories/pi-stories9/)
 
+[6] [Graphite kubernetes yaml file for the Pi4](https://github.com/gdha/pi4-graphite/blob/main/kubernetes/readme.md)
 
 ### Edit history
 
 - Added "Fixing longhorn" (24/Jan/2023)
-
+- Adding "Fixing graphite" (24/Feb/2023)
