@@ -72,6 +72,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#fixing_longhorn">Fixing longhorn</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fixing_graphite">Fixing graphite</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#references">References</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#edit_history">Edit history</a>
@@ -193,16 +195,25 @@ cert-manager-cainjector-598fcd9fdd-sn9cs   1/1     Running   0          161m
 cert-manager-webhook-746ff5ffb9-wmnvp      1/1     Running   0          161m
 </code></pre>
 <h3 id="fixing_longhorn">Fixing longhorn<a class="headerlink" href="#fixing_longhorn" title="Permanent link">&para;</a></h3>
-<p>The easiest way to fix longhorn is to remove and do a fresh install [5].</p>
+<p>The easiest way to fix longhorn is to remove and do a fresh install [5]. We remember we also had the issue when longhorn pods were deleted that the namespace of longhorn stayed in <em>terminating</em> status. To remediate this there is a <a href="https://medium.com/@it-craftsman/how-to-fix-kubernetes-namespaces-stuck-in-terminating-state-ea46c5fff045">trick</a></p>
+<h3 id="fixing_graphite">Fixing graphite<a class="headerlink" href="#fixing_graphite" title="Permanent link">&para;</a></h3>
+<p>The graphite container was setup [6] via the kubernetes yaml files. Therefore, to remove the failing pod just run (inside the kubernetes directory of our <a href="https://github.com/gdha/pi4-graphite">graphite github project</a>):</p>
+<pre><code class="language-bash">$ kubectl delete -f *.yaml
+</code></pre>
+<p>And, recreate it again:</p>
+<pre><code class="language-bash">$ kubectle apply -f *.yaml
+</code></pre>
 <h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
 <p>[1] <a href="https://gdha.github.io/pi-stories/pi-stories6/">Raspberry Pi 4 cluster Series - Upgrading k3s software on your cluster</a></p>
 <p>[2] <a href="https://cert-manager.io/docs/installation/upgrading/remove-deprecated-apis/">Removing Deprecated API Resources in cert-manager</a></p>
 <p>[3] <a href="https://bryanbende.com/development/2021/07/01/k3s-raspberry-pi-cert-manager">K3s on Raspberry Pi - cert-manager</a></p>
 <p>[4] <a href="https://github.com/jetstack/cert-manager/releases">GitHub Cert-manager release page</a></p>
 <p>[5] <a href="https://gdha.github.io/pi-stories/pi-stories9/">Installation of longhorn</a></p>
+<p>[6] <a href="https://github.com/gdha/pi4-graphite/blob/main/kubernetes/readme.md">Graphite kubernetes yaml file for the Pi4</a></p>
 <h3 id="edit_history">Edit history<a class="headerlink" href="#edit_history" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Added "Fixing longhorn" (24/Jan/2023)</li>
+<li>Adding "Fixing graphite" (24/Feb/2023)</li>
 </ul>
               
             </div>
