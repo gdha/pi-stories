@@ -63,6 +63,10 @@ Next step is to prepare the service monitors.
 
 ### Install Service Monitors
 
+#### Prometheus Node Exporter
+
+We will install the Prometheus Node Exporter [2] service which is a daemonset to collect metrics from individual cluster nodes, and many other details.
+The [installation is quite simple](https://github.com/gdha/pi4-monitoring/tree/master/node-exporter).
 
 ![](img/prometheus.png)
 
@@ -78,3 +82,5 @@ Next step is to prepare the service monitors.
 ### References
 
 [1] [Prometheus Operator GitHub sources](https://github.com/gdha/pi4-monitoring/tree/master/prometheus-operator)
+
+[2] [Prometheus Node Exporter](https://github.com/prometheus/node_exporter)
