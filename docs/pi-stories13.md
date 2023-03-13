@@ -6,14 +6,24 @@ This story is mostly based on [K3s Monitoring](https://rpi4cluster.com/monitorin
 
 ![](img/grafana-k8s-cluster-overview.png)
 
+To start we have to download the [pi4-monitoring GitHub project](https://github.com/gdha/pi4-monitoring):
+
+```bash
+$ git clone https://github.com/gdha/pi4-monitoring.git
+$ cd pi4-monitoring
+$ ls
+grafana  images  kubelet  kube-state-metrics  LICENSE  longhorn-servicemonitor.yaml  monitoring-namespace.yaml  node-exporter  prometheus  prometheus-operator  readme.md  traefik
+```
+
 ### Prometheus Operator
 
 One instance that will help us provision Prometheus, and some of its components. It extends the Kubernetes API, so that when we create some YAML deployments it will look as if we’re telling Kubernetes to deploy something, but it’s actually telling Prometheus Operator to do it for us. Official documentation: [Prometheus Operator](https://prometheus-operator.dev/docs/prologue/introduction/)
 
-We executed the following steps to install the Prometheus Operator [1]:
+We executed the following steps to install the Prometheus Operator [1] - is optional as it is already present and prepared under the prometheus-operator directory:
 
 ```bash
-wget https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/master/bundle.yaml
+$ cd prometheus-operator
+$ wget https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/master/bundle.yaml
 ```
 
 Followed by editing with sed the `bundle.yaml` file to replace the default namespace by monitoring (which is the namespace in where we want to built our monitoring tools for kubernetes).
@@ -35,10 +45,19 @@ $ grep 'namespace: ' bundle.yaml
   namespace: monitoring
   namespace: monitoring
   namespace: monitoring
+```
 
+To create the prometheus-operator we first need to create the namespace `monitoring`:
+
+```bash
 $ kubectl create -f ../monitoring-namespace.yaml 
 namespace/monitoring created
+```
 
+Then, we can create the prometheus-operator as follow:
+
+```bash
+$ cd ~/projects/pi4-monitoring/prometheus-operator
 $ kubectl apply --server-side -f bundle.yaml 
 customresourcedefinition.apiextensions.k8s.io/alertmanagerconfigs.monitoring.coreos.com serverside-applied
 customresourcedefinition.apiextensions.k8s.io/alertmanagers.monitoring.coreos.com serverside-applied
@@ -67,6 +86,121 @@ Next step is to prepare the service monitors.
 
 We will install the Prometheus Node Exporter [2] service which is a daemonset to collect metrics from individual cluster nodes, and many other details.
 The [installation is quite simple](https://github.com/gdha/pi4-monitoring/tree/master/node-exporter).
+
+```bash
+$ cd ~/projects/pi4-monitoring
+$ kubectl apply -f node-exporter/
+clusterrolebinding.rbac.authorization.k8s.io/node-exporter created
+clusterrole.rbac.authorization.k8s.io/node-exporter created
+daemonset.apps/node-exporter created
+serviceaccount/node-exporter created
+servicemonitor.monitoring.coreos.com/node-exporter created
+service/node-exporter created
+```
+
+This will create all permissions, and deploy the pod with the application Node Exporter, that will read metrics from Linux.
+
+After doing so, you should see node-exporter-xxxx pods in the monitoring namespace; I have 5 nodes, so it’s there 5 times.
+
+```bash
+$ kubectl get pods -n monitoring -o wide
+NAME                                   READY   STATUS    RESTARTS   AGE   IP              NODE   NOMINATED NODE   READINESS GATES
+prometheus-operator-6d56dc87f4-tg5qh   1/1     Running   0          10m   10.42.2.197     n2     <none>           <none>
+node-exporter-flgs7                    2/2     Running   0          61s   192.168.0.204   n4     <none>           <none>
+node-exporter-r4wfz                    2/2     Running   0          61s   192.168.0.202   n2     <none>           <none>
+node-exporter-jblkk                    2/2     Running   0          61s   192.168.0.201   n1     <none>           <none>
+node-exporter-fhkw6                    2/2     Running   0          61s   192.168.0.203   n3     <none>           <none>
+node-exporter-jwt8k                    2/2     Running   0          61s   192.168.0.205   n5     <none>           <none>
+```
+
+#### Kube State Metrics
+
+This is a simple service that listens to the Kubernetes API, and generates metrics about the state of the objects.
+
+Link to official GitHub: [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics).
+
+When we download the [GitHub project pi4-monitoring](https://github.com/gdha/pi4-monitoring) then `cd ~/projects/pi4monitoring` and execute:
+
+```bash
+$ kubectl apply -f kube-state-metrics/
+$ kubectl get pods -n monitoring | grep kube-state
+kube-state-metrics-6f8578cffd-cmks6    1/1     Running   19 (93m ago)   45d
+```
+
+#### Kubelet
+
+Kubelet, in case you did not know, is an essential part of Kubernetes’ control plane, and is also something that exposes Prometheus metrics by default in the port 10255.
+And as before:
+
+```bash
+$ cd ~/projects/pi4monitoring
+$ kubectl apply -f kubelet-servicemonitor.yaml
+servicemonitor.monitoring.coreos.com/kubelet created
+```
+
+#### Traefik
+
+I do not use Traefik much in my setup, but it is there, and it also exposes Prometheus-ready data, so why not...
+
+```bash
+$ cd ~/projects/pi4monitoring
+$ kubectl apply -f traefik-servicemonitor.yaml
+servicemonitor.monitoring.coreos.com/traefik created
+$ kubectl get servicemonitors.monitoring.coreos.com -n monitoring
+NAME                                 AGE
+node-exporter                        45d
+kube-state-metrics                   45d
+kubelet                              45d
+traefik                              45d
+```
+
+### Install Prometheus
+
+Now, we are going to deploy a single instance of Prometheus. Normally, you would/should deploy multiple instances spread throughout the cluster. For example, one instance dedicated to monitor just Kubernetes API, the next dedicated to monitor nodes, and so on... As with many things in the Kubernetes world, there is no specific way things should look 🙂, so to save resources, we will deploy just one.
+
+To deploy a single instance of prometheus perform the following actions:
+
+```bash
+$ cd ~/projects/pi4-monitoring
+$ kubectl apply -f prometheus/
+clusterrole.rbac.authorization.k8s.io/prometheus created
+clusterrolebinding.rbac.authorization.k8s.io/prometheus created
+serviceaccount/prometheus created
+service/prometheus-external created
+service/prometheus created
+prometheus.monitoring.coreos.com/prometheus-persistant created
+```
+
+When you inside the `prometheus.yaml` file you will the Service Monitors we created:
+
+```bash
+  serviceMonitorSelector:
+    matchExpressions:
+    - key: name
+      operator: In
+      values:
+      - longhorn-prometheus-servicemonitor
+      - kube-state-metrics
+      - node-exporter
+      - kubelet
+      - traefik
+```
+
+Furthermore, as storage we will be using the longhorn volumes as you can see:
+
+```bash
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 20Gi
+```
+
+![](img/PVC-prometheus-persistant.png)
 
 ![](img/prometheus.png)
 
