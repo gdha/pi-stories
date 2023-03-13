@@ -1,4 +1,4 @@
- PI4 Stories
+# PI4 Stories
 
 ## Raspberry Pi 4 cluster Series - Setup monitoring
 
@@ -200,9 +200,60 @@ Furthermore, as storage we will be using the longhorn volumes as you can see:
             storage: 20Gi
 ```
 
+The longhorn volume created is:
+
 ![](img/PVC-prometheus-persistant.png)
 
+The `prometheus-service-ext.yaml` file defines the loadbalancer piece. See:
+
+```bash
+$ kubectl get svc -n monitoring | grep external
+prometheus-external   LoadBalancer   10.43.53.220    192.168.0.232   9090:31862/TCP      45d
+```
+
+When you browse to URL: http://192.168.0.232:9090/ you will get to see :
+
+![](img/prometheus-initial-screen.png)
+
+You can reverse the background colors with the icons on the right corner (I prefer black as background). When you select the "Service Discovery" under the status tab you will see the following screen proofing we receive information about our kubernetes cluster:
+
 ![](img/prometheus.png)
+
+#### Longhorn service monitor
+
+Our storage provisioner Longhorn, that we deployed somewhere near the start of this whole K3s Kubernetes cluster setup, also natively provides data for Prometheus.
+
+Create in the folder `monitoring`, that we will put most of our configs in, the file `[longhorn-servicemonitor.yaml](https://github.com/gdha/pi4-monitoring/blob/master/longhorn-servicemonitor.yaml)`.
+
+As you can see, we are not talking to Kubernetes API (we are... but...), but to `apiVersion: monitoring.coreos.com/v1`, so we are basically telling Prometheus Operator to create something for us. In this case it’s kind: `ServiceMonitor`.
+
+This should be clear, `metadata: -> namespace: monitoring`, we are telling it to deploy into our monitoring namespace.
+
+The rest under `spec:` is basically telling what app the Service Monitor should "bind to". It’s looking for `app: longhorn-manager` in namespace `longhorn-system` and `port: manager`. This port could be a port number, but it also can have a name, so in this case it’s named manager.
+
+This is the longhorn-manager we are targeting.
+
+```bash
+$ kubectl get daemonset -n longhorn-system
+NAME                       DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+engine-image-ei-fc06c6fb   5         5         5       5            5           <none>          48d
+longhorn-manager           5         5         5       5            5           <none>          48d
+longhorn-csi-plugin        5         5         5       5            5           <none>          48d
+```
+
+To describea the daemonset of longhorn-manager execute:
+
+```bash
+$ kubectl describe daemonset longhorn-manager -n longhorn-system | grep Port
+    Port:       <none>
+    Host Port:  <none>
+    Port:       9500/TCP
+    Host Port:  0/TCP
+```
+
+Alright, now we can move on the grafana.
+
+### Install grafana
 
 ![](img/grafana-home.png)
 
