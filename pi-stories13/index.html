@@ -78,7 +78,15 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#prometheus_node_exporter">Prometheus Node Exporter</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#kube_state_metrics">Kube State Metrics</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#kubelet">Kubelet</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#traefik">Traefik</a>
+    </li>
         </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#install_prometheus">Install Prometheus</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
     </li>
@@ -114,10 +122,17 @@
 <h2 id="raspberry_pi_4_cluster_series_-_setup_monitoring">Raspberry Pi 4 cluster Series - Setup monitoring<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_setup_monitoring" title="Permanent link">&para;</a></h2>
 <p>This story is mostly based on <a href="https://rpi4cluster.com/monitoring/monitor-intro/">K3s Monitoring</a>. Basically, we need to install Prometheus and many other components to be able to feed Grafana. Our goal is to get something like:</p>
 <p><img alt="" src="../img/grafana-k8s-cluster-overview.png" /></p>
+<p>To start we have to download the <a href="https://github.com/gdha/pi4-monitoring">pi4-monitoring GitHub project</a>:</p>
+<pre><code class="language-bash">$ git clone https://github.com/gdha/pi4-monitoring.git
+$ cd pi4-monitoring
+$ ls
+grafana  images  kubelet  kube-state-metrics  LICENSE  longhorn-servicemonitor.yaml  monitoring-namespace.yaml  node-exporter  prometheus  prometheus-operator  readme.md  traefik
+</code></pre>
 <h3 id="prometheus_operator">Prometheus Operator<a class="headerlink" href="#prometheus_operator" title="Permanent link">&para;</a></h3>
 <p>One instance that will help us provision Prometheus, and some of its components. It extends the Kubernetes API, so that when we create some YAML deployments it will look as if we’re telling Kubernetes to deploy something, but it’s actually telling Prometheus Operator to do it for us. Official documentation: <a href="https://prometheus-operator.dev/docs/prologue/introduction/">Prometheus Operator</a></p>
-<p>We executed the following steps to install the Prometheus Operator [1]:</p>
-<pre><code class="language-bash">wget https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/master/bundle.yaml
+<p>We executed the following steps to install the Prometheus Operator [1] - is optional as it is already present and prepared under the prometheus-operator directory:</p>
+<pre><code class="language-bash">$ cd prometheus-operator
+$ wget https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/master/bundle.yaml
 </code></pre>
 <p>Followed by editing with sed the <code>bundle.yaml</code> file to replace the default namespace by monitoring (which is the namespace in where we want to built our monitoring tools for kubernetes).</p>
 <p>Then we first create the namespace and apply the bundle.yaml file as seen below:</p>
@@ -135,10 +150,13 @@ $ grep 'namespace: ' bundle.yaml
   namespace: monitoring
   namespace: monitoring
   namespace: monitoring
-
-$ kubectl create -f ../monitoring-namespace.yaml 
+</code></pre>
+<p>To create the prometheus-operator we first need to create the namespace <code>monitoring</code>:</p>
+<pre><code class="language-bash">$ kubectl create -f ../monitoring-namespace.yaml 
 namespace/monitoring created
-
+</code></pre>
+<p>Then, we can create the prometheus-operator as follow:</p>
+<pre><code class="language-bash">$ cd ~/projects/pi4-monitoring/prometheus-operator
 $ kubectl apply --server-side -f bundle.yaml 
 customresourcedefinition.apiextensions.k8s.io/alertmanagerconfigs.monitoring.coreos.com serverside-applied
 customresourcedefinition.apiextensions.k8s.io/alertmanagers.monitoring.coreos.com serverside-applied
@@ -164,6 +182,89 @@ prometheus-operator-6d56dc87f4-tg5qh   1/1     Running   0          25s
 <h4 id="prometheus_node_exporter">Prometheus Node Exporter<a class="headerlink" href="#prometheus_node_exporter" title="Permanent link">&para;</a></h4>
 <p>We will install the Prometheus Node Exporter [2] service which is a daemonset to collect metrics from individual cluster nodes, and many other details.
 The <a href="https://github.com/gdha/pi4-monitoring/tree/master/node-exporter">installation is quite simple</a>.</p>
+<pre><code class="language-bash">$ cd ~/projects/pi4-monitoring
+$ kubectl apply -f node-exporter/
+clusterrolebinding.rbac.authorization.k8s.io/node-exporter created
+clusterrole.rbac.authorization.k8s.io/node-exporter created
+daemonset.apps/node-exporter created
+serviceaccount/node-exporter created
+servicemonitor.monitoring.coreos.com/node-exporter created
+service/node-exporter created
+</code></pre>
+<p>This will create all permissions, and deploy the pod with the application Node Exporter, that will read metrics from Linux.</p>
+<p>After doing so, you should see node-exporter-xxxx pods in the monitoring namespace; I have 5 nodes, so it’s there 5 times.</p>
+<pre><code class="language-bash">$ kubectl get pods -n monitoring -o wide
+NAME                                   READY   STATUS    RESTARTS   AGE   IP              NODE   NOMINATED NODE   READINESS GATES
+prometheus-operator-6d56dc87f4-tg5qh   1/1     Running   0          10m   10.42.2.197     n2     &lt;none&gt;           &lt;none&gt;
+node-exporter-flgs7                    2/2     Running   0          61s   192.168.0.204   n4     &lt;none&gt;           &lt;none&gt;
+node-exporter-r4wfz                    2/2     Running   0          61s   192.168.0.202   n2     &lt;none&gt;           &lt;none&gt;
+node-exporter-jblkk                    2/2     Running   0          61s   192.168.0.201   n1     &lt;none&gt;           &lt;none&gt;
+node-exporter-fhkw6                    2/2     Running   0          61s   192.168.0.203   n3     &lt;none&gt;           &lt;none&gt;
+node-exporter-jwt8k                    2/2     Running   0          61s   192.168.0.205   n5     &lt;none&gt;           &lt;none&gt;
+</code></pre>
+<h4 id="kube_state_metrics">Kube State Metrics<a class="headerlink" href="#kube_state_metrics" title="Permanent link">&para;</a></h4>
+<p>This is a simple service that listens to the Kubernetes API, and generates metrics about the state of the objects.</p>
+<p>Link to official GitHub: <a href="https://github.com/kubernetes/kube-state-metrics">kube-state-metrics</a>.</p>
+<p>When we download the <a href="https://github.com/gdha/pi4-monitoring">GitHub project pi4-monitoring</a> then <code>cd ~/projects/pi4monitoring</code> and execute:</p>
+<pre><code class="language-bash">$ kubectl apply -f kube-state-metrics/
+$ kubectl get pods -n monitoring | grep kube-state
+kube-state-metrics-6f8578cffd-cmks6    1/1     Running   19 (93m ago)   45d
+</code></pre>
+<h4 id="kubelet">Kubelet<a class="headerlink" href="#kubelet" title="Permanent link">&para;</a></h4>
+<p>Kubelet, in case you did not know, is an essential part of Kubernetes’ control plane, and is also something that exposes Prometheus metrics by default in the port 10255.
+And as before:</p>
+<pre><code class="language-bash">$ cd ~/projects/pi4monitoring
+$ kubectl apply -f kubelet-servicemonitor.yaml
+servicemonitor.monitoring.coreos.com/kubelet created
+</code></pre>
+<h4 id="traefik">Traefik<a class="headerlink" href="#traefik" title="Permanent link">&para;</a></h4>
+<p>I do not use Traefik much in my setup, but it is there, and it also exposes Prometheus-ready data, so why not...</p>
+<pre><code class="language-bash">$ cd ~/projects/pi4monitoring
+$ kubectl apply -f traefik-servicemonitor.yaml
+servicemonitor.monitoring.coreos.com/traefik created
+$ kubectl get servicemonitors.monitoring.coreos.com -n monitoring
+NAME                                 AGE
+node-exporter                        45d
+kube-state-metrics                   45d
+kubelet                              45d
+traefik                              45d
+</code></pre>
+<h3 id="install_prometheus">Install Prometheus<a class="headerlink" href="#install_prometheus" title="Permanent link">&para;</a></h3>
+<p>Now, we are going to deploy a single instance of Prometheus. Normally, you would/should deploy multiple instances spread throughout the cluster. For example, one instance dedicated to monitor just Kubernetes API, the next dedicated to monitor nodes, and so on... As with many things in the Kubernetes world, there is no specific way things should look 🙂, so to save resources, we will deploy just one.</p>
+<p>To deploy a single instance of prometheus perform the following actions:</p>
+<pre><code class="language-bash">$ cd ~/projects/pi4-monitoring
+$ kubectl apply -f prometheus/
+clusterrole.rbac.authorization.k8s.io/prometheus created
+clusterrolebinding.rbac.authorization.k8s.io/prometheus created
+serviceaccount/prometheus created
+service/prometheus-external created
+service/prometheus created
+prometheus.monitoring.coreos.com/prometheus-persistant created
+</code></pre>
+<p>When you inside the <code>prometheus.yaml</code> file you will the Service Monitors we created:</p>
+<pre><code class="language-bash">  serviceMonitorSelector:
+    matchExpressions:
+    - key: name
+      operator: In
+      values:
+      - longhorn-prometheus-servicemonitor
+      - kube-state-metrics
+      - node-exporter
+      - kubelet
+      - traefik
+</code></pre>
+<p>Furthermore, as storage we will be using the longhorn volumes as you can see:</p>
+<pre><code class="language-bash">  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 20Gi
+</code></pre>
+<p><img alt="" src="../img/PVC-prometheus-persistant.png" /></p>
 <p><img alt="" src="../img/prometheus.png" /></p>
 <p><img alt="" src="../img/grafana-home.png" /></p>
 <p><img alt="" src="../img/kubernetes-cluster-grafana.png" /></p>
