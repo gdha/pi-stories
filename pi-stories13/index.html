@@ -72,23 +72,33 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Setup monitoring</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#prometheus_operator">Prometheus Operator</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#install_service_monitors">Install Service Monitors</a>
+    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_setup_monitoring">Raspberry Pi 4 cluster Series - Setup monitoring</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#prometheus_node_exporter">Prometheus Node Exporter</a>
+    <li class="toctree-l3"><a class="reference internal" href="#prometheus_operator">Prometheus Operator</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#kube_state_metrics">Kube State Metrics</a>
+    <li class="toctree-l3"><a class="reference internal" href="#install_service_monitors">Install Service Monitors</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#prometheus_node_exporter">Prometheus Node Exporter</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#kubelet">Kubelet</a>
+    <li class="toctree-l4"><a class="reference internal" href="#kube_state_metrics">Kube State Metrics</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#traefik">Traefik</a>
+    <li class="toctree-l4"><a class="reference internal" href="#kubelet">Kubelet</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#traefik">Traefik</a>
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#install_prometheus">Install Prometheus</a>
+    <li class="toctree-l3"><a class="reference internal" href="#install_prometheus">Install Prometheus</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#longhorn_service_monitor">Longhorn service monitor</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#install_grafana">Install grafana</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#references">References</a>
+    </li>
+        </ul>
     </li>
     </ul>
                   </li>
@@ -118,7 +128,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p>PI4 Stories</p>
+                <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
 <h2 id="raspberry_pi_4_cluster_series_-_setup_monitoring">Raspberry Pi 4 cluster Series - Setup monitoring<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_setup_monitoring" title="Permanent link">&para;</a></h2>
 <p>This story is mostly based on <a href="https://rpi4cluster.com/monitoring/monitor-intro/">K3s Monitoring</a>. Basically, we need to install Prometheus and many other components to be able to feed Grafana. Our goal is to get something like:</p>
 <p><img alt="" src="../img/grafana-k8s-cluster-overview.png" /></p>
@@ -264,8 +274,38 @@ prometheus.monitoring.coreos.com/prometheus-persistant created
           requests:
             storage: 20Gi
 </code></pre>
+<p>The longhorn volume created is:</p>
 <p><img alt="" src="../img/PVC-prometheus-persistant.png" /></p>
+<p>The <code>prometheus-service-ext.yaml</code> file defines the loadbalancer piece. See:</p>
+<pre><code class="language-bash">$ kubectl get svc -n monitoring | grep external
+prometheus-external   LoadBalancer   10.43.53.220    192.168.0.232   9090:31862/TCP      45d
+</code></pre>
+<p>When you browse to URL: http://192.168.0.232:9090/ you will get to see :</p>
+<p><img alt="" src="img/prometheus-initial-screen.png" /></p>
+<p>You can reverse the background colors with the icons on the right corner (I prefer black as background). When you select the "Service Discovery" under the status tab you will see the following screen proofing we receive information about our kubernetes cluster:</p>
 <p><img alt="" src="../img/prometheus.png" /></p>
+<h4 id="longhorn_service_monitor">Longhorn service monitor<a class="headerlink" href="#longhorn_service_monitor" title="Permanent link">&para;</a></h4>
+<p>Our storage provisioner Longhorn, that we deployed somewhere near the start of this whole K3s Kubernetes cluster setup, also natively provides data for Prometheus.</p>
+<p>Create in the folder <code>monitoring</code>, that we will put most of our configs in, the file <code>[longhorn-servicemonitor.yaml](https://github.com/gdha/pi4-monitoring/blob/master/longhorn-servicemonitor.yaml)</code>.</p>
+<p>As you can see, we are not talking to Kubernetes API (we are... but...), but to <code>apiVersion: monitoring.coreos.com/v1</code>, so we are basically telling Prometheus Operator to create something for us. In this case it’s kind: <code>ServiceMonitor</code>.</p>
+<p>This should be clear, <code>metadata: -&gt; namespace: monitoring</code>, we are telling it to deploy into our monitoring namespace.</p>
+<p>The rest under <code>spec:</code> is basically telling what app the Service Monitor should "bind to". It’s looking for <code>app: longhorn-manager</code> in namespace <code>longhorn-system</code> and <code>port: manager</code>. This port could be a port number, but it also can have a name, so in this case it’s named manager.</p>
+<p>This is the longhorn-manager we are targeting.</p>
+<pre><code class="language-bash">$ kubectl get daemonset -n longhorn-system
+NAME                       DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+engine-image-ei-fc06c6fb   5         5         5       5            5           &lt;none&gt;          48d
+longhorn-manager           5         5         5       5            5           &lt;none&gt;          48d
+longhorn-csi-plugin        5         5         5       5            5           &lt;none&gt;          48d
+</code></pre>
+<p>To describea the daemonset of longhorn-manager execute:</p>
+<pre><code class="language-bash">$ kubectl describe daemonset longhorn-manager -n longhorn-system | grep Port
+    Port:       &lt;none&gt;
+    Host Port:  &lt;none&gt;
+    Port:       9500/TCP
+    Host Port:  0/TCP
+</code></pre>
+<p>Alright, now we can move on the grafana.</p>
+<h3 id="install_grafana">Install grafana<a class="headerlink" href="#install_grafana" title="Permanent link">&para;</a></h3>
 <p><img alt="" src="../img/grafana-home.png" /></p>
 <p><img alt="" src="../img/kubernetes-cluster-grafana.png" /></p>
 <p><img alt="" src="../img/graphite-celsius.png" /></p>
