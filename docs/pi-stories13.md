@@ -255,6 +255,55 @@ Alright, now we can move on the grafana.
 
 ### Install grafana
 
+Our grafana pod will alos use a longhorn device as defined under file:
+
+```bash
+ cat grafana-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: longhorn-grafana-pvc
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 10Gi
+```
+
+To install the pod just run:
+
+```bash
+$ cd ~/projects/pi4-monitoring
+$ kubectl apply -f grafana/
+deployment.apps/grafana created
+persistentvolumeclaim/longhorn-grafana-pvc created
+service/grafana created
+serviceaccount/grafana created
+
+$ kubectl get endpoints -n monitoring
+NAME                  ENDPOINTS                                                              AGE
+prometheus-operator   10.42.2.225:8080                                                       5d16h
+kube-state-metrics    10.42.2.220:8081,10.42.2.220:8080                                      5d16h
+prometheus-operated   10.42.2.233:9090                                                       5d16h
+prometheus            10.42.2.233:9090                                                       5d16h
+prometheus-external   10.42.2.233:9090                                                       5d16h
+node-exporter         192.168.0.201:9100,192.168.0.202:9100,192.168.0.203:9100 + 2 more...   5d16h
+grafana               10.42.1.21:3000                                                        2m44s
+
+$ kubectl get svc -n monitoring
+NAME                  TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)             AGE
+prometheus-operator   ClusterIP      None            <none>          8080/TCP            5d16h
+node-exporter         ClusterIP      None            <none>          9100/TCP            5d16h
+kube-state-metrics    ClusterIP      None            <none>          8080/TCP,8081/TCP   5d16h
+prometheus-external   LoadBalancer   10.43.179.122   192.168.0.242   9090:30549/TCP      5d16h
+prometheus            ClusterIP      10.43.19.14     <none>          9090/TCP            5d16h
+prometheus-operated   ClusterIP      None            <none>          9090/TCP            5d16h
+grafana               LoadBalancer   10.43.202.37    192.168.0.243   3000:31881/TCP      3m2s
+```
+
 ![](img/grafana-home.png)
 
 ![](img/kubernetes-cluster-grafana.png)
