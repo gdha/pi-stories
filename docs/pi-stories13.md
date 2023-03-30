@@ -295,14 +295,20 @@ grafana               10.42.1.21:3000                                           
 
 $ kubectl get svc -n monitoring
 NAME                  TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)             AGE
-prometheus-operator   ClusterIP      None            <none>          8080/TCP            5d16h
-node-exporter         ClusterIP      None            <none>          9100/TCP            5d16h
-kube-state-metrics    ClusterIP      None            <none>          8080/TCP,8081/TCP   5d16h
-prometheus-external   LoadBalancer   10.43.179.122   192.168.0.242   9090:30549/TCP      5d16h
-prometheus            ClusterIP      10.43.19.14     <none>          9090/TCP            5d16h
-prometheus-operated   ClusterIP      None            <none>          9090/TCP            5d16h
-grafana               LoadBalancer   10.43.202.37    192.168.0.243   3000:31881/TCP      3m2s
+prometheus-operator   ClusterIP      None            <none>          8080/TCP            63d
+node-exporter         ClusterIP      None            <none>          9100/TCP            62d
+kube-state-metrics    ClusterIP      None            <none>          8080/TCP,8081/TCP   62d
+prometheus-external   LoadBalancer   10.43.53.220    192.168.0.232   9090:31862/TCP      62d
+prometheus            ClusterIP      10.43.78.140    <none>          9090/TCP            62d
+prometheus-operated   ClusterIP      None            <none>          9090/TCP            62d
+grafana               LoadBalancer   10.43.108.229   192.168.0.233   3000:32251/TCP      62d
 ```
+
+Open a browser and use url http://192.168.0.233:3000/ and login with the default admin account with first time password admin.
+
+On the left pane we can import grafana graphs with "+" -> create -> import
+
+From https://grafana.com/grafana/dashboards/ we can import some examples:
 
 ![](img/grafana-home.png)
 
