@@ -306,15 +306,34 @@ grafana               LoadBalancer   10.43.108.229   192.168.0.233   3000:32251/
 
 Open a browser and use url http://192.168.0.233:3000/ and login with the default admin account with first time password admin.
 
+![](img/grafana-home.png)
+
 On the left pane we can import grafana graphs with "+" -> create -> import
 
-From https://grafana.com/grafana/dashboards/ we can import some examples:
+From [GrafanaLabs](https://grafana.com/grafana/dashboards/) we can import some examples:
 
-![](img/grafana-home.png)
+* Kubernetes Nodes from GrafanaLabs - copy the ID into your clipboard:
+
+![](img/grafanaLabs-k8s-nodes.png)
+
+And, paste the ID into:
+
+![](img/grafana-import.png)
+
+and, perform the import in your grafana window.
+You will see the results in an instance:
+
+![](img/grafana-k8s-nodes.png)
+
+* Another good example is [Kubernetes Cluster from GrafanaLabs](https://grafana.com/grafana/dashboards/7249-kubernetes-cluster/) to import into your grafana dashboard.
 
 ![](img/kubernetes-cluster-grafana.png)
 
+* Even better is to create your own dashboard, in our case the already existing graphite celsius graphs:
+
 ![](img/graphite-celsius.png)
+
+Try it out as it is not that complicated as an exercise and you will be proud of your first designed dashboard:
 
 ![](img/pi4-celsius-grafana.png)
 
