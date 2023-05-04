@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Raspberry Pi 4 Keep your Operating System updated - Raspberry PI k3s stories</title>
+    <title>Raspberry Pi 4 Setup logging with Loki - Raspberry PI k3s stories</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Raspberry Pi 4 Keep your Operating System updated";
-        var mkdocs_page_input_path = "pi-stories8.md";
+        var mkdocs_page_name = "Raspberry Pi 4 Setup logging with Loki";
+        var mkdocs_page_input_path = "pi-stories14.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -60,11 +60,7 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories7/">Raspberry Pi 4 YAML everywhere -what about correctness?</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Keep your Operating System updated</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_keep_your_operating_system_updated">Raspberry Pi 4 cluster Series - Keep your Operating System updated</a>
-    </li>
-    </ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories8/">Raspberry Pi 4 Keep your Operating System updated</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories9/">Raspberry Pi 4 Installation of Longhorn</a>
                   </li>
@@ -76,7 +72,13 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories13/">Raspberry Pi 4 Setup monitoring</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories14/">Raspberry Pi 4 Setup logging with Loki</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Setup logging with Loki</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#install_arkade">Install Arkade</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#installation_of_loki_and_promtail">Installation of loki and promtail</a>
+    </li>
+    </ul>
                   </li>
               </ul>
       </div>
@@ -94,9 +96,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
           <li>PI4 STORIES &raquo;</li>
-      <li>Raspberry Pi 4 Keep your Operating System updated</li>
+      <li>Raspberry Pi 4 Setup logging with Loki</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories8.md">Edit on gdha/pi-stories</a>
+          <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories14.md">Edit on gdha/pi-stories</a>
     </li>
   </ul>
   <hr/>
@@ -104,81 +106,52 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
-<h2 id="raspberry_pi_4_cluster_series_-_keep_your_operating_system_updated">Raspberry Pi 4 cluster Series - Keep your Operating System updated<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_keep_your_operating_system_updated" title="Permanent link">&para;</a></h2>
-<p>When you login on one of your nodes you often see a message like the following:</p>
-<pre><code class="language-bash">Welcome to Ubuntu 20.04.1 LTS (GNU/Linux 5.4.0-1026-raspi aarch64)
+                <p>PI4 Stories</p>
+<h2 id="raspberry_pi_4_cluster_series_-_setup_logging_with_loki">Raspberry Pi 4 cluster Series - Setup logging with Loki<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_setup_logging_with_loki" title="Permanent link">&para;</a></h2>
+<p>This story is mostly based on <a href="https://rpi4cluster.com/monitoring/k3s-logging/">Logging Logs</a> article.</p>
+<p>We have our Prometheus and Grafana on k3s cluster if you followed my guides. But Prometheus is not able to get logs from k3s nodes, containers, Kubernetes API, and it's not made of that kind of monitoring. We need Loki + Promtail, you can find all info on their Grafana Loki and Promtail.</p>
+<ul>
+<li>
+<p>Loki - or also known as Grafana Loki - log aggregation system, it does not index the contents of the logs, but rather a set of labels for each log stream. In simple terms, it's the app that accepts logs from everything and store it.</p>
+</li>
+<li>
+<p>Promtail - is a tool that reads the logs from various sources like OS, Containers, Kubernetes API server etc... and push them to Loki.</p>
+</li>
+</ul>
+<p>We will be using Arkade to install loki, therefore, we first need to install it.</p>
+<h3 id="install_arkade">Install Arkade<a class="headerlink" href="#install_arkade" title="Permanent link">&para;</a></h3>
+<p>This is basically Helm, just made even simpler.</p>
+<p>More info about Arkade: <a href="https://github.com/alexellis/arkade">https://github.com/alexellis/arkade</a></p>
+<pre><code class="language-bash">$ curl -SLsf https://dl.get-arkade.dev/ | sudo sh
+aarch64
+Downloading package https://github.com/alexellis/arkade/releases/download/0.8.62/arkade-arm64 as /tmp/arkade-arm64
+Download complete.
 
- * Documentation:  https://help.ubuntu.com
- * Management:     https://landscape.canonical.com
- * Support:        https://ubuntu.com/advantage
+Running with sufficient permissions to attempt to move arkade to /usr/local/bin
+New version of arkade installed to /usr/local/bin
+Creating alias 'ark' for 'arkade'.
+            _             _
+  __ _ _ __| | ____ _  __| | ___
+ / _` | '__| |/ / _` |/ _` |/ _ \
+| (_| | |  |   &lt; (_| | (_| |  __/
+ \__,_|_|  |_|\_\__,_|\__,_|\___|
 
-  System information as of Thu 28 Jan 2021 12:05:56 PM CET
+Open Source Marketplace For Developer Tools
 
-  System load:              0.55
-  Usage of /:               18.3% of 28.40GB
-  Memory usage:             14%
-  Swap usage:               0%
-  Temperature:              34.6 C
-  Processes:                157
-  Users logged in:          1
-  IPv4 address for cni0:    10.42.1.1
-  IPv4 address for docker0: 172.17.0.1
-  IPv4 address for eth0:    192.168.0.205
+Version: 0.8.62
+Git Commit: 003e8716bbc987c412643af3a90cf87ef778bd2e
 
- * Introducing self-healing high availability clusters in MicroK8s.
-   Simple, hardened, Kubernetes for production, from RaspberryPi to DC.
-
-     https://microk8s.io/high-availability
-
-62 updates can be installed immediately.
-0 of these updates are security updates.
-To see these additional updates run: apt list --upgradable
-
-
-Last login: Thu Jan 28 12:01:54 2021 from 192.168.0.41
+ 🐳 arkade needs your support: https://github.com/sponsors/alexellis
+gdha@n1:~/projects/pi4-logging$ ls /usr/local/bin
+ark  arkade  crictl  golangci-lint  helm  k3s  k3s-killall.sh  k3s-uninstall.sh  kubectl  kube-linter
 </code></pre>
-<p>Pay attention to the amount of packages ready to update:</p>
-<pre><code class="language-bash">See line &quot;62 updates can be installed immediately&quot;
-</code></pre>
-<p>Doing that for a bunch of systems is tiring/boring so let get this done via ansible.
-First we need to download package information from all configured sources.</p>
-<pre><code class="language-bash">$ ansible pi -m shell -b -a &quot;apt update&quot;
-n1 | SUCCESS | rc=0 &gt;&gt;
-Hit:1 http://ports.ubuntu.com/ubuntu-ports focal InRelease
-Get:2 http://ports.ubuntu.com/ubuntu-ports focal-updates InRelease [114 kB]
-Get:3 http://ports.ubuntu.com/ubuntu-ports focal-backports InRelease [101 kB]
-Get:4 http://ports.ubuntu.com/ubuntu-ports focal-security InRelease [109 kB]
-Fetched 324 kB in 2s (187 kB/s)
-Reading package lists...
-Building dependency tree...
-Reading state information...
-49 packages can be upgraded. Run 'apt list --upgradable' to see them.
-WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-
-...
-
-n5 | SUCCESS | rc=0 &gt;&gt;
-Hit:1 http://ports.ubuntu.com/ubuntu-ports focal InRelease
-Get:2 http://ports.ubuntu.com/ubuntu-ports focal-updates InRelease [114 kB]
-Get:3 http://ports.ubuntu.com/ubuntu-ports focal-backports InRelease [101 kB]
-Get:4 http://ports.ubuntu.com/ubuntu-ports focal-security InRelease [109 kB]
-Fetched 324 kB in 2s (196 kB/s)
-Reading package lists...
-Building dependency tree...
-Reading state information...
-58 packages can be upgraded. Run 'apt list --upgradable' to see them.
-WARNING: apt does not have a stable CLI interface. Use with caution in scripts
-</code></pre>
-<p>And, finally, to automate the installation of the packages:</p>
-<pre><code class="language-bash">$ ansible pi -m shell -b -a &quot;apt --yes upgrade&quot;
-</code></pre>
+<p>To upgrade arkade just re-run above command.</p>
+<h3 id="installation_of_loki_and_promtail">Installation of loki and promtail<a class="headerlink" href="#installation_of_loki_and_promtail" title="Permanent link">&para;</a></h3>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../pi-stories7/" class="btn btn-neutral float-left" title="Raspberry Pi 4 YAML everywhere -what about correctness?"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../pi-stories9/" class="btn btn-neutral float-right" title="Raspberry Pi 4 Installation of Longhorn">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../pi-stories13/" class="btn btn-neutral float-left" title="Raspberry Pi 4 Setup monitoring"><span class="icon icon-circle-arrow-left"></span> Previous</a>
     </div>
 
   <hr/>
@@ -202,10 +175,8 @@ WARNING: apt does not have a stable CLI interface. Use with caution in scripts
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../pi-stories7/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../pi-stories13/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
-    
-      <span><a href="../pi-stories9/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

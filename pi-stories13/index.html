@@ -34,7 +34,7 @@
           <a href=".." class="icon icon-home"> Raspberry PI k3s stories
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -102,6 +102,8 @@
     </li>
     </ul>
                   </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories14/">Raspberry Pi 4 Setup logging with Loki</a>
+                  </li>
               </ul>
       </div>
     </div>
@@ -116,7 +118,7 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
           <li>PI4 STORIES &raquo;</li>
       <li>Raspberry Pi 4 Setup monitoring</li>
     <li class="wy-breadcrumbs-aside">
@@ -281,7 +283,7 @@ prometheus.monitoring.coreos.com/prometheus-persistant created
 prometheus-external   LoadBalancer   10.43.53.220    192.168.0.232   9090:31862/TCP      45d
 </code></pre>
 <p>When you browse to URL: http://192.168.0.232:9090/ you will get to see :</p>
-<p><img alt="" src="img/prometheus-initial-screen.png" /></p>
+<p><img alt="" src="../img/prometheus-initial-screen.png" /></p>
 <p>You can reverse the background colors with the icons on the right corner (I prefer black as background). When you select the "Service Discovery" under the status tab you will see the following screen proofing we receive information about our kubernetes cluster:</p>
 <p><img alt="" src="../img/prometheus.png" /></p>
 <h4 id="longhorn_service_monitor">Longhorn service monitor<a class="headerlink" href="#longhorn_service_monitor" title="Permanent link">&para;</a></h4>
@@ -350,11 +352,27 @@ prometheus-operated   ClusterIP      None            &lt;none&gt;          9090/
 grafana               LoadBalancer   10.43.108.229   192.168.0.233   3000:32251/TCP      62d
 </code></pre>
 <p>Open a browser and use url http://192.168.0.233:3000/ and login with the default admin account with first time password admin.</p>
-<p>On the left pane we can import grafana graphs with "+" -&gt; create -&gt; import</p>
-<p>From https://grafana.com/grafana/dashboards/ we can import some examples:</p>
 <p><img alt="" src="../img/grafana-home.png" /></p>
+<p>On the left pane we can import grafana graphs with "+" -&gt; create -&gt; import</p>
+<p>From <a href="https://grafana.com/grafana/dashboards/">GrafanaLabs</a> we can import some examples:</p>
+<ul>
+<li>Kubernetes Nodes from GrafanaLabs - copy the ID into your clipboard:</li>
+</ul>
+<p><img alt="" src="../img/grafanaLabs-k8s-nodes.png" /></p>
+<p>And, paste the ID into:</p>
+<p><img alt="" src="../img/grafana-import.png" /></p>
+<p>and, perform the import in your grafana window.
+You will see the results in an instance:</p>
+<p><img alt="" src="../img/grafana-k8s-nodes.png" /></p>
+<ul>
+<li>Another good example is <a href="https://grafana.com/grafana/dashboards/7249-kubernetes-cluster/">Kubernetes Cluster from GrafanaLabs</a> to import into your grafana dashboard.</li>
+</ul>
 <p><img alt="" src="../img/kubernetes-cluster-grafana.png" /></p>
+<ul>
+<li>Even better is to create your own dashboard, in our case the already existing graphite celsius graphs:</li>
+</ul>
 <p><img alt="" src="../img/graphite-celsius.png" /></p>
+<p>Try it out as it is not that complicated as an exercise and you will be proud of your first designed dashboard:</p>
 <p><img alt="" src="../img/pi4-celsius-grafana.png" /></p>
 <h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
 <p>[1] <a href="https://github.com/gdha/pi4-monitoring/tree/master/prometheus-operator">Prometheus Operator GitHub sources</a></p>
@@ -364,6 +382,7 @@ grafana               LoadBalancer   10.43.108.229   192.168.0.233   3000:32251/
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href="../pi-stories12/" class="btn btn-neutral float-left" title="Raspberry Pi 4 Spin up graphite and temperature2celsius pods"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../pi-stories14/" class="btn btn-neutral float-right" title="Raspberry Pi 4 Setup logging with Loki">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -389,6 +408,8 @@ grafana               LoadBalancer   10.43.108.229   192.168.0.233   3000:32251/
     
       <span><a href="../pi-stories12/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
+    
+      <span><a href="../pi-stories14/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
