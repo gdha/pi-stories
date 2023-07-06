@@ -147,6 +147,109 @@ ark  arkade  crictl  golangci-lint  helm  k3s  k3s-killall.sh  k3s-uninstall.sh 
 </code></pre>
 <p>To upgrade arkade just re-run above command.</p>
 <h3 id="installation_of_loki_and_promtail">Installation of loki and promtail<a class="headerlink" href="#installation_of_loki_and_promtail" title="Permanent link">&para;</a></h3>
+<p>Before we start we have to make sure that the namespace has been created:</p>
+<pre><code class="language-bash">gdha@n1:~/projects/pi4-logging$ kubectl apply -f logging-namespace.yaml 
+namespace/logging created
+</code></pre>
+<p>Then, we can use the installed <code>arkade</code> executable to install loki</p>
+<pre><code class="language-bash">gdha@n1:~/projects/pi4-logging$ arkade install loki -n logging  --persistence
+2023/02/03 15:24:10 
+Using Kubeconfig: /home/gdha/.kube/config
+[Warning] unable to create namespace logging, may already exist: Error from server (AlreadyExists): namespaces &quot;logging&quot; already exists
+Client: aarch64, Linux
+2023/02/03 15:24:10 User dir established as: /home/gdha/.arkade/
+2023/02/03 15:24:10 Looking up version for helm
+2023/02/03 15:24:10 Found: v3.11.0
+Downloading: https://get.helm.sh/helm-v3.11.0-linux-arm64.tar.gz
+/tmp/helm-v3.11.0-linux-arm64.tar.gz written.
+2023/02/03 15:24:14 Looking up version for helm
+2023/02/03 15:24:14 Found: v3.11.0
+2023/02/03 15:24:15 Extracted: /tmp/helm
+2023/02/03 15:24:15 Copying /tmp/helm to /home/gdha/.arkade/bin/helm
+Downloaded to:  /home/gdha/.arkade/bin/helm helm
+&quot;grafana&quot; has been added to your repositories
+
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the &quot;metallb&quot; chart repository
+...Successfully got an update from the &quot;longhorn&quot; chart repository
+...Successfully got an update from the &quot;traefik&quot; chart repository
+...Successfully got an update from the &quot;kiwigrid&quot; chart repository
+...Successfully got an update from the &quot;grafana&quot; chart repository
+Update Complete. ⎈Happy Helming!⎈
+
+VALUES values.yaml
+Command: /home/gdha/.arkade/bin/helm [upgrade --install loki-stack grafana/loki-stack --namespace logging --values /tmp/charts/loki-stack/values.yaml --set loki.persistence.enabled=true]
+Release &quot;loki-stack&quot; does not exist. Installing it now.
+NAME: loki-stack
+LAST DEPLOYED: Fri Feb  3 15:24:22 2023
+NAMESPACE: logging
+STATUS: deployed
+REVISION: 1
+NOTES:
+The Loki stack has been deployed to your cluster. Loki can now be added as a datasource in Grafana.
+
+See http://docs.grafana.org/features/datasources/loki/ for more detail.
+=======================================================================
+= loki has been installed.                                   =
+=======================================================================
+
+# Get started with loki here:
+# https://grafana.com/docs/loki/latest
+
+# See how to integrate loki with Grafana here
+# https://grafana.com/docs/loki/latest/getting-started/grafana
+
+# Check loki's logs with:
+
+kubectl logs svc/loki-stack
+
+kubectl logs svc/loki-stack-headless
+
+
+# If you installed with Grafana you can access the dashboard with the username &quot;admin&quot; and password shown below
+ # To get password
+ kubectl get secret loki-stack-grafana -o jsonpath=&quot;{.data.admin-password}&quot; | base64 --decode ; echo
+
+ # Forward traffic to your localhost
+ kubectl port-forward service/loki-stack-grafana 3000:80
+
+
+
+whale arkade needs your support: https://github.com/sponsors/alexellis
+</code></pre>
+<p>Now, verify if the pods have been created:</p>
+<pre><code class="language-bash">gdha@n1:~/projects/pi4-logging$ kubectl get pods -n logging
+NAME                        READY   STATUS    RESTARTS   AGE
+loki-stack-0                0/1     Running   0          114s
+loki-stack-promtail-d45tz   1/1     Running   0          114s
+loki-stack-promtail-qv75h   1/1     Running   0          114s
+loki-stack-promtail-rhcr9   1/1     Running   0          114s
+loki-stack-promtail-dwz7s   1/1     Running   0          114s
+loki-stack-promtail-4qwlg   1/1     Running   0          114s
+</code></pre>
+<p>As last we still need to apply the patch:</p>
+<pre><code class="language-bash">gdha@n1:~/projects/pi4-logging$ cat patch.yaml 
+spec:
+  template:
+    spec:
+      tolerations:
+        - operator: Exists
+
+gdha@n1:~/projects/pi4-logging$ kubectl patch daemonset loki-stack-promtail -n logging --patch &quot;$(cat patch.yaml)&quot;
+daemonset.apps/loki-stack-promtail patched
+</code></pre>
+<p>Check if the services are available for usage:</p>
+<pre><code class="language-bash">gdha@n1:~/projects/pi4-logging$ kubectl get svc -n logging
+NAME                    TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+loki-stack-headless     ClusterIP   None           &lt;none&gt;        3100/TCP   6m39s
+loki-stack-memberlist   ClusterIP   None           &lt;none&gt;        7946/TCP   6m39s
+loki-stack              ClusterIP   10.43.220.29   &lt;none&gt;        3100/TCP   6m39s
+</code></pre>
+<p>To view the logs we need to login onto our Grafana site and via configure - data sources - add data sources and search for Loki</p>
+<p><img alt="" src="../img/loki-add-data-source.png" /></p>
+<p>and select "loki". On the next screen fill in the URL section the IP address found with 'loki-stack' service.</p>
+<p><img alt="" src="../img/loki-url.png" /></p>
+<p>In our case it is <code>http://10.43.220.29:3100</code></p>
               
             </div>
           </div><footer>
