@@ -2,7 +2,7 @@
 
 ## Raspberry Pi 4 cluster Series - Setup logging with Loki
 
-This story is mostly based on [Logging Logs](https://rpi4cluster.com/monitoring/k3s-logging/) article.
+This story is mostly based on [Logging Logs](https://rpi4cluster.com/monitoring/k3s-logging/) [1] article.
 
 We have our Prometheus and Grafana on k3s cluster if you followed my guides. But Prometheus is not able to get logs from k3s nodes, containers, Kubernetes API, and it's not made of that kind of monitoring. We need Loki + Promtail, you can find all info on their Grafana Loki and Promtail.
 
@@ -168,5 +168,20 @@ and select "loki". On the next screen fill in the URL section the IP address fou
 
 ![](img/loki-url.png)
 
-In our case it is `http://10.43.220.29:3100`
+In our case it is `http://10.43.220.29:3100`. Thereafter, it is kust a matter of pressing "Save & Test" button.
 
+In the side bar of Grafana click on the "Explore" button and select "Loki" in the upper left corner (of the service to use).
+
+Use Loki's "Log Lables" to select what you want to see - just play with it...
+
+![](img/loki-log-labels.png) 
+
+Your imagination is the limit with Loki/Grafana, e.g.
+
+![](img/loki.png)
+
+### References
+
+[1] [k3s Monitoring - Logging Logs](https://rpi4cluster.com/monitoring/k3s-logging/)
+
+ 
