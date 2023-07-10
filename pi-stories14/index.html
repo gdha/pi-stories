@@ -78,6 +78,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#installation_of_loki_and_promtail">Installation of loki and promtail</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
+    </li>
     </ul>
                   </li>
               </ul>
@@ -108,7 +110,7 @@
               
                 <p>PI4 Stories</p>
 <h2 id="raspberry_pi_4_cluster_series_-_setup_logging_with_loki">Raspberry Pi 4 cluster Series - Setup logging with Loki<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_setup_logging_with_loki" title="Permanent link">&para;</a></h2>
-<p>This story is mostly based on <a href="https://rpi4cluster.com/monitoring/k3s-logging/">Logging Logs</a> article.</p>
+<p>This story is mostly based on <a href="https://rpi4cluster.com/monitoring/k3s-logging/">Logging Logs</a> [1] article.</p>
 <p>We have our Prometheus and Grafana on k3s cluster if you followed my guides. But Prometheus is not able to get logs from k3s nodes, containers, Kubernetes API, and it's not made of that kind of monitoring. We need Loki + Promtail, you can find all info on their Grafana Loki and Promtail.</p>
 <ul>
 <li>
@@ -249,7 +251,14 @@ loki-stack              ClusterIP   10.43.220.29   &lt;none&gt;        3100/TCP 
 <p><img alt="" src="../img/loki-add-data-source.png" /></p>
 <p>and select "loki". On the next screen fill in the URL section the IP address found with 'loki-stack' service.</p>
 <p><img alt="" src="../img/loki-url.png" /></p>
-<p>In our case it is <code>http://10.43.220.29:3100</code></p>
+<p>In our case it is <code>http://10.43.220.29:3100</code>. Thereafter, it is kust a matter of pressing "Save &amp; Test" button.</p>
+<p>In the side bar of Grafana click on the "Explore" button and select "Loki" in the upper left corner (of the service to use).</p>
+<p>Use Loki's "Log Lables" to select what you want to see - just play with it...</p>
+<p><img alt="" src="../img/loki-log-labels.png" /> </p>
+<p>Your imagination is the limit with Loki/Grafana, e.g.</p>
+<p><img alt="" src="../img/loki.png" /></p>
+<h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
+<p>[1] <a href="https://rpi4cluster.com/monitoring/k3s-logging/">k3s Monitoring - Logging Logs</a></p>
               
             </div>
           </div><footer>
