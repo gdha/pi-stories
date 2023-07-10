@@ -29,5 +29,6 @@ nav:
     - 'Raspberry Pi 4 Spin up graphite and temperature2celsius pods': 'pi-stories12.md'
     - 'Raspberry Pi 4 Setup monitoring': 'pi-stories13.md'
     - 'Raspberry Pi 4 Setup logging with Loki': 'pi-stories14.md'
+    - 'Raspberry Pi 4 Troubleshooting': 'pi-stories15.md'
 
 

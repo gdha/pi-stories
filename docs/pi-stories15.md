@@ -1,3 +1,12 @@
+# PI4 Stories
+
+## Raspberry Pi 4 cluster Series - Troubleshooting pod issues
+
+### PODs are stuck in termating status
+
+If you ever come in the situation that some pods get stuck in "terminating" status [1] for one of another reason (upgrade, delete,...) and then these pods stay in the terminating status then what can you do?
+
+```bash
 gdha@n1:~$ kubectl get pods -A
 NAMESPACE         NAME                                                  READY   STATUS        RESTARTS       AGE
 ingress-nginx     ingress-nginx-admission-patch-w5dhz                   0/1     Completed     0              107d
@@ -7,12 +16,18 @@ graphite          graphite-0                                            0/1     
 monitoring        node-exporter-dvzxs                                   2/2     Running       54 (17m ago)   105d
 celsius           celsius-779654f68d-d56q6                              1/1     Running       24 (17m ago)   92d
 ntopng            ntopng-7d5d578657-9wj7g                               1/1     Running       7 (17m ago)    6d23h
+```
+No panic, just do the following trick - force a termination without waiting on anything:
 
-
+```bash
 gdha@n1:~$ kubectl delete pod graphite-0 --grace-period=0 --force --namespace graphite
 Warning: Immediate deletion does not wait for confirmation that the running resource has been terminated. The resource may continue to run on the cluster indefinitely.
 pod "graphite-0" force deleted
+```
 
+And, there you go - one pod is gone:
+
+```bash
 gdha@n1:~$ kubectl get pods -A
 NAMESPACE         NAME                                                  READY   STATUS        RESTARTS       AGE
 ingress-nginx     ingress-nginx-admission-patch-w5dhz                   0/1     Completed     0              107d
@@ -102,11 +117,16 @@ logging           loki-stack-promtail-zfpdt                             1/1     
 uptime-kuma       uptime-kuma-0                                         1/1     Running       6 (28m ago)    3d14h
 logging           loki-stack-promtail-nh2m7                             1/1     Running       1 (33m ago)    97d
 graphite          graphite-0                                            1/1     Running   
+```
 
+Repeat these steps for the remining pods which are stuck:
+
+```bash
 gdha@n1:~$ kubectl delete pod grafana-544f695579-g246k --grace-period=0 --force --namespace monitoring
 Warning: Immediate deletion does not wait for confirmation that the running resource has been terminated. The resource may continue to run on the cluster indefinitely.
 pod "grafana-544f695579-g246k" force deleted
-
+```
 
 ## References
-[PODs are stuck in terminating status](https://stackoverflow.com/questions/35453792/pods-stuck-in-terminating-status)
+
+[1] [PODs are stuck in terminating status](https://stackoverflow.com/questions/35453792/pods-stuck-in-terminating-status)
