@@ -127,6 +127,133 @@ Warning: Immediate deletion does not wait for confirmation that the running reso
 pod "grafana-544f695579-g246k" force deleted
 ```
 
+### PODs are stuck in ContainerCreating status
+
+Sometimes we come into a situation where a pod is stuck in ContainerCreating status after restarting a cluster (e.g. after a reboot) - example:
+
+```bash
+$ kubectl get pods -n graphite          graphite-0 -o wide
+NAME         READY   STATUS              RESTARTS   AGE   IP       NODE   NOMINATED NODE   READINESS GATES
+graphite-0   0/1     ContainerCreating   0          23m   <none>   n5     <none>           <none>
+```
+
+The reason is not obvious as the logs show only:
+
+```bash
+$ kubectl logs -n graphite  graphite-0
+Error from server (BadRequest): container "graphite" in pod "graphite-0" is waiting to start: ContainerCreating
+```
+
+We could suspect that it could not download a fresh copy of the image, but it worked before always like a charm?
+
+Another way to dig a bit deeper to find the real issue is to use the command:
+
+```bash
+$ kubectl describe pod -n graphite  graphite-0
+Name:             graphite-0
+Namespace:        graphite
+Priority:         0
+Service Account:  default
+Node:             n5/192.168.0.205
+Start Time:       Wed, 12 Jul 2023 08:36:05 +0200
+Labels:           app.kubernetes.io/instance=graphite
+                  app.kubernetes.io/name=graphite
+                  controller-revision-hash=graphite-645d65f6fb
+                  statefulset.kubernetes.io/pod-name=graphite-0
+                  workload.user.cattle.io/workloadselector=statefulSet-graphite-graphite
+Annotations:      <none>
+Status:           Pending
+IP:               
+IPs:              <none>
+Controlled By:    StatefulSet/graphite
+Containers:
+  graphite:
+    Container ID:   
+    Image:          ghcr.io/gdha/graphite:v1.2
+    Image ID:       
+    Ports:          2003/TCP, 80/TCP
+    Host Ports:     0/TCP, 0/TCP
+    State:          Waiting
+      Reason:       ContainerCreating
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      memory:  512Mi
+    Requests:
+      memory:   400Mi
+    Liveness:   http-get http://:liveness-port/metrics/find%3Fquery=%2A delay=0s timeout=2s period=2s #success=1 #failure=3
+    Readiness:  http-get http://:liveness-port/metrics/find%3Fquery=%2A delay=0s timeout=2s period=2s #success=2 #failure=3
+    Startup:    http-get http://:liveness-port/metrics/find%3Fquery=%2A delay=0s timeout=1s period=10s #success=1 #failure=30
+    Environment Variables from:
+      graphite    Secret  Optional: false
+    Environment:  <none>
+    Mounts:
+      /opt/graphite/storage from graphite-storage (rw)
+      /var/log from bind-mount--logs (rw)
+      /var/run/secrets from graphite-secrets (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-kxvv5 (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             False 
+  ContainersReady   False 
+  PodScheduled      True 
+Volumes:
+  bind-mount--logs:
+    Type:          HostPath (bare host directory volume)
+    Path:          /app/util/graphite/logs
+    HostPathType:  DirectoryOrCreate
+  graphite-secrets:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  graphite
+    Optional:    false
+  graphite-storage:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  graphite
+    ReadOnly:   false
+  kube-api-access-kxvv5:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason       Age                   From               Message
+  ----     ------       ----                  ----               -------
+  Normal   Scheduled    30m                   default-scheduler  Successfully assigned graphite/graphite-0 to n5
+  Warning  FailedMount  7m17s (x19 over 29m)  kubelet            MountVolume.MountDevice failed for volume "pvc-14e6e723-0fa2-4b8f-8619-ae02f2b74cdc" : rpc error: code = Internal desc = mount failed: exit status 32
+Mounting command: mount
+Mounting arguments: -t ext4 -o defaults /dev/longhorn/pvc-14e6e723-0fa2-4b8f-8619-ae02f2b74cdc /var/lib/kubelet/plugins/kubernetes.io/csi/driver.longhorn.io/8a5f0348fbb5570ffccf61701ff8b83081168509f5904af61a35649c9f2cc7d9/globalmount
+Output: mount: /var/lib/kubelet/plugins/kubernetes.io/csi/driver.longhorn.io/8a5f0348fbb5570ffccf61701ff8b83081168509f5904af61a35649c9f2cc7d9/globalmount: /dev/longhorn/pvc-14e6e723-0fa2-4b8f-8619-ae02f2b74cdc already mounted or mount point busy.
+  Warning  FailedMount  3m15s (x12 over 28m)  kubelet  Unable to attach or mount volumes: unmounted volumes=[graphite-storage], unattached volumes=[], failed to process volumes=[]: timed out waiting for the condition
+```
+
+Okay, here we see clearly the error "/dev/longhorn/pvc-14e6e723-0fa2-4b8f-8619-ae02f2b74cdc already mounted or mount point busy". 
+
+So, let us try the following:
+
+```bash
+$ kubectl delete pod -n graphite  graphite-0
+pod "graphite-0" deleted
+$ kubectl get pods -n graphite          graphite-0 -o wide
+NAME         READY   STATUS              RESTARTS   AGE   IP       NODE   NOMINATED NODE   READINESS GATES
+graphite-0   0/1     ContainerCreating   0          12m   <none>   n5     <none>           <none>
+```
+
+Unfortunately, that did not fix it. So, we remove the PVC and recreated it, but no luck. To see the last events use the command:
+
+```bash
+$ kubectl get events --all-namespaces  --sort-by='.metadata.creationTimestamp'
+NAMESPACE    LAST SEEN   TYPE      REASON        OBJECT                         MESSAGE
+graphite     14m         Warning   FailedMount   pod/graphite-0                 MountVolume.MountDevice failed for volume "pvc-90ed5ccf-3152-4e0b-b795-cb985a7d83be" : rpc error: code = Internal desc = format of disk "/dev/longhorn/pvc-90ed5ccf-3152-4e0b-b795-cb985a7d83be" failed: type:("ext4") target:("/var/lib/kubelet/plugins/kubernetes.io/csi/driver.longhorn.io/d3ebefb7681c1a1f9472812339e5a4342cca0dee55d743334be457f6a9cf1fb3/globalmount") options:("defaults") errcode:(exit status 1) output:(mke2fs 1.46.4 (18-Aug-2021)...
+graphite     5m8s        Warning   FailedMount   pod/graphite-0                 Unable to attach or mount volumes: unmounted volumes=[graphite-storage], unattached volumes=[], failed to process volumes=[]: timed out waiting for the condition
+monitoring   36m         Warning   Unhealthy     pod/grafana-544f695579-st45c   Readiness probe failed: Get "http://10.42.4.117:3000/api/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+```
+
 ## References
 
 [1] [PODs are stuck in terminating status](https://stackoverflow.com/questions/35453792/pods-stuck-in-terminating-status)
