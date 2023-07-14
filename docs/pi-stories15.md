@@ -253,7 +253,12 @@ graphite     14m         Warning   FailedMount   pod/graphite-0                 
 graphite     5m8s        Warning   FailedMount   pod/graphite-0                 Unable to attach or mount volumes: unmounted volumes=[graphite-storage], unattached volumes=[], failed to process volumes=[]: timed out waiting for the condition
 monitoring   36m         Warning   Unhealthy     pod/grafana-544f695579-st45c   Readiness probe failed: Get "http://10.42.4.117:3000/api/health": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
 ```
+Via some research we came across page [Troubleshooting: `MountVolume.SetUp failed for volume` due to multipathd on the node](https://longhorn.io/kb/troubleshooting-volume-with-multipath/) [2] which might be the solution for our problem here as after rebooting the complete cluster the graphite PVC was mounted correctly, but then the loki-stack PVC was not able to mount with the exact same error. Therefore, we can conclude there is nothing wrong with the PVC, but it is an interaction clash with the multipath daemon.
+
+We update our [k3s ansible playbook](https://github.com/gdha/k3s-ansible) to also update the `/etc/multipath.conf` file to blacklist `/dev/sd*` devices.
 
 ## References
 
 [1] [PODs are stuck in terminating status](https://stackoverflow.com/questions/35453792/pods-stuck-in-terminating-status)
+
+[2] [Troubleshooting: `MountVolume.SetUp failed for volume` due to multipathd on the node](https://longhorn.io/kb/troubleshooting-volume-with-multipath/)
