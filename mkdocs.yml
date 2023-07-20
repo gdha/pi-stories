@@ -30,5 +30,6 @@ nav:
     - 'Raspberry Pi 4 Setup monitoring': 'pi-stories13.md'
     - 'Raspberry Pi 4 Setup logging with Loki': 'pi-stories14.md'
     - 'Raspberry Pi 4 Troubleshooting': 'pi-stories15.md'
+    - 'Raspberry Pi 4 Deploying uptime kuma with helm': 'pi-stories16.md'
 
 
