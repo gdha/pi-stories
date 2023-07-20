@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Raspberry Pi 4 Keep your Operating System updated - Raspberry PI k3s stories</title>
+    <title>Raspberry Pi 4 Deploying uptime kuma with helm - Raspberry PI k3s stories</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Raspberry Pi 4 Keep your Operating System updated";
-        var mkdocs_page_input_path = "pi-stories8.md";
+        var mkdocs_page_name = "Raspberry Pi 4 Deploying uptime kuma with helm";
+        var mkdocs_page_input_path = "pi-stories16.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -60,11 +60,7 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories7/">Raspberry Pi 4 YAML everywhere -what about correctness?</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Keep your Operating System updated</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_keep_your_operating_system_updated">Raspberry Pi 4 cluster Series - Keep your Operating System updated</a>
-    </li>
-    </ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories8/">Raspberry Pi 4 Keep your Operating System updated</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories9/">Raspberry Pi 4 Installation of Longhorn</a>
                   </li>
@@ -80,7 +76,21 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories15/">Raspberry Pi 4 Troubleshooting</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories16/">Raspberry Pi 4 Deploying uptime kuma with helm</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Deploying uptime kuma with helm</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_deploying_uptime_kuma_with_helm">Raspberry Pi 4 cluster Series - Deploying uptime kuma with helm</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#download_the_github_sources_of_uptime_kuma">Download the GitHub sources of Uptime Kuma</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#build_the_uptime_kuma_for_arm64_architecture">Build the Uptime Kuma for ARM64 architecture</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#start_the_uptime_kuma_pod_via_helm">Start the Uptime Kuma pod via helm</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#references">References</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
                   </li>
               </ul>
       </div>
@@ -98,9 +108,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
           <li>PI4 STORIES &raquo;</li>
-      <li>Raspberry Pi 4 Keep your Operating System updated</li>
+      <li>Raspberry Pi 4 Deploying uptime kuma with helm</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories8.md">Edit on gdha/pi-stories</a>
+          <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories16.md">Edit on gdha/pi-stories</a>
     </li>
   </ul>
   <hr/>
@@ -109,80 +119,34 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
-<h2 id="raspberry_pi_4_cluster_series_-_keep_your_operating_system_updated">Raspberry Pi 4 cluster Series - Keep your Operating System updated<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_keep_your_operating_system_updated" title="Permanent link">&para;</a></h2>
-<p>When you login on one of your nodes you often see a message like the following:</p>
-<pre><code class="language-bash">Welcome to Ubuntu 20.04.1 LTS (GNU/Linux 5.4.0-1026-raspi aarch64)
-
- * Documentation:  https://help.ubuntu.com
- * Management:     https://landscape.canonical.com
- * Support:        https://ubuntu.com/advantage
-
-  System information as of Thu 28 Jan 2021 12:05:56 PM CET
-
-  System load:              0.55
-  Usage of /:               18.3% of 28.40GB
-  Memory usage:             14%
-  Swap usage:               0%
-  Temperature:              34.6 C
-  Processes:                157
-  Users logged in:          1
-  IPv4 address for cni0:    10.42.1.1
-  IPv4 address for docker0: 172.17.0.1
-  IPv4 address for eth0:    192.168.0.205
-
- * Introducing self-healing high availability clusters in MicroK8s.
-   Simple, hardened, Kubernetes for production, from RaspberryPi to DC.
-
-     https://microk8s.io/high-availability
-
-62 updates can be installed immediately.
-0 of these updates are security updates.
-To see these additional updates run: apt list --upgradable
-
-
-Last login: Thu Jan 28 12:01:54 2021 from 192.168.0.41
+<h2 id="raspberry_pi_4_cluster_series_-_deploying_uptime_kuma_with_helm">Raspberry Pi 4 cluster Series - Deploying uptime kuma with helm<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_deploying_uptime_kuma_with_helm" title="Permanent link">&para;</a></h2>
+<h3 id="download_the_github_sources_of_uptime_kuma">Download the GitHub sources of Uptime Kuma<a class="headerlink" href="#download_the_github_sources_of_uptime_kuma" title="Permanent link">&para;</a></h3>
+<p>We forked the original GitHub Sources of <a href="https://github.com/k3rnelpan1c-dev/uptime-kuma-helm">https://github.com/k3rnelpan1c-dev/uptime-kuma-helm</a> to make our adjustments [1].</p>
+<p>If you wonder what you can do with Uptime Kuma, then the best description found is "<a href="https://github.com/louislam/uptime-kuma">Uptime Kuma is an easy-to-use self-hosted monitoring tool.</a>" - a simple example is to watch a NAS system with a simple <code>ping</code>:</p>
+<p><img alt="" src="../img/uptime-kuma-nas.png" /></p>
+<h3 id="build_the_uptime_kuma_for_arm64_architecture">Build the Uptime Kuma for ARM64 architecture<a class="headerlink" href="#build_the_uptime_kuma_for_arm64_architecture" title="Permanent link">&para;</a></h3>
+<p>We have set-up GitHub Actions to build a container image for <a href="https://github.com/gdha/pi4-uptime-kuma-helm/pkgs/container/uptime-kuma">Uptime Kuma for x86 based images</a>.</p>
+<p>However, as we want to have an image for ARM64 we need to build it ourselves. We made a script <code>build.sh</code> to build the ARM64 based image:</p>
+<pre><code class="language-bash">REL=${1:-v1.0}
+cat ~/.ghcr-token | docker login ghcr.io -u gdha --password-stdin
+echo &quot;Building pi4-uptime-kuma:$REL&quot;
+docker build --tag ghcr.io/gdha/pi4-uptime-kuma:$REL .
+docker tag ghcr.io/gdha/pi4-uptime-kuma:$REL ghcr.io/gdha/pi4-uptime-kuma:latest
+echo &quot;Pushing pi4-uptime-kuma:$REL to GitHub Docker Container registry&quot;
+docker push ghcr.io/gdha/pi4-uptime-kuma:$REL
 </code></pre>
-<p>Pay attention to the amount of packages ready to update:</p>
-<pre><code class="language-bash">See line &quot;62 updates can be installed immediately&quot;
-</code></pre>
-<p>Doing that for a bunch of systems is tiring/boring so let get this done via ansible.
-First we need to download package information from all configured sources.</p>
-<pre><code class="language-bash">$ ansible pi -m shell -b -a &quot;apt update&quot;
-n1 | SUCCESS | rc=0 &gt;&gt;
-Hit:1 http://ports.ubuntu.com/ubuntu-ports focal InRelease
-Get:2 http://ports.ubuntu.com/ubuntu-ports focal-updates InRelease [114 kB]
-Get:3 http://ports.ubuntu.com/ubuntu-ports focal-backports InRelease [101 kB]
-Get:4 http://ports.ubuntu.com/ubuntu-ports focal-security InRelease [109 kB]
-Fetched 324 kB in 2s (187 kB/s)
-Reading package lists...
-Building dependency tree...
-Reading state information...
-49 packages can be upgraded. Run 'apt list --upgradable' to see them.
-WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
-
-...
-
-n5 | SUCCESS | rc=0 &gt;&gt;
-Hit:1 http://ports.ubuntu.com/ubuntu-ports focal InRelease
-Get:2 http://ports.ubuntu.com/ubuntu-ports focal-updates InRelease [114 kB]
-Get:3 http://ports.ubuntu.com/ubuntu-ports focal-backports InRelease [101 kB]
-Get:4 http://ports.ubuntu.com/ubuntu-ports focal-security InRelease [109 kB]
-Fetched 324 kB in 2s (196 kB/s)
-Reading package lists...
-Building dependency tree...
-Reading state information...
-58 packages can be upgraded. Run 'apt list --upgradable' to see them.
-WARNING: apt does not have a stable CLI interface. Use with caution in scripts
-</code></pre>
-<p>And, finally, to automate the installation of the packages:</p>
-<pre><code class="language-bash">$ ansible pi -m shell -b -a &quot;apt --yes upgrade&quot;
-</code></pre>
+<p>You can find the latest <a href="https://github.com/users/gdha/packages/container/package/pi4-uptime-kuma">v1.0.5 image for ARM64</a></p>
+<h3 id="start_the_uptime_kuma_pod_via_helm">Start the Uptime Kuma pod via helm<a class="headerlink" href="#start_the_uptime_kuma_pod_via_helm" title="Permanent link">&para;</a></h3>
+<p>Well this will be the first introduction with Helm charts [2]. <a href="https://helm.sh/">Helm</a> is a package manager for Kubernetes [3] and we were interesting to have some more knowledge about it.</p>
+<h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
+<p>[1] <a href="https://github.com/gdha/pi4-uptime-kuma-helm/tree/main">https://github.com/gdha/pi4-uptime-kuma-helm/</a></p>
+<p>[2] <a href="https://devopscube.com/create-helm-chart/">How to Create Helm Chart (Comprehensive Beginners Guide)</a></p>
+<p>[3] <a href="https://devopslearning.medium.com/introduction-to-helm-and-creating-your-first-helm-chart-53c5df736bf2">Introduction to Helm and Creating your first Helm Chart</a></p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../pi-stories7/" class="btn btn-neutral float-left" title="Raspberry Pi 4 YAML everywhere -what about correctness?"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../pi-stories9/" class="btn btn-neutral float-right" title="Raspberry Pi 4 Installation of Longhorn">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../pi-stories15/" class="btn btn-neutral float-left" title="Raspberry Pi 4 Troubleshooting"><span class="icon icon-circle-arrow-left"></span> Previous</a>
     </div>
 
   <hr/>
@@ -206,10 +170,8 @@ WARNING: apt does not have a stable CLI interface. Use with caution in scripts
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../pi-stories7/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../pi-stories15/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
-    
-      <span><a href="../pi-stories9/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
