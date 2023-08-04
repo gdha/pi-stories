@@ -81,7 +81,7 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#download_the_github_sources_of_uptime_kuma">Download the GitHub sources of Uptime Kuma</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#the_container_contents">The container contents</a>
+    <li class="toctree-l3"><a class="reference internal" href="#the_container_image_content">The container image content</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#build_the_uptime_kuma_for_arm64_architecture">Build the Uptime Kuma for ARM64 architecture</a>
     </li>
@@ -125,9 +125,9 @@
 <p>We forked the original GitHub Sources of <a href="https://github.com/k3rnelpan1c-dev/uptime-kuma-helm">https://github.com/k3rnelpan1c-dev/uptime-kuma-helm</a> to make our adjustments [1].</p>
 <p>If you wonder what you can do with Uptime Kuma, then the best description found is "<a href="https://github.com/louislam/uptime-kuma">Uptime Kuma is an easy-to-use self-hosted monitoring tool.</a>" - a simple example is to watch a NAS system with a simple <code>ping</code>:</p>
 <p><img alt="" src="../img/uptime-kuma-nas.png" /></p>
-<h3 id="the_container_contents">The container contents<a class="headerlink" href="#the_container_contents" title="Permanent link">&para;</a></h3>
+<h3 id="the_container_image_content">The container image content<a class="headerlink" href="#the_container_image_content" title="Permanent link">&para;</a></h3>
 <p>The <a href="https://github.com/gdha/pi4-uptime-kuma-helm/tree/main/container">directory</a> contains the Dockerfile to build the container image.</p>
-<p>Within Uptime Kuma we can use <a href="https://github.com/caronc/apprise">apprise</a> which is an interesting tool that we will be using outside this project as well.</p>
+<p>Within Uptime Kuma we can use <a href="https://github.com/caronc/apprise">apprise</a> which is an interesting tool to send out notifications that we will be using outside this project as well.</p>
 <h3 id="build_the_uptime_kuma_for_arm64_architecture">Build the Uptime Kuma for ARM64 architecture<a class="headerlink" href="#build_the_uptime_kuma_for_arm64_architecture" title="Permanent link">&para;</a></h3>
 <p>We have set-up GitHub Actions to build a container image for <a href="https://github.com/gdha/pi4-uptime-kuma-helm/pkgs/container/uptime-kuma">Uptime Kuma for x86 based images</a>.</p>
 <p>However, as we want to have an image for ARM64 we need to build it ourselves. We made a script <code>container/build.sh</code> to build the ARM64 based image:</p>
