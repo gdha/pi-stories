@@ -10,11 +10,11 @@ If you wonder what you can do with Uptime Kuma, then the best description found 
 
 ![](img/uptime-kuma-nas.png)
 
-### The container contents
+### The container image content
 
 The [directory](https://github.com/gdha/pi4-uptime-kuma-helm/tree/main/container) contains the Dockerfile to build the container image.
 
-Within Uptime Kuma we can use [apprise](https://github.com/caronc/apprise) which is an interesting tool that we will be using outside this project as well.
+Within Uptime Kuma we can use [apprise](https://github.com/caronc/apprise) which is an interesting tool to send out notifications that we will be using outside this project as well.
 
 ### Build the Uptime Kuma for ARM64 architecture
 
