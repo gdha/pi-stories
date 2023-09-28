@@ -257,6 +257,53 @@ Via some research we came across page [Troubleshooting: `MountVolume.SetUp faile
 
 We update our [k3s ansible playbook](https://github.com/gdha/k3s-ansible) to also update the `/etc/multipath.conf` file to blacklist `/dev/sd*` devices.
 
+### POD stuck in ImagePullBackOff status
+
+For example when we tried to upgrade out ntopng image with helm we got an error like:
+
+```bash
+$ kubectl get pods -n ntopng
+NAME                      READY   STATUS             RESTARTS   AGE
+ntopng-6586866d8b-w668c   0/1     ImagePullBackOff   0          69m
+```
+
+The first thing we think of is a missmatch of our GitHub Container Registry (ghrc) Personal Access Token (PAT). How can we verify that the PAT our kubernetes cluster knows is still the same as the one listed in our `~/.ghcr-token` file?
+
+As we know in which namespace to look (in our case ntopng) we can start digging as follow:
+
+```bash
+$ kubectl get secret -n ntopng
+NAME                           TYPE                             DATA   AGE
+ntopng-ghrc                    kubernetes.io/dockerconfigjson   1      67m
+ntopng                         Opaque                           0      67m
+sh.helm.release.v1.ntopng.v1   helm.sh/release.v1               1      67m
+```
+
+Right, as we suspect the ghrc secret lets extract this from out cluster:
+
+```bash
+$ kubectl get secret -n ntopng ntopng-ghrc --output="jsonpath={.data.\.dockerconfigjson}" | base64 --decode
+{"auths":{"ghcr.io":{"username":"gdha","password":"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","auth":"Z2RoYTpnaHBfdXlPNElwUnJ6TmpFc25JTnN3NEQ1dVZRVWdkYVpSNDR2NGM2"}}}
+```
+
+There is our PAT key: `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` and indeed it was an old one which we revoked a time ago.
+
+To fix this we must update our `ghcr-secret.yaml` file and especially the .dockerconfigjson data section. 
+
+How? Well, as example I take the revoked old PAT key of ghrc:
+
+```bash
+$ kubectl create secret docker-registry dockerconfigjson-github-com --docker-server=ghcr.io  --docker-username=gdha --docker-password=$(echo -n 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) --dry-run=client -oyaml
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJnaGNyLmlvIjp7InVzZXJuYW1lIjoiZ2RoYSIsInBhc3N3b3JkIjoiZ2hwX3V5TzRJcFJyek5qRXNuSU5zdzRENXVWUVVnZGFaUjQ0djRjNiIsImF1dGgiOiJaMlJvWVRwbmFIQmZkWGxQTkVsd1VuSjZUbXBGYzI1SlRuTjNORVExZFZaUlZXZGtZVnBTTkRSMk5HTTIifX19
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: dockerconfigjson-github-com
+type: kubernetes.io/dockerconfigjson
+```
+ 
 ## References
 
 [1] [PODs are stuck in terminating status](https://stackoverflow.com/questions/35453792/pods-stuck-in-terminating-status)
