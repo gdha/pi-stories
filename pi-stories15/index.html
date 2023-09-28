@@ -81,6 +81,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#pods_are_stuck_in_containercreating_status">PODs are stuck in ContainerCreating status</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pod_stuck_in_imagepullbackoff_status">POD stuck in ImagePullBackOff status</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
@@ -103,8 +105,8 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
-          <li>PI4 STORIES &raquo;</li>
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">PI4 STORIES</li>
       <li class="breadcrumb-item active">Raspberry Pi 4 Troubleshooting</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories15.md">Edit on gdha/pi-stories</a>
@@ -341,6 +343,37 @@ monitoring   36m         Warning   Unhealthy     pod/grafana-544f695579-st45c   
 </code></pre>
 <p>Via some research we came across page <a href="https://longhorn.io/kb/troubleshooting-volume-with-multipath/">Troubleshooting: <code>MountVolume.SetUp failed for volume</code> due to multipathd on the node</a> [2] which might be the solution for our problem here as after rebooting the complete cluster the graphite PVC was mounted correctly, but then the loki-stack PVC was not able to mount with the exact same error. Therefore, we can conclude there is nothing wrong with the PVC, but it is an interaction clash with the multipath daemon.</p>
 <p>We update our <a href="https://github.com/gdha/k3s-ansible">k3s ansible playbook</a> to also update the <code>/etc/multipath.conf</code> file to blacklist <code>/dev/sd*</code> devices.</p>
+<h3 id="pod_stuck_in_imagepullbackoff_status">POD stuck in ImagePullBackOff status<a class="headerlink" href="#pod_stuck_in_imagepullbackoff_status" title="Permanent link">&para;</a></h3>
+<p>For example when we tried to upgrade out ntopng image with helm we got an error like:</p>
+<pre><code class="language-bash">$ kubectl get pods -n ntopng
+NAME                      READY   STATUS             RESTARTS   AGE
+ntopng-6586866d8b-w668c   0/1     ImagePullBackOff   0          69m
+</code></pre>
+<p>The first thing we think of is a missmatch of our GitHub Container Registry (ghrc) Personal Access Token (PAT). How can we verify that the PAT our kubernetes cluster knows is still the same as the one listed in our <code>~/.ghcr-token</code> file?</p>
+<p>As we know in which namespace to look (in our case ntopng) we can start digging as follow:</p>
+<pre><code class="language-bash">$ kubectl get secret -n ntopng
+NAME                           TYPE                             DATA   AGE
+ntopng-ghrc                    kubernetes.io/dockerconfigjson   1      67m
+ntopng                         Opaque                           0      67m
+sh.helm.release.v1.ntopng.v1   helm.sh/release.v1               1      67m
+</code></pre>
+<p>Right, as we suspect the ghrc secret lets extract this from out cluster:</p>
+<pre><code class="language-bash">$ kubectl get secret -n ntopng ntopng-ghrc --output=&quot;jsonpath={.data.\.dockerconfigjson}&quot; | base64 --decode
+{&quot;auths&quot;:{&quot;ghcr.io&quot;:{&quot;username&quot;:&quot;gdha&quot;,&quot;password&quot;:&quot;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&quot;,&quot;auth&quot;:&quot;Z2RoYTpnaHBfdXlPNElwUnJ6TmpFc25JTnN3NEQ1dVZRVWdkYVpSNDR2NGM2&quot;}}}
+</code></pre>
+<p>There is our PAT key: <code>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</code> and indeed it was an old one which we revoked a time ago.</p>
+<p>To fix this we must update our <code>ghcr-secret.yaml</code> file and especially the .dockerconfigjson data section. </p>
+<p>How? Well, as example I take the revoked old PAT key of ghrc:</p>
+<pre><code class="language-bash">$ kubectl create secret docker-registry dockerconfigjson-github-com --docker-server=ghcr.io  --docker-username=gdha --docker-password=$(echo -n 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) --dry-run=client -oyaml
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJnaGNyLmlvIjp7InVzZXJuYW1lIjoiZ2RoYSIsInBhc3N3b3JkIjoiZ2hwX3V5TzRJcFJyek5qRXNuSU5zdzRENXVWUVVnZGFaUjQ0djRjNiIsImF1dGgiOiJaMlJvWVRwbmFIQmZkWGxQTkVsd1VuSjZUbXBGYzI1SlRuTjNORVExZFZaUlZXZGtZVnBTTkRSMk5HTTIifX19
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: dockerconfigjson-github-com
+type: kubernetes.io/dockerconfigjson
+</code></pre>
 <h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <p>[1] <a href="https://stackoverflow.com/questions/35453792/pods-stuck-in-terminating-status">PODs are stuck in terminating status</a></p>
 <p>[2] <a href="https://longhorn.io/kb/troubleshooting-volume-with-multipath/">Troubleshooting: <code>MountVolume.SetUp failed for volume</code> due to multipathd on the node</a></p>
