@@ -303,9 +303,108 @@ metadata:
   name: dockerconfigjson-github-com
 type: kubernetes.io/dockerconfigjson
 ```
- 
+### How to debug a POD
+
+Interesting topic as we stumbled over the pi4-ntopng POD which refused to start with an error:
+
+```bash
+Starting redis-server: 
+*** FATAL CONFIG FILE ERROR ***
+Reading the configuration file, at line 171
+>>> 'logfile /var/log/redis/redis-server.log'
+Can't open the log file: Permission denied
+failed
+29/Sep/2023 15:30:47 [Redis.cpp:98] ERROR: Connection error [Connection refused]
+29/Sep/2023 15:30:48 [Redis.cpp:80] Redis has disconnected, reconnecting [remaining attempts: 14]
+```
+
+Of course, the POD exits immediately. So, how can we debug our error? It might just be that there is more wrong the only the permission denied error...
+We found a good article [3] which gives us some more insight on how to dig deeper.
+
+We need to override the "entrypoint" as it behaves as init 1, and therefore, we cannot just pass a bash command to it. Execute the following:
+
+```bash
+$ docker run -it --entrypoint /bin/bash ghcr.io/gdha/pi4-ntopng:5.7.0 
+```
+
+This will drop us into a shell command from where we can peek around in the container to see what might be wrong. Indeed as the error above mentioned the ownership of `/var/log/redis` was wrong:
+
+```bash
+root@131f7e6411c5:/var/log# ls -l
+total 692
+-rw-r--r-- 1 root root   4901 Sep 29 15:13 alternatives.log
+drwxr-xr-x 1 root root   4096 Sep 29 15:12 apt
+-rw-r--r-- 1 root root  58584 Jan 26  2023 bootstrap.log
+-rw-rw---- 1 root utmp      0 Jan 26  2023 btmp
+-rw-r--r-- 1 root root 282997 Sep 29 15:14 dpkg.log
+-rw-r--r-- 1 root root  32000 Sep 29 15:14 faillog
+-rw-r--r-- 1 root root    484 Sep 29 15:12 fontconfig.log
+drwxr-sr-x 2 root root   4096 Sep 29 15:11 journal
+-rw-rw-r-- 1 root root 296000 Sep 29 15:14 lastlog
+drwx------ 2 root root   4096 Sep 29 15:11 private
+drwxr-s--- 1 root root   4096 Sep 29 15:12 redis
+-rw-rw-r-- 1 root utmp      0 Jan 26  2023 wtmp
+root@131f7e6411c5:/var/log# chown -R redis:redis /var/log/redis
+```
+
+However, as we are inside the container lets try to start redis:
+
+```bash
+root@131f7e6411c5:~# /etc/init.d/redis-server  start
+Starting redis-server: failed
+```
+
+Hum, not 100% okay it seems. However, as the log file of redis should be available now we can check it out:
+
+```bash
+root@131f7e6411c5:~# cat /var/log/redis/redis-server.log 
+19:C 02 Oct 2023 07:11:40.148 # Can't chdir to '/var/lib/redis': Permission denied
+33:C 02 Oct 2023 07:13:22.884 # Can't chdir to '/var/lib/redis': Permission denied
+69:C 02 Oct 2023 07:17:39.861 # Can't chdir to '/var/lib/redis': Permission denied
+```
+
+Indeed still another directory to be tackled:
+
+```bash
+root@131f7e6411c5:~# chown -R redis:redis /var/lib/redis
+```
+
+We can start redis again and see what it says:
+
+```bash
+root@131f7e6411c5:~# /usr/bin/redis-server
+37:C 02 Oct 2023 07:15:29.235 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+37:C 02 Oct 2023 07:15:29.236 # Redis version=5.0.7, bits=64, commit=00000000, modified=0, pid=37, just started
+37:C 02 Oct 2023 07:15:29.236 # Warning: no config file specified, using the default config. In order to specify a config file use /usr/bin/redis-server /path/to/redis.conf
+                _._                                                  
+           _.-``__ ''-._                                             
+      _.-``    `.  `_.  ''-._           Redis 5.0.7 (00000000/0) 64 bit
+  .-`` .-```.  ```\/    _.,_ ''-._                                   
+ (    '      ,       .-`  | `,    )     Running in standalone mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
+ |    `-._   `._    /     _.-'    |     PID: 37
+  `-._    `-._  `-./  _.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |           http://redis.io        
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |                                  
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+      `-._    `-.__.-'    _.-'                                       
+          `-._        _.-'                                           
+              `-.__.-'                                               
+
+37:M 02 Oct 2023 07:15:29.258 # Server initialized
+37:M 02 Oct 2023 07:15:29.258 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+37:M 02 Oct 2023 07:15:29.259 * Ready to accept connections
+```
+
+Yep, it seems to start, but the message around transparent_hugepage is quite interesting which we can take care of in our Dockerfile.
+
 ## References
 
 [1] [PODs are stuck in terminating status](https://stackoverflow.com/questions/35453792/pods-stuck-in-terminating-status)
 
 [2] [Troubleshooting: `MountVolume.SetUp failed for volume` due to multipathd on the node](https://longhorn.io/kb/troubleshooting-volume-with-multipath/)
+
+[3] [Ten tips for debugging Docker containers](https://medium.com/@betz.mark/ten-tips-for-debugging-docker-containers-cde4da841a1d)
