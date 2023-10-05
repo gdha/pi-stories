@@ -129,8 +129,8 @@
 <p>The <a href="https://github.com/gdha/pi4-uptime-kuma-helm/tree/main/container">directory</a> contains the Dockerfile to build the container image.</p>
 <p>Within Uptime Kuma we can use <a href="https://github.com/caronc/apprise">apprise</a> which is an interesting tool to send out notifications that we will be using outside this project as well.</p>
 <h3 id="build_the_uptime_kuma_for_arm64_architecture">Build the Uptime Kuma for ARM64 architecture<a class="headerlink" href="#build_the_uptime_kuma_for_arm64_architecture" title="Permanent link">&para;</a></h3>
-<p>We have set-up GitHub Actions to build a container image for <a href="https://github.com/gdha/pi4-uptime-kuma-helm/pkgs/container/uptime-kuma">Uptime Kuma for x86 based images</a>.</p>
-<p>However, as we want to have an image for ARM64 we need to build it ourselves. We made a script <code>container/build.sh</code> to build the ARM64 based image:</p>
+<p>We have set-up GitHub Actions to build a container image for <a href="https://github.com/gdha/pi4-uptime-kuma-helm/pkgs/container/uptime-kuma">Uptime Kuma for x86_64/arm64 based images</a>.</p>
+<p>Before we used the GitHub Actions successfully, we wanted to have an image for ARM64 to build ourselves. We made a script <code>container/build.sh</code> to build the ARM64 based image:</p>
 <pre><code class="language-bash">REL=${1:-v1.0}
 cat ~/.ghcr-token | docker login ghcr.io -u gdha --password-stdin
 echo &quot;Building pi4-uptime-kuma:$REL&quot;
@@ -139,10 +139,11 @@ docker tag ghcr.io/gdha/pi4-uptime-kuma:$REL ghcr.io/gdha/pi4-uptime-kuma:latest
 echo &quot;Pushing pi4-uptime-kuma:$REL to GitHub Docker Container registry&quot;
 docker push ghcr.io/gdha/pi4-uptime-kuma:$REL
 </code></pre>
-<p>You can find the latest <a href="https://github.com/users/gdha/packages/container/package/pi4-uptime-kuma">v1.0.5 image for ARM64</a></p>
+<p>You can find the latest <a href="https://github.com/users/gdha/packages/container/package/pi4-uptime-kuma">Pi4 images for ARM64</a>. However, as GitHub Actions is now capable of building both x86_64 and arm64 we prefer to use <a href="https://github.com/gdha/pi4-uptime-kuma-helm/pkgs/container/uptime-kuma">uptime-kuma images</a></p>
 <h3 id="introducing_the_helm_chart_of_the_uptime_kuma_application">Introducing the Helm chart of the Uptime Kuma application<a class="headerlink" href="#introducing_the_helm_chart_of_the_uptime_kuma_application" title="Permanent link">&para;</a></h3>
 <p>Well this will be the first introduction with Helm charts [2]. <a href="https://helm.sh/">Helm</a> is a package manager for Kubernetes [3] and we were interesting to have some more knowledge about it.</p>
-<p>The helm chart of uptime kuma [4]:</p>
+<p>It might be better to clone our <a href="https://github.com/gdha/pi4-uptime-kuma-helm">uptime-kuma repository</a> and go into directory <code>uptime-kuma</code> to find the helm chart, which we will use file based and not from a helm repository. We can do that later with a local helm repository, but we wanted to play around with helm first.</p>
+<p>The helm chart of uptime kuma <code>Chart.yaml</code> [4]:</p>
 <pre><code class="language-bash">apiVersion: v2
 name: uptime-kuma
 description: A Helm chart for Uptime Kuma. A fancy self-hosted monitoring tool.
@@ -160,14 +161,14 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 1.0.5
+version: 1.0.6
 
 # This is the version number of the (container) application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 # Use: docker image ls  (to find the latest one)
-appVersion: &quot;v1.0.5&quot;
+appVersion: &quot;1.23.2&quot;
 
 icon: https://github.com/louislam/uptime-kuma/blob/master/public/apple-touch-icon-precomposed.png
 
@@ -176,11 +177,356 @@ sources:
 - https://github.com/louislam/uptime-kuma
 - https://helm.sh/docs/topics/charts/
 </code></pre>
+<p>And, the <code>values.yaml</code> file looks like:</p>
+<pre><code class="language-bash"># Default values for uptime-kuma.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## Specify override namespace, specifically this is useful for using as sub-chart
+## and its release namespace is not the `uptime-kuma`
+namespaceOverride: &quot;uptime-kuma&quot;
+
+image:
+  registry: &quot;ghcr.io&quot;
+  repository: &quot;gdha/uptime-kuma&quot;
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the Chart's appVersion.
+  tag: &quot;&quot;
+
+imagePullSecrets: [{name: dockerconfigjson-github-com}]
+nameOverride: &quot;&quot;
+fullnameOverride: &quot;&quot;
+
+statefulSet:
+  labels: {}
+  annotations: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: &quot;&quot;
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+livenessProbe:
+  exec:
+    command:
+      - extra/healthcheck
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+    scheme: HTTP
+
+service:
+  type: LoadBalancer
+  port: 80
+
+route:
+  enabled: false
+  annotations: {}
+  host: &quot;&quot;
+  labels: {}
+
+ingress:
+  enabled: false
+  className: &quot;&quot;
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: &quot;true&quot;
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 200m
+  #   memory: 256Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+persistence:
+  enabled: true
+  claimNameOverwrite: &quot;&quot;
+  sizeLimit: 4Gi
+  storageClass: &quot;longhorn&quot;
+  annotations: {}
+  labels: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+testPod:
+  image: docker.io/busybox@sha256:3fbc632167424a6d997e74f52b878d7cc478225cffac6bc977eedfe51c7f4e79
+  annotations: {}
+</code></pre>
+<p>Go into the <code>templates</code> directory:</p>
+<pre><code class="language-bash">gdha@n1:~/projects/pi4-uptime-kuma-helm/uptime-kuma/templates$ ll
+total 52
+drwxrwxr-x 4 gdha gdha 4096 Sep 28 15:44 ./
+drwxrwxr-x 3 gdha gdha 4096 Aug 11 16:28 ../
+lrwxrwxrwx 1 gdha gdha   24 Aug  7 16:33 ghcr-secret.yaml -&gt; .hidden/ghcr-secret.yaml
+-rw-rw-r-- 1 gdha gdha 2578 Feb 22  2023 _helpers.tpl
+drwxrwxr-x 2 gdha gdha 4096 Sep 28 15:44 .hidden/
+-rw-rw-r-- 1 gdha gdha 1705 Feb 22  2023 ingress.yaml
+-rw-rw-r-- 1 gdha gdha 2140 Feb 22  2023 NOTES.txt
+-rw-rw-r-- 1 gdha gdha  732 Feb 22  2023 pvc.yaml
+-rw-rw-r-- 1 gdha gdha  817 Feb 22  2023 route.yaml
+-rw-rw-r-- 1 gdha gdha  215 Feb 22  2023 secrets.yaml
+-rw-rw-r-- 1 gdha gdha  381 Feb 22  2023 serviceaccount.yaml
+-rw-rw-r-- 1 gdha gdha  457 Feb 22  2023 service.yaml
+-rw-rw-r-- 1 gdha gdha 2557 Feb 22  2023 statefulSet.yaml
+drwxrwxr-x 2 gdha gdha 4096 Feb 22  2023 tests/
+</code></pre>
+<p>where you will find the needed yaml files to start-up the uptime-kuma pod in your k3s kubernetes cluster.</p>
+<p>Be aware that the <code>ghcr-secret.yaml</code> is hidden and you need to create this yourself under the <code>.hidden</code> directory as follow:</p>
+<pre><code class="language-bash">kubectl create secret docker-registry dockerconfigjson-github-com --docker-server=ghcr.io  --docker-username=$USER --docker-password=$(cat ~/.ghcr-token) --dry-run=client -oyaml &gt;.hidden/ghcr-secret.yaml
+</code></pre>
+<p>Of course, you must have saved your secret GitHub token in the file <code>~/.ghcr-token</code>.</p>
+<p>To to be to use the helm chart we need to first to create the namespace and do a dry-run of our chart:</p>
+<pre><code class="language-bash">$ pwd
+/home/gdha/projects/pi4-uptime-kuma-helm
+$ kubectl create namespace uptime-kuma
+$ helm install --dry-run --namespace uptime-kuma uptime-kuma  ./uptime-kuma
+walk.go:74: found symbolic link in path: /home/gdha/projects/pi4-uptime-kuma-helm/uptime-kuma/templates/ghcr-secret.yaml resolves to /home/gdha/projects/pi4-uptime-kuma-helm/uptime-kuma/templates/.hidden/ghcr-secret.yaml. Contents of linked file included and used
+NAME: uptime-kuma
+LAST DEPLOYED: Thu Oct  5 16:40:04 2023
+NAMESPACE: uptime-kuma
+STATUS: pending-install
+REVISION: 1
+HOOKS:
+---
+# Source: uptime-kuma/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: &quot;uptime-kuma-test-connection&quot;
+  namespace: uptime-kuma
+  labels:
+    helm.sh/chart: uptime-kuma-1.0.6
+    app.kubernetes.io/name: uptime-kuma
+    app.kubernetes.io/instance: uptime-kuma
+    app.kubernetes.io/version: &quot;1.22.1&quot;
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    &quot;helm.sh/hook&quot;: test
+spec:
+  containers:
+    - name: wget
+      image: docker.io/busybox@sha256:3fbc632167424a6d997e74f52b878d7cc478225cffac6bc977eedfe51c7f4e79
+      command: [&quot;/bin/sh&quot;]
+      args: ['uptime-kuma:80']
+      args: [&quot;-c&quot;, &quot;cd tmp/ ; wget 'uptime-kuma:80'&quot;]
+  restartPolicy: Never
+MANIFEST:
+---
+# Source: uptime-kuma/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: uptime-kuma
+  namespace: uptime-kuma
+  labels:
+    helm.sh/chart: uptime-kuma-1.0.6
+    app.kubernetes.io/name: uptime-kuma
+    app.kubernetes.io/instance: uptime-kuma
+    app.kubernetes.io/version: &quot;1.22.1&quot;
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: uptime-kuma/templates/ghcr-secret.yaml
+# kubectl create secret docker-registry dockerconfigjson-github-com --docker-server=ghcr.io  --docker-username=gdha --docker-password=$(cat ~/.ghcr-token) --dry-run=client -oyaml &gt;.hidden/ghcr-secret.yaml
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJnaGNyLmlvIjp7InVzZXJuYW1lIjoiZ2RoYSIsInBhc3N3b3JkIjoiZ2hwX3dzRlVUazhROG1ZdFBKODllblZlbUo3WUtab280QzM2ODJGNyIsImF1dGgiOiJaMlJvWVRwbmFIQmZkM05HVlZSck9GRTRiVmwwVUVvNE9XVnVWbVZ0U2pkWlMxcHZielJETXpZNE1rWTMifX19
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: dockerconfigjson-github-com
+  namespace: uptime-kuma
+  labels:
+    helm.sh/chart: uptime-kuma-1.0.6
+    app.kubernetes.io/name: uptime-kuma
+    app.kubernetes.io/instance: uptime-kuma
+    app.kubernetes.io/version: &quot;1.22.1&quot;
+    app.kubernetes.io/managed-by: Helm
+type: kubernetes.io/dockerconfigjson
+---
+# Source: uptime-kuma/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: uptime-kuma
+  namespace: uptime-kuma
+  labels:
+    helm.sh/chart: uptime-kuma-1.0.6
+    app.kubernetes.io/name: uptime-kuma
+    app.kubernetes.io/instance: uptime-kuma
+    app.kubernetes.io/version: &quot;1.22.1&quot;
+    app.kubernetes.io/managed-by: Helm
+type: Opaque
+---
+# Source: uptime-kuma/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uptime-kuma
+  namespace: uptime-kuma
+  annotations:
+  labels:
+    helm.sh/chart: uptime-kuma-1.0.6
+    app.kubernetes.io/name: uptime-kuma
+    app.kubernetes.io/instance: uptime-kuma
+    app.kubernetes.io/version: &quot;1.22.1&quot;
+    app.kubernetes.io/managed-by: Helm
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: &quot;4Gi&quot;
+  storageClassName: &quot;longhorn&quot;
+---
+# Source: uptime-kuma/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: uptime-kuma
+  namespace: uptime-kuma
+  labels:
+    helm.sh/chart: uptime-kuma-1.0.6
+    app.kubernetes.io/name: uptime-kuma
+    app.kubernetes.io/instance: uptime-kuma
+    app.kubernetes.io/version: &quot;1.22.1&quot;
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: uptime-kuma
+    app.kubernetes.io/instance: uptime-kuma
+---
+# Source: uptime-kuma/templates/statefulSet.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: uptime-kuma
+  namespace: uptime-kuma
+  labels:
+    helm.sh/chart: uptime-kuma-1.0.6
+    app.kubernetes.io/name: uptime-kuma
+    app.kubernetes.io/instance: uptime-kuma
+    app.kubernetes.io/version: &quot;1.22.1&quot;
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+spec:
+  replicas: 1
+  serviceName: uptime-kuma
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: uptime-kuma
+      app.kubernetes.io/instance: uptime-kuma
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: uptime-kuma
+        app.kubernetes.io/instance: uptime-kuma
+    spec:
+      imagePullSecrets:
+        - name: dockerconfigjson-github-com
+      serviceAccountName: uptime-kuma
+      securityContext:
+        {}
+      containers:
+        - name: uptime-kuma
+          securityContext:
+            {}
+          image: &quot;ghcr.io/gdha/uptime-kuma:1.22.1&quot;
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: UPTIME_KUMA_PORT
+              value: '3001'
+            - name: PORT
+              value: '3001'
+          ports:
+            - name: http
+              containerPort: 3001
+              protocol: TCP
+          volumeMounts:
+            - name: uptime-storage
+              mountPath: /app/data
+          livenessProbe:
+            exec:
+              command:
+              - extra/healthcheck
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+          resources:
+            {}
+      volumes:
+        - name: uptime-storage
+          persistentVolumeClaim:
+            claimName: uptime-kuma
+
+NOTES:
+1. Get the application URL by running these commands:
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get --namespace uptime-kuma svc -w uptime-kuma'
+  export SERVICE_IP=$(kubectl get svc --namespace uptime-kuma uptime-kuma --template &quot;{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}&quot;)
+  echo http://$SERVICE_IP:80
+</code></pre>
+<p>To perform the real install remove the <code>--dry-run</code> option, and to get the external IP address do the following:</p>
+<pre><code class="language-bash">$ kubectl get svc --namespace uptime-kuma uptime-kuma --template &quot;{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}&quot;
+192.168.0.234
+</code></pre>
+<p>We had an issue with the longhorn PVC with missing permissions - see the <a href="https://github.com/gdha/pi4-uptime-kuma-helm/issues/16">issue #16</a></p>
+<p>To test if it works there is a simple test:</p>
+<pre><code class="language-bash">$ curl http://192.168.0.234:80
+Found. Redirecting to /dashboard
+</code></pre>
 <h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
 <p>[1] <a href="https://github.com/gdha/pi4-uptime-kuma-helm/tree/main">https://github.com/gdha/pi4-uptime-kuma-helm/</a></p>
 <p>[2] <a href="https://devopscube.com/create-helm-chart/">How to Create Helm Chart (Comprehensive Beginners Guide)</a></p>
 <p>[3] <a href="https://devopslearning.medium.com/introduction-to-helm-and-creating-your-first-helm-chart-53c5df736bf2">Introduction to Helm and Creating your first Helm Chart</a></p>
 <p>[4] <a href="https://github.com/gdha/pi4-uptime-kuma-helm/blob/main/uptime-kuma/Chart.yaml">Chart.yaml of Uptime Kuma</a></p>
+<p>[5] <a href="https://github.com/gdha/pi4-uptime-kuma-helm/issues/16">PVC longhorn has permission issues</a></p>
               
             </div>
           </div><footer>
