@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Raspberry Pi 4 Deploying ntopng with helm - Raspberry PI k3s stories</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Raspberry Pi 4 Deploying ntopng with helm";
+        var mkdocs_page_input_path = "pi-stories17.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Raspberry PI k3s stories
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">WELCOME</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">PI4 STORIES</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories1/">Raspberry Pi 4 Basic OS Configuration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories2/">Raspberry Pi 4 Prepare for kubernetes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories3/">Raspberry Pi 4 Installing k3s software</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories4/">Raspberry Pi 4 Install awesome kubectl aliases</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories5/">Raspberry Pi 4 Installing cert-manager on our cluster</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories6/">Raspberry Pi 4 Upgrading k3s software on your cluster</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories7/">Raspberry Pi 4 YAML everywhere -what about correctness?</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories8/">Raspberry Pi 4 Keep your Operating System updated</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories9/">Raspberry Pi 4 Installation of Longhorn</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories10/">Raspberry Pi 4 Issues after upgrading k3s</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories11/">Raspberry Pi 4 Replacing internal traefik with Metallb</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories12/">Raspberry Pi 4 Spin up graphite and temperature2celsius pods</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories13/">Raspberry Pi 4 Setup monitoring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories14/">Raspberry Pi 4 Setup logging with Loki</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories15/">Raspberry Pi 4 Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories16/">Raspberry Pi 4 Deploying uptime kuma with helm</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Raspberry Pi 4 Deploying ntopng with helm</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_deploying_ntopng_with_helm">Raspberry Pi 4 cluster Series - Deploying ntopng with helm</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#download_the_github_sources_of_ntopng">Download the GitHub sources of ntopng</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#build_pi4-ntopng_with_buildsh_script_arm64">Build pi4-ntopng with build.sh script (arm64)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#build_pi4-ntopng_from_the_sources_with_buildersh_script_arm64">Build pi4-ntopng from the sources with builder.sh script (arm64)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#use_the_kubernetes_helm_chart_to_get_it_into_kubernetes">Use the kubernetes helm chart to get it into kubernetes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rederences">Rederences</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Raspberry PI k3s stories</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">PI4 STORIES</li>
+      <li class="breadcrumb-item active">Raspberry Pi 4 Deploying ntopng with helm</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories17.md">Edit on gdha/pi-stories</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
+<h2 id="raspberry_pi_4_cluster_series_-_deploying_ntopng_with_helm">Raspberry Pi 4 cluster Series - Deploying ntopng with helm<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_deploying_ntopng_with_helm" title="Permanent link">&para;</a></h2>
+<h3 id="download_the_github_sources_of_ntopng">Download the GitHub sources of ntopng<a class="headerlink" href="#download_the_github_sources_of_ntopng" title="Permanent link">&para;</a></h3>
+<p>We liked the <a href="https://github.com/ntop/ntopng">ntopng application</a> [1] so we thought why not integrate it with our kubernetes cluster. However, the original project did not have the required code to integrate it with our kubernetes cluster, but we did find another <a href="https://github.com/MySocialApp/kubernetes-helm-chart-ntopng.git">project</a> that provides a helm chart for ntopng. Yet another chalenge was building an image for arm64.</p>
+<p>Therefore, we cloned these 2 projects into our <a href="https://github.com/gdha/pi4-ntopng">pi4-ntopng github project</a> [2].</p>
+<p>We have 2 ways to build a pi4_ntopng container. One with the <code>build.sh</code> script which uses the ntopng package which available in ubuntu 20.04 repository (currently version 3.8.190813 or v1.5). The second way is building from scratch (from the sources of https://github.com/ntop/ntopng dev branch) with the script <code>builder.sh</code> which uses the development version (beginning of October 2023 it is version 5.7.0 or v1.9).</p>
+<h3 id="build_pi4-ntopng_with_buildsh_script_arm64">Build pi4-ntopng with build.sh script (arm64)<a class="headerlink" href="#build_pi4-ntopng_with_buildsh_script_arm64" title="Permanent link">&para;</a></h3>
+<p>We builded the pi4_ntopng with the <code>build.sh</code> script that uses the ntopng executable provided by the operating system used by the container (in our case ubuntu 20). To test the image (version 3.8.190813) with docker (before trying to integrate it within kubernetes) we can do the following:</p>
+<pre><code class="language-bash">$ docker run --net=host -t -p 3000:3000 ghcr.io/gdha/pi4-ntopng:v1.5
+WARNING: Published ports are discarded when using host network mode
+Starting redis-server: redis-server.
+23/Feb/2023 15:54:51 [Ntop.cpp:1902] Setting local networks to 127.0.0.0/8
+23/Feb/2023 15:54:51 [Redis.cpp:127] Successfully connected to redis 127.0.0.1:6379@0
+23/Feb/2023 15:54:51 [Redis.cpp:127] Successfully connected to redis 127.0.0.1:6379@0
+23/Feb/2023 15:54:52 [PcapInterface.cpp:93] Reading packets from interface veth51dfafac...
+23/Feb/2023 15:54:52 [Ntop.cpp:1996] Registered interface veth51dfafac [id: 1]
+sh: 1: netstat: not found
+23/Feb/2023 15:54:52 [PcapInterface.cpp:93] Reading packets from interface eth0...
+23/Feb/2023 15:54:52 [Ntop.cpp:1996] Registered interface eth0 [id: 2]
+sh: 1: netstat: not found
+23/Feb/2023 15:54:52 [PcapInterface.cpp:93] Reading packets from interface cni0...
+23/Feb/2023 15:54:52 [Ntop.cpp:1996] Registered interface cni0 [id: 3]
+sh: 1: netstat: not found
+23/Feb/2023 15:54:53 [PcapInterface.cpp:93] Reading packets from interface flannel.1...
+23/Feb/2023 15:54:53 [Ntop.cpp:1996] Registered interface flannel.1 [id: 4]
+23/Feb/2023 15:54:53 [PcapInterface.cpp:93] Reading packets from interface vethfa36f5b1...
+23/Feb/2023 15:54:53 [Ntop.cpp:1996] Registered interface vethfa36f5b1 [id: 5]
+23/Feb/2023 15:54:53 [PcapInterface.cpp:93] Reading packets from interface veth8ab316d2...
+23/Feb/2023 15:54:53 [Ntop.cpp:1996] Registered interface veth8ab316d2 [id: 6]
+23/Feb/2023 15:54:53 [PcapInterface.cpp:93] Reading packets from interface vethcbc7a4d3...
+23/Feb/2023 15:54:53 [Ntop.cpp:1996] Registered interface vethcbc7a4d3 [id: 7]
+23/Feb/2023 15:54:54 [PcapInterface.cpp:93] Reading packets from interface veth4b6b52e6...
+23/Feb/2023 15:54:54 [Ntop.cpp:1996] Registered interface veth4b6b52e6 [id: 8]
+23/Feb/2023 15:54:54 [PcapInterface.cpp:93] Reading packets from interface veth78a0b0e7...
+23/Feb/2023 15:54:54 [Ntop.cpp:1996] Registered interface veth78a0b0e7 [id: 9]
+23/Feb/2023 15:54:55 [PcapInterface.cpp:93] Reading packets from interface veth6e8b72d7...
+23/Feb/2023 15:54:55 [Ntop.cpp:1996] Registered interface veth6e8b72d7 [id: 10]
+23/Feb/2023 15:54:55 [PcapInterface.cpp:93] Reading packets from interface veth9cbeefd9...
+23/Feb/2023 15:54:55 [Ntop.cpp:1996] Registered interface veth9cbeefd9 [id: 11]
+23/Feb/2023 15:54:55 [PcapInterface.cpp:93] Reading packets from interface veth1f978b38...
+23/Feb/2023 15:54:55 [Ntop.cpp:1996] Registered interface veth1f978b38 [id: 12]
+23/Feb/2023 15:54:55 [PcapInterface.cpp:93] Reading packets from interface veth95b9e068...
+23/Feb/2023 15:54:55 [Ntop.cpp:1996] Registered interface veth95b9e068 [id: 13]
+23/Feb/2023 15:54:55 [PcapInterface.cpp:93] Reading packets from interface vethc58d8e82...
+23/Feb/2023 15:54:55 [Ntop.cpp:1996] Registered interface vethc58d8e82 [id: 14]
+23/Feb/2023 15:54:55 [PcapInterface.cpp:93] Reading packets from interface veth06e8023d...
+23/Feb/2023 15:54:55 [Ntop.cpp:1996] Registered interface veth06e8023d [id: 15]
+23/Feb/2023 15:54:55 [PcapInterface.cpp:93] Reading packets from interface vethed261334...
+23/Feb/2023 15:54:55 [Ntop.cpp:1996] Registered interface vethed261334 [id: 16]
+23/Feb/2023 15:54:56 [PcapInterface.cpp:93] Reading packets from interface vethce929971...
+23/Feb/2023 15:54:56 [Ntop.cpp:1996] Registered interface vethce929971 [id: 17]
+23/Feb/2023 15:54:56 [PcapInterface.cpp:93] Reading packets from interface vethd9135091...
+23/Feb/2023 15:54:56 [Ntop.cpp:1996] Registered interface vethd9135091 [id: 18]
+23/Feb/2023 15:54:56 [PcapInterface.cpp:93] Reading packets from interface lo...
+23/Feb/2023 15:54:56 [Ntop.cpp:1996] Registered interface lo [id: 19]
+sh: 1: netstat: not found
+23/Feb/2023 15:54:56 [PcapInterface.cpp:93] Reading packets from interface docker0...
+23/Feb/2023 15:54:56 [Ntop.cpp:1996] Registered interface docker0 [id: 20]
+23/Feb/2023 15:54:56 [main.cpp:308] PID stored in file /var/run/ntopng.pid
+23/Feb/2023 15:54:57 [HTTPserver.cpp:1029] HTTPS Disabled: missing SSL certificate /usr/share/ntopng/httpdocs/ssl/ntopng-cert.pem
+23/Feb/2023 15:54:57 [HTTPserver.cpp:1031] Please read https://github.com/ntop/ntopng/blob/dev/doc/README.SSL if you want to enable SSL.
+23/Feb/2023 15:54:57 [Utils.cpp:563] WARNING: Unable to retain privileges for privileged file writing
+23/Feb/2023 15:54:57 [Utils.cpp:592] User changed to ntopng
+23/Feb/2023 15:54:57 [HTTPserver.cpp:1198] Web server dirs [/usr/share/ntopng/httpdocs][/usr/share/ntopng/scripts]
+23/Feb/2023 15:54:57 [HTTPserver.cpp:1201] HTTP server listening on 3000
+23/Feb/2023 15:54:57 [main.cpp:390] Working directory: /var/lib/ntopng
+23/Feb/2023 15:54:57 [main.cpp:392] Scripts/HTML pages directory: /usr/share/ntopng
+23/Feb/2023 15:54:57 [Ntop.cpp:403] Welcome to ntopng aarch64 v.3.8.190813 - (C) 1998-18 ntop.org
+23/Feb/2023 15:54:57 [Ntop.cpp:717] Adding 127.0.0.1/32 as IPv4 interface address for lo
+23/Feb/2023 15:54:57 [Ntop.cpp:725] Adding 127.0.0.0/8 as IPv4 local network for lo
+23/Feb/2023 15:54:57 [Ntop.cpp:717] Adding 192.168.0.201/32 as IPv4 interface address for eth0
+23/Feb/2023 15:54:57 [Ntop.cpp:725] Adding 192.168.0.0/24 as IPv4 local network for eth0
+23/Feb/2023 15:54:57 [Ntop.cpp:717] Adding 172.17.0.1/32 as IPv4 interface address for docker0
+23/Feb/2023 15:54:57 [Ntop.cpp:725] Adding 172.17.0.0/16 as IPv4 local network for docker0
+23/Feb/2023 15:54:57 [Ntop.cpp:717] Adding 10.42.0.0/32 as IPv4 interface address for flannel.1
+23/Feb/2023 15:54:57 [Ntop.cpp:725] Adding 10.42.0.0/32 as IPv4 local network for flannel.1
+23/Feb/2023 15:54:57 [Ntop.cpp:717] Adding 10.42.0.1/32 as IPv4 interface address for cni0
+23/Feb/2023 15:54:57 [Ntop.cpp:725] Adding 10.42.0.0/24 as IPv4 local network for cni0
+23/Feb/2023 15:54:57 [Ntop.cpp:744] Adding fd28:f4dd:39e1:0:dea6:32ff:fe87:61f/128 as IPv6 interface address for eth0
+23/Feb/2023 15:54:57 [Ntop.cpp:753] Adding fd28:f4dd:39e1:0:dea6:32ff:fe87:61f/64 as IPv6 local network for eth0
+23/Feb/2023 15:54:57 [Ntop.cpp:744] Adding 2a02:a03f:837b:a800:dea6:32ff:fe87:61f/128 as IPv6 interface address for eth0
+23/Feb/2023 15:54:57 [Ntop.cpp:753] Adding 2a02:a03f:837b:a800:dea6:32ff:fe87:61f/64 as IPv6 local network for eth0
+23/Feb/2023 15:54:57 [Ntop.cpp:744] Adding fe80::dea6:32ff:fe87:61f/128 as IPv6 interface address for eth0
+23/Feb/2023 15:54:57 [Ntop.cpp:753] Adding fe80::dea6:32ff:fe87:61f/64 as IPv6 local network for eth0
+23/Feb/2023 15:55:11 [PeriodicActivities.cpp:72] Started periodic activities loop...
+23/Feb/2023 15:55:12 [PeriodicActivities.cpp:113] Each periodic activity script will use 5 threads
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface veth51dfafac [id: 1]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface eth0 [id: 2]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface cni0 [id: 3]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface flannel.1 [id: 4]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface vethfa36f5b1 [id: 5]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface veth8ab316d2 [id: 6]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface vethcbc7a4d3 [id: 7]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface veth4b6b52e6 [id: 8]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface veth78a0b0e7 [id: 9]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface veth6e8b72d7 [id: 10]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface veth9cbeefd9 [id: 11]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface veth1f978b38 [id: 12]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface veth95b9e068 [id: 13]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface vethc58d8e82 [id: 14]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface veth06e8023d [id: 15]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface vethed261334 [id: 16]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface vethce929971 [id: 17]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface vethd9135091 [id: 18]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface lo [id: 19]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2577] Started packet polling on interface docker0 [id: 20]...
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2007] Invalid packet received [len: 2862][max len: 1468].
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K vethed261334 gro off gso off tso off
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2007] Invalid packet received [len: 6018][max len: 1468].
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K veth8ab316d2 gro off gso off tso off
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2007] Invalid packet received [len: 2764][max len: 1468].
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K veth4b6b52e6 gro off gso off tso off
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2007] Invalid packet received [len: 2381][max len: 1468].
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K veth78a0b0e7 gro off gso off tso off
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2007] Invalid packet received [len: 2381][max len: 1468].
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K cni0 gro off gso off tso off
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2007] Invalid packet received [len: 4162][max len: 1468].
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K veth1f978b38 gro off gso off tso off
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2007] Invalid packet received [len: 2862][max len: 1468].
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K veth95b9e068 gro off gso off tso off
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2007] Invalid packet received [len: 5658][max len: 1468].
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K flannel.1 gro off gso off tso off
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2007] Invalid packet received [len: 2862][max len: 1468].
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:55:12 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K vethc58d8e82 gro off gso off tso off
+23/Feb/2023 15:55:13 [NetworkInterface.cpp:2007] Invalid packet received [len: 5708][max len: 1518].
+23/Feb/2023 15:55:13 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:55:13 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K eth0 gro off gso off tso off
+23/Feb/2023 15:55:14 [NetworkInterface.cpp:2007] Invalid packet received [len: 4193][max len: 1468].
+23/Feb/2023 15:55:14 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:55:14 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K veth06e8023d gro off gso off tso off
+23/Feb/2023 15:58:35 [NetworkInterface.cpp:2007] Invalid packet received [len: 1690][max len: 1468].
+23/Feb/2023 15:58:35 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:58:35 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K vethd9135091 gro off gso off tso off
+23/Feb/2023 15:58:35 [NetworkInterface.cpp:2007] Invalid packet received [len: 1690][max len: 1468].
+23/Feb/2023 15:58:35 [NetworkInterface.cpp:2008] WARNING: If you have TSO/GRO enabled, please disable it
+23/Feb/2023 15:58:35 [NetworkInterface.cpp:2010] WARNING: Use sudo ethtool -K veth9cbeefd9 gro off gso off tso off
+</code></pre>
+<p>Open a browser and access the ntopng application via URL <code>http:&lt;ip address of docker host&gt;:3000/</code></p>
+<p><img alt="" src="../img/ntopng-38.png" /></p>
+<h3 id="build_pi4-ntopng_from_the_sources_with_buildersh_script_arm64">Build pi4-ntopng from the sources with builder.sh script (arm64)<a class="headerlink" href="#build_pi4-ntopng_from_the_sources_with_buildersh_script_arm64" title="Permanent link">&para;</a></h3>
+<p>The <code>builder.sh</code> script is using the <code>Dockerfile.builder</code> to build the ntopng executable from scratch and it was a serious battle to get it working, but we are proud on the result. By using the <code>builder.sh</code> script we also get the complete log saved as <code>builder.log</code> which might be useful when something went wrong. It might be that the compilation fails as we are using the development branch of the ntopng project. If all goed well we always have the state of art application of ntopng.</p>
+<p>To test with docker use the same method as described above with the <code>build.sh</code> script.</p>
+<p>Open a browser and access the ntopng application via URL <code>http:&lt;ip address of docker host&gt;:3000/</code></p>
+<p><img alt="" src="../img/ntopng-570.png" /></p>
+<h3 id="use_the_kubernetes_helm_chart_to_get_it_into_kubernetes">Use the kubernetes helm chart to get it into kubernetes<a class="headerlink" href="#use_the_kubernetes_helm_chart_to_get_it_into_kubernetes" title="Permanent link">&para;</a></h3>
+<p>Go into directory <code>kubernetes-helm-chart-ntopng</code> and review the <code>kubernetes/Chart.yaml</code> and <code>kubernetes/values.yaml</code> files. We have pinned it to use version <em>5.7.0</em>.</p>
+<pre><code class="language-bash">$ kubectl create -f ./kubernetes/namespace.yaml
+
+$ helm install --debug --dry-run --namespace ntopng ntopng ./kubernetes
+install.go:193: [debug] Original chart version: &quot;&quot;
+install.go:210: [debug] CHART PATH: /home/gdha/projects/pi4-ntopng/kubernetes-helm-chart-ntopng/kubernetes
+
+walk.go:74: found symbolic link in path: /home/gdha/projects/pi4-ntopng/kubernetes-helm-chart-ntopng/kubernetes/templates/ghcr-secret.yaml resolves to /home/gdha/projects/pi4-ntopng/kubernetes-helm-chart-ntopng/kubernetes/templates/.hidden/ghcr-secret.yaml. Contents of linked file included and used
+NAME: ntopng
+LAST DEPLOYED: Fri Oct  6 16:25:29 2023
+NAMESPACE: ntopng
+STATUS: pending-install
+REVISION: 1
+TEST SUITE: None
+USER-SUPPLIED VALUES:
+{}
+
+COMPUTED VALUES:
+ntopngConfig: |-
+  --disable-login=1
+  --dns-mode=3
+  # Limit memory usage
+  --max-num-flows=200000
+  --max-num-hosts=250000
+  #--interface=xxxxxx
+  --no-promisc
+ntopngImageName: ghcr.io/gdha/pi4-ntopng
+ntopngImageVersion: 5.7.0
+ntopngNodeSelector:
+  kubernetes.io/os: linux
+ntopngResources: null
+ntopngService:
+  port: 80
+  type: LoadBalancer
+
+HOOKS:
+MANIFEST:
+---
+# Source: ntopng/templates/ghcr-secret.yaml
+# kubectl create secret docker-registry dockerconfigjson-github-com --docker-server=ghcr.io  --docker-username=$USER --docker-password=$(cat ~/.ghcr-token) --dry-run=client -oyaml &gt;.hidden/ghcr-secret.yaml
+#  ln -s  .hidden/ghcr-secret.yaml ghcr-secret.yaml
+# Edit ghcr-secret.yaml and modify namespace and labels in the metadata section.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ntopng-ghrc
+  namespace: ntopng
+  labels:
+    app: ntopng
+    chart: ntopng-5.7.0
+    release: ntopng
+    heritage: Helm
+  creationTimestamp: null
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+---
+# Source: ntopng/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ntopng
+  namespace: ntopng
+  labels:
+    app: ntopng
+    chart: ntopng-5.7.0
+    release: ntopng
+    heritage: Helm
+type: Opaque
+---
+# Source: ntopng/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ntopng
+  namespace: ntopng
+  labels:
+    app: ntopng
+    chart: ntopng-5.7.0
+    release: ntopng
+    heritage: Helm
+data:
+  ntopng.conf: |-
+    --disable-login=1
+    --dns-mode=3
+    # Limit memory usage
+    --max-num-flows=200000
+    --max-num-hosts=250000
+    #--interface=xxxxxx
+    --no-promisc
+---
+# Source: ntopng/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ntopng
+  namespace: ntopng
+  labels:
+    app: ntopng
+    chart: ntopng-5.7.0
+    release: ntopng
+    heritage: Helm
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  selector:
+    app: ntopng
+  ports:
+  - name: ntopng
+    port: 80
+    targetPort: 3000
+    protocol: TCP
+---
+# Source: ntopng/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ntopng
+  namespace: ntopng
+  labels:
+    app: ntopng
+    chart: ntopng-5.7.0
+    release: ntopng
+    heritage: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ntopng
+  template:
+    metadata:
+      labels:
+        app: ntopng
+        chart: ntopng-5.7.0
+        release: ntopng
+        heritage: Helm
+    spec:
+      terminationGracePeriodSeconds: 10
+      hostNetwork: true
+      nodeSelector:
+        kubernetes.io/os: &quot;linux&quot;
+      imagePullSecrets:
+        - name: ntopng-ghrc
+      containers:
+      - name: ntopng
+        image: ghcr.io/gdha/pi4-ntopng:5.7.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: ntopng
+          containerPort: 3000
+          protocol: TCP
+        resources:
+            null
+
+        env:
+          - name: CONFIG
+            value: /ntopng/ntopng.conf
+        volumeMounts:
+        - name: config
+          mountPath: /ntopng
+      volumes:
+      - name: config
+        configMap:
+          name: ntopng
+</code></pre>
+<p>To find the endpoint IP address to point to in the web browser do the following:</p>
+<pre><code class="language-bash">$ kubectl get endpoints -n ntopng
+NAME     ENDPOINTS            AGE
+ntopng   192.168.0.205:3000   32h
+</code></pre>
+<h3 id="rederences">Rederences<a class="headerlink" href="#rederences" title="Permanent link">&para;</a></h3>
+<p>[1] <a href="https://github.com/ntop/ntopng">GitHub project ntopng</a></p>
+<p>[2] <a href="https://github.com/gdha/pi4-ntopng">GitHub project ntopng with helm chart for arm64</a></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../pi-stories16/" class="btn btn-neutral float-left" title="Raspberry Pi 4 Deploying uptime kuma with helm"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright 2023 - CC0 1.0 Universal</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../pi-stories16/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
