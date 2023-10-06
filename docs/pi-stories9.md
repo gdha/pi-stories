@@ -210,6 +210,42 @@ $ curl -v 192.168.0.230:80
 
 However, we a browser pointing to `http://192.168.0.230/#/dashboard` we get a better overview:
 
+### Upgrading longhorn version with the help of helm
+
+We were running version 1.4.0 of longhorn and we wanted to upgrade to [version 1.5.1](https://longhorn.io/docs/1.5.1/deploy/upgrade/longhorn-manager/). Here are the steps how we did this:
+
+```bash
+$ helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "metallb" chart repository
+...Successfully got an update from the "longhorn" chart repository
+...Successfully got an update from the "kiwigrid" chart repository
+...Successfully got an update from the "traefik" chart repository
+...Successfully got an update from the "grafana" chart repository
+Update Complete. ⎈Happy Helming!⎈
+
+$ helm search repo longhorn
+NAME             	CHART VERSION	APP VERSION	DESCRIPTION                                       
+longhorn/longhorn	1.5.1        	v1.5.1     	Longhorn is a distributed block storage system ...
+
+$ helm upgrade longhorn longhorn/longhorn --namespace longhorn-system --version 1.5.1
+Release "longhorn" has been upgraded. Happy Helming!
+NAME: longhorn
+LAST DEPLOYED: Fri Oct  6 08:31:36 2023
+NAMESPACE: longhorn-system
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NOTES:
+Longhorn is now installed on the cluster!
+
+Please wait a few minutes for other Longhorn components such as CSI deployments, Engine Images, and Instance Managers to be initialized.
+
+Visit our documentation at https://longhorn.io/docs/
+
+$ kubectl get pods -n longhorn-system -w
+```
+
 ![](img/longhorn-dashboard.png)
 
 Or, when selecting the node tab:
