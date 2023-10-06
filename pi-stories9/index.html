@@ -73,6 +73,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#use_the_longhorn_ui">Use the longhorn UI</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#upgrading_longhorn_version_with_the_help_of_helm">Upgrading longhorn version with the help of helm</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
@@ -307,6 +309,38 @@ Events:       &lt;none&gt;
 * Connection #0 to host 192.168.0.230 left intact
 </code></pre>
 <p>However, we a browser pointing to <code>http://192.168.0.230/#/dashboard</code> we get a better overview:</p>
+<h3 id="upgrading_longhorn_version_with_the_help_of_helm">Upgrading longhorn version with the help of helm<a class="headerlink" href="#upgrading_longhorn_version_with_the_help_of_helm" title="Permanent link">&para;</a></h3>
+<p>We were running version 1.4.0 of longhorn and we wanted to upgrade to <a href="https://longhorn.io/docs/1.5.1/deploy/upgrade/longhorn-manager/">version 1.5.1</a>. Here are the steps how we did this:</p>
+<pre><code class="language-bash">$ helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the &quot;metallb&quot; chart repository
+...Successfully got an update from the &quot;longhorn&quot; chart repository
+...Successfully got an update from the &quot;kiwigrid&quot; chart repository
+...Successfully got an update from the &quot;traefik&quot; chart repository
+...Successfully got an update from the &quot;grafana&quot; chart repository
+Update Complete. ⎈Happy Helming!⎈
+
+$ helm search repo longhorn
+NAME                CHART VERSION   APP VERSION DESCRIPTION                                       
+longhorn/longhorn   1.5.1           v1.5.1      Longhorn is a distributed block storage system ...
+
+$ helm upgrade longhorn longhorn/longhorn --namespace longhorn-system --version 1.5.1
+Release &quot;longhorn&quot; has been upgraded. Happy Helming!
+NAME: longhorn
+LAST DEPLOYED: Fri Oct  6 08:31:36 2023
+NAMESPACE: longhorn-system
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+NOTES:
+Longhorn is now installed on the cluster!
+
+Please wait a few minutes for other Longhorn components such as CSI deployments, Engine Images, and Instance Managers to be initialized.
+
+Visit our documentation at https://longhorn.io/docs/
+
+$ kubectl get pods -n longhorn-system -w
+</code></pre>
 <p><img alt="" src="../img/longhorn-dashboard.png" /></p>
 <p>Or, when selecting the node tab:</p>
 <p><img alt="" src="../img/longhorn-nodes-overview.png" /></p>
