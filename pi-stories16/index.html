@@ -517,6 +517,11 @@ NOTES:
 192.168.0.234
 </code></pre>
 <p>We had an issue with the longhorn PVC with missing permissions - see the <a href="https://github.com/gdha/pi4-uptime-kuma-helm/issues/16">issue #16</a></p>
+<p>In the meantime we fixed <a href="https://github.com/gdha/pi4-uptime-kuma-helm/issues/16">issue #16</a> with introducing an initContainer which mounts the longhorn volume and perform the chmod. Note: the <a href="https://github.com/gdha/pi4-uptime-kuma-helm/blob/main/container/Containerfile#L5">uid 3310</a> is the one used in the Container building.</p>
+<p>To see if the initContainer worked well you can check the logs:</p>
+<pre><code class="language-bash">$ kubectl logs -n uptime-kuma uptime-kuma-0 -c fix-volume-rights
+drwxr-xr-x    3 3310     3310          4096 Oct  6 09:51 /home
+</code></pre>
 <p>To test if it works there is a simple test:</p>
 <pre><code class="language-bash">$ curl http://192.168.0.234:80
 Found. Redirecting to /dashboard
