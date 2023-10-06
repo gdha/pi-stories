@@ -210,6 +210,16 @@ $ curl -v 192.168.0.230:80
 
 However, we a browser pointing to `http://192.168.0.230/#/dashboard` we get a better overview:
 
+![](img/longhorn-dashboard.png)
+
+Or, when selecting the node tab:
+
+![](img/longhorn-nodes-overview.png)
+
+And, the details of one node:
+
+![](img/longhorn-1node-details.png)
+
 ### Upgrading longhorn version with the help of helm
 
 We were running version 1.4.0 of longhorn and we wanted to upgrade to [version 1.5.1](https://longhorn.io/docs/1.5.1/deploy/upgrade/longhorn-manager/). Here are the steps how we did this:
@@ -246,15 +256,13 @@ Visit our documentation at https://longhorn.io/docs/
 $ kubectl get pods -n longhorn-system -w
 ```
 
-![](img/longhorn-dashboard.png)
+It will take a couple of minutes to upgrade the longhorn manager and then you can refresh the longhorn GUI window on your browser and you will see in the left down corner the correct (new) version number. However, please note that each volume will show on the left side an upper arrow indicating that there is an action waiting:
 
-Or, when selecting the node tab:
+![](img/longhorn-engine-1.png)
 
-![](img/longhorn-nodes-overview.png)
+Select a volume and on the right side you can pick the "upgrade engine" option; select the available longhorn engine version and click ok. Do this for each volume you have:
 
-And, the details of one node:
-
-![](img/longhorn-1node-details.png)
+![](img/longhorn-engine-2.png)
 
 ## References
 
