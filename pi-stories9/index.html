@@ -309,6 +309,11 @@ Events:       &lt;none&gt;
 * Connection #0 to host 192.168.0.230 left intact
 </code></pre>
 <p>However, we a browser pointing to <code>http://192.168.0.230/#/dashboard</code> we get a better overview:</p>
+<p><img alt="" src="../img/longhorn-dashboard.png" /></p>
+<p>Or, when selecting the node tab:</p>
+<p><img alt="" src="../img/longhorn-nodes-overview.png" /></p>
+<p>And, the details of one node:</p>
+<p><img alt="" src="../img/longhorn-1node-details.png" /></p>
 <h3 id="upgrading_longhorn_version_with_the_help_of_helm">Upgrading longhorn version with the help of helm<a class="headerlink" href="#upgrading_longhorn_version_with_the_help_of_helm" title="Permanent link">&para;</a></h3>
 <p>We were running version 1.4.0 of longhorn and we wanted to upgrade to <a href="https://longhorn.io/docs/1.5.1/deploy/upgrade/longhorn-manager/">version 1.5.1</a>. Here are the steps how we did this:</p>
 <pre><code class="language-bash">$ helm repo update
@@ -341,11 +346,10 @@ Visit our documentation at https://longhorn.io/docs/
 
 $ kubectl get pods -n longhorn-system -w
 </code></pre>
-<p><img alt="" src="../img/longhorn-dashboard.png" /></p>
-<p>Or, when selecting the node tab:</p>
-<p><img alt="" src="../img/longhorn-nodes-overview.png" /></p>
-<p>And, the details of one node:</p>
-<p><img alt="" src="../img/longhorn-1node-details.png" /></p>
+<p>It will take a couple of minutes to upgrade the longhorn manager and then you can refresh the longhorn GUI window on your browser and you will see in the left down corner the correct (new) version number. However, please note that each volume will show on the left side an upper arrow indicating that there is an action waiting:</p>
+<p><img alt="" src="../img/longhorn-engine-1.png" /></p>
+<p>Select a volume and on the right side you can pick the "upgrade engine" option; select the available longhorn engine version and click ok. Do this for each volume you have:</p>
+<p><img alt="" src="../img/longhorn-engine-2.png" /></p>
 <h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <p>[1] <a href="https://github.com/gdha/pi4-longhorn/blob/main/prepare-usb-disk/readme.md">Ansible playbook to prepare USB devices</a></p>
 <p>[2] <a href="https://longhorn.io/">Longhorn</a></p>
