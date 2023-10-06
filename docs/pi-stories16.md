@@ -24,7 +24,7 @@ Before we used the GitHub Actions successfully, we wanted to have an image for A
 
 ```bash
 REL=${1:-v1.0}
-cat ~/.ghcr-token | docker login ghcr.io -u gdha --password-stdin
+cat ~/.ghcr-token | docker login ghcr.io -u $USER --password-stdin
 echo "Building pi4-uptime-kuma:$REL"
 docker build --tag ghcr.io/gdha/pi4-uptime-kuma:$REL .
 docker tag ghcr.io/gdha/pi4-uptime-kuma:$REL ghcr.io/gdha/pi4-uptime-kuma:latest
@@ -198,7 +198,7 @@ testPod:
 Go into the `templates` directory:
 
 ```bash
-gdha@n1:~/projects/pi4-uptime-kuma-helm/uptime-kuma/templates$ ll
+n1:~/projects/pi4-uptime-kuma-helm/uptime-kuma/templates$ ll
 total 52
 drwxrwxr-x 4 gdha gdha 4096 Sep 28 15:44 ./
 drwxrwxr-x 3 gdha gdha 4096 Aug 11 16:28 ../
@@ -230,10 +230,10 @@ To to be to use the helm chart we need to first to create the namespace and do a
 
 ```bash
 $ pwd
-/home/gdha/projects/pi4-uptime-kuma-helm
+~/projects/pi4-uptime-kuma-helm
 $ kubectl create namespace uptime-kuma
 $ helm install --dry-run --namespace uptime-kuma uptime-kuma  ./uptime-kuma
-walk.go:74: found symbolic link in path: /home/gdha/projects/pi4-uptime-kuma-helm/uptime-kuma/templates/ghcr-secret.yaml resolves to /home/gdha/projects/pi4-uptime-kuma-helm/uptime-kuma/templates/.hidden/ghcr-secret.yaml. Contents of linked file included and used
+walk.go:74: found symbolic link in path: ~/projects/pi4-uptime-kuma-helm/uptime-kuma/templates/ghcr-secret.yaml resolves to ~/projects/pi4-uptime-kuma-helm/uptime-kuma/templates/.hidden/ghcr-secret.yaml. Contents of linked file included and used
 NAME: uptime-kuma
 LAST DEPLOYED: Thu Oct  5 16:40:04 2023
 NAMESPACE: uptime-kuma
@@ -279,7 +279,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 ---
 # Source: uptime-kuma/templates/ghcr-secret.yaml
-# kubectl create secret docker-registry dockerconfigjson-github-com --docker-server=ghcr.io  --docker-username=gdha --docker-password=$(cat ~/.ghcr-token) --dry-run=client -oyaml >.hidden/ghcr-secret.yaml
+# kubectl create secret docker-registry dockerconfigjson-github-com --docker-server=ghcr.io  --docker-username=$USER --docker-password=$(cat ~/.ghcr-token) --dry-run=client -oyaml >.hidden/ghcr-secret.yaml
 apiVersion: v1
 data:
   .dockerconfigjson: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -450,6 +450,22 @@ To test if it works there is a simple test:
 ```bash
 $ curl http://192.168.0.234:80
 Found. Redirecting to /dashboard
+```
+### Remove the uptime-kuma pod
+
+To delete the pod "uptime-kuma" you just have to execute the following:
+
+```bash
+$ helm uninstall --debug --namespace uptime-kuma uptime-kuma
+uninstall.go:95: [debug] uninstall: Deleting uptime-kuma
+client.go:477: [debug] Starting delete for "uptime-kuma" Service
+client.go:477: [debug] Starting delete for "uptime-kuma" StatefulSet
+client.go:477: [debug] Starting delete for "uptime-kuma" PersistentVolumeClaim
+client.go:477: [debug] Starting delete for "uptime-kuma" Secret
+client.go:477: [debug] Starting delete for "dockerconfigjson-github-com" Secret
+client.go:477: [debug] Starting delete for "uptime-kuma" ServiceAccount
+uninstall.go:148: [debug] purge requested for uptime-kuma
+release "uptime-kuma" uninstalled
 ```
 
 ### References
