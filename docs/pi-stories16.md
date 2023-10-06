@@ -436,6 +436,15 @@ $ kubectl get svc --namespace uptime-kuma uptime-kuma --template "{{ range (inde
 ```
 We had an issue with the longhorn PVC with missing permissions - see the [issue #16](https://github.com/gdha/pi4-uptime-kuma-helm/issues/16)
 
+In the meantime we fixed [issue #16](https://github.com/gdha/pi4-uptime-kuma-helm/issues/16) with introducing an initContainer which mounts the longhorn volume and perform the chmod. Note: the [uid 3310](https://github.com/gdha/pi4-uptime-kuma-helm/blob/main/container/Containerfile#L5) is the one used in the Container building.
+
+To see if the initContainer worked well you can check the logs:
+
+```bash
+$ kubectl logs -n uptime-kuma uptime-kuma-0 -c fix-volume-rights
+drwxr-xr-x    3 3310     3310          4096 Oct  6 09:51 /home
+```
+
 To test if it works there is a simple test:
 
 ```bash
