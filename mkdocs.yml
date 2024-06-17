@@ -4,7 +4,7 @@ docs_dir: docs/
 site_dir: site/
 repo_name: 'gdha/pi-stories'
 repo_url: 'https://github.com/gdha/pi-stories'
-copyright: 'Copyright 2023 - CC0 1.0 Universal'
+copyright: 'Copyright 2024 - CC0 1.0 Universal'
 
 theme:
   name: 'readthedocs'
@@ -32,5 +32,6 @@ nav:
     - 'Raspberry Pi 4 Troubleshooting': 'pi-stories15.md'
     - 'Raspberry Pi 4 Deploying uptime kuma with helm': 'pi-stories16.md'
     - 'Raspberry Pi 4 Deploying ntopng with helm': 'pi-stories17.md'
+    - 'Raspberry Pi 4 Deploying jenkins with yaml files': 'pi-stories18.md'
 
 
