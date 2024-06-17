@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Raspberry Pi 4 Deploying jenkins with yaml files - Raspberry PI k3s stories</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Raspberry Pi 4 Deploying jenkins with yaml files";
+        var mkdocs_page_input_path = "pi-stories18.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Raspberry PI k3s stories
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">WELCOME</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">PI4 STORIES</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories1/">Raspberry Pi 4 Basic OS Configuration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories2/">Raspberry Pi 4 Prepare for kubernetes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories3/">Raspberry Pi 4 Installing k3s software</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories4/">Raspberry Pi 4 Install awesome kubectl aliases</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories5/">Raspberry Pi 4 Installing cert-manager on our cluster</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories6/">Raspberry Pi 4 Upgrading k3s software on your cluster</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories7/">Raspberry Pi 4 YAML everywhere -what about correctness?</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories8/">Raspberry Pi 4 Keep your Operating System updated</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories9/">Raspberry Pi 4 Installation of Longhorn</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories10/">Raspberry Pi 4 Issues after upgrading k3s</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories11/">Raspberry Pi 4 Replacing internal traefik with Metallb</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories12/">Raspberry Pi 4 Spin up graphite and temperature2celsius pods</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories13/">Raspberry Pi 4 Setup monitoring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories14/">Raspberry Pi 4 Setup logging with Loki</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories15/">Raspberry Pi 4 Troubleshooting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories16/">Raspberry Pi 4 Deploying uptime kuma with helm</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories17/">Raspberry Pi 4 Deploying ntopng with helm</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Raspberry Pi 4 Deploying jenkins with yaml files</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_deploying_jenkins_with_yaml_files">Raspberry Pi 4 cluster Series - Deploying Jenkins with yaml files</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#download_the_github_yaml_sources_of_jenkins_pod">Download the GitHub yaml sources of Jenkins POD</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#basic_configuration_of_the_jenkins_application_in_our_cluster">Basic configuration of the Jenkins application in our cluster</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#set_up_a_workflow_k3s-test">Set up a workflow k3s-test</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#references">References</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Raspberry PI k3s stories</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">PI4 STORIES</li>
+      <li class="breadcrumb-item active">Raspberry Pi 4 Deploying jenkins with yaml files</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/gdha/pi-stories/edit/master/docs/pi-stories18.md">Edit on gdha/pi-stories</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="pi4_stories">PI4 Stories<a class="headerlink" href="#pi4_stories" title="Permanent link">&para;</a></h1>
+<h2 id="raspberry_pi_4_cluster_series_-_deploying_jenkins_with_yaml_files">Raspberry Pi 4 cluster Series - Deploying Jenkins with yaml files<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_deploying_jenkins_with_yaml_files" title="Permanent link">&para;</a></h2>
+<h3 id="download_the_github_yaml_sources_of_jenkins_pod">Download the GitHub yaml sources of Jenkins POD<a class="headerlink" href="#download_the_github_yaml_sources_of_jenkins_pod" title="Permanent link">&para;</a></h3>
+<p>We do not want copy/paste the procedure in setting up Jenkins on a kubernetes cluster described in <a href="https://devopscube.com/setup-jenkins-on-kubernetes-cluster/">article - How To Setup Jenkins On Kubernetes Cluster – Beginners Guide</a>] [2].</p>
+<p>However, the sources we used to set it up in our cluster can be download from our <a href="https://github.com/gdha/pi4-jenkins">pi4-jenkins github project</a> [1].</p>
+<h3 id="basic_configuration_of_the_jenkins_application_in_our_cluster">Basic configuration of the Jenkins application in our cluster<a class="headerlink" href="#basic_configuration_of_the_jenkins_application_in_our_cluster" title="Permanent link">&para;</a></h3>
+<p>After doing the first initial Jenkins configuration and adding some packages you might need or find useful we can define our k3s cluster within Jenkins so we can use it to deploy an Jenkins agent via k3s. Therefore, go to "Manage Jenkins -&gt; Clouds" and select on the button "new cloud". Then fill in what you see below:</p>
+<p><img alt="" src="../img/jenkins-cloud-config-k3s-1.png" /></p>
+<p><img alt="" src="../img/jenkins-cloud-config-k3s-2.png" /></p>
+<p><img alt="" src="../img/jenkins-cloud-config-k3s-3.png" /></p>
+<p><img alt="" src="../img/jenkins-cloud-config-k3s-4.png" /></p>
+<h3 id="set_up_a_workflow_k3s-test">Set up a workflow k3s-test<a class="headerlink" href="#set_up_a_workflow_k3s-test" title="Permanent link">&para;</a></h3>
+<p>We can create a simple pipeline workflow within Jenkins called <code>k3s-test</code> and add a simple test script in the pipeline section:</p>
+<pre><code>// Uses Declarative syntax to run commands inside a container.
+pipeline {
+    agent {
+        kubernetes {
+            defaultContainer 'jnlp'
+        }
+    }
+    stages {
+        stage('Main') {
+            steps {
+                sh 'hostname; ls /'
+            }
+        }
+    }
+}
+</code></pre>
+<p>Then, just click on the "Build Now" button to get some action and wait for the result (output of the console):</p>
+<pre><code class="language-bash">Started by user gratien dhaese
+[Pipeline] Start of Pipeline
+[Pipeline] podTemplate
+[Pipeline] {
+[Pipeline] node
+Created Pod: k3s devops-tools/k3s-test-12-r7t20-tp9h0-w3md4
+Still waiting to schedule task
+‘k3s-test-12-r7t20-tp9h0-w3md4’ is offline
+Agent k3s-test-12-r7t20-tp9h0-w3md4 is provisioned from template k3s-test_12-r7t20-tp9h0
+---
+apiVersion: &quot;v1&quot;
+kind: &quot;Pod&quot;
+metadata:
+  annotations:
+    buildUrl: &quot;http://jenkins-service.devops-tools.svc.cluster.local:8080/job/k3s-test/12/&quot;
+    runUrl: &quot;job/k3s-test/12/&quot;
+  labels:
+    jenkins: &quot;agent&quot;
+    jenkins/label-digest: &quot;3ea935590b9ee455238d862a312e8637c1a83963&quot;
+    jenkins/label: &quot;k3s-test_12-r7t20&quot;
+  name: &quot;k3s-test-12-r7t20-tp9h0-w3md4&quot;
+  namespace: &quot;devops-tools&quot;
+spec:
+  containers:
+  - env:
+    - name: &quot;JENKINS_SECRET&quot;
+      value: &quot;********&quot;
+    - name: &quot;JENKINS_AGENT_NAME&quot;
+      value: &quot;k3s-test-12-r7t20-tp9h0-w3md4&quot;
+    - name: &quot;JENKINS_NAME&quot;
+      value: &quot;k3s-test-12-r7t20-tp9h0-w3md4&quot;
+    - name: &quot;JENKINS_AGENT_WORKDIR&quot;
+      value: &quot;/home/jenkins/agent&quot;
+    - name: &quot;JENKINS_URL&quot;
+      value: &quot;http://jenkins-service.devops-tools.svc.cluster.local:8080/&quot;
+    image: &quot;jenkins/inbound-agent:3148.v532a_7e715ee3-1&quot;
+    name: &quot;jnlp&quot;
+    resources:
+      requests:
+        memory: &quot;256Mi&quot;
+        cpu: &quot;100m&quot;
+    volumeMounts:
+    - mountPath: &quot;/home/jenkins/agent&quot;
+      name: &quot;workspace-volume&quot;
+      readOnly: false
+  nodeSelector:
+    kubernetes.io/os: &quot;linux&quot;
+  restartPolicy: &quot;Never&quot;
+  volumes:
+  - emptyDir:
+      medium: &quot;&quot;
+    name: &quot;workspace-volume&quot;
+
+Running on k3s-test-12-r7t20-tp9h0-w3md4 in /home/jenkins/agent/workspace/k3s-test
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Main)
+[Pipeline] sh
++ hostname
+k3s-test-12-r7t20-tp9h0-w3md4
++ ls /
+bin
+boot
+dev
+etc
+home
+lib
+media
+mnt
+opt
+proc
+root
+run
+sbin
+srv
+sys
+tmp
+usr
+var
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] }
+[Pipeline] // podTemplate
+[Pipeline] End of Pipeline
+Finished: SUCCESS
+</code></pre>
+<h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
+<p>[1] <a href="https://github.com/gdha/pi4-jenkins">Github sources of the Pi4 Jenkins kubernetes yaml files</a></p>
+<p>[2] <a href="https://devopscube.com/setup-jenkins-on-kubernetes-cluster/">How To Setup Jenkins On Kubernetes Cluster – Beginners Guide</a></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../pi-stories17/" class="btn btn-neutral float-left" title="Raspberry Pi 4 Deploying ntopng with helm"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright 2024 - CC0 1.0 Universal</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/gdha/pi-stories" class="fa fa-code-fork" style="color: #fcfcfc"> gdha/pi-stories</a>
+        </span>
+    
+    
+      <span><a href="../pi-stories17/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
