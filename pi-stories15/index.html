@@ -233,7 +233,7 @@ uptime-kuma       uptime-kuma-0                                         1/1     
 logging           loki-stack-promtail-nh2m7                             1/1     Running       1 (33m ago)    97d
 graphite          graphite-0                                            1/1     Running   
 </code></pre>
-<p>Repeat these steps for the remining pods which are stuck:</p>
+<p>Repeat these steps for the remaining pods which are stuck:</p>
 <pre><code class="language-bash">gdha@n1:~$ kubectl delete pod grafana-544f695579-g246k --grace-period=0 --force --namespace monitoring
 Warning: Immediate deletion does not wait for confirmation that the running resource has been terminated. The resource may continue to run on the cluster indefinitely.
 pod &quot;grafana-544f695579-g246k&quot; force deleted
@@ -355,7 +355,7 @@ monitoring   36m         Warning   Unhealthy     pod/grafana-544f695579-st45c   
 NAME                      READY   STATUS             RESTARTS   AGE
 ntopng-6586866d8b-w668c   0/1     ImagePullBackOff   0          69m
 </code></pre>
-<p>The first thing we think of is a missmatch of our GitHub Container Registry (ghrc) Personal Access Token (PAT). How can we verify that the PAT our kubernetes cluster knows is still the same as the one listed in our <code>~/.ghcr-token</code> file?</p>
+<p>The first thing we think of is a mismatch of our GitHub Container Registry (ghrc) Personal Access Token (PAT). How can we verify that the PAT our kubernetes cluster knows is still the same as the one listed in our <code>~/.ghcr-token</code> file?</p>
 <p>As we know in which namespace to look (in our case ntopng) we can start digging as follow:</p>
 <pre><code class="language-bash">$ kubectl get secret -n ntopng
 NAME                           TYPE                             DATA   AGE

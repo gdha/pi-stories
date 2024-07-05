@@ -61,7 +61,7 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#raspberry_pi_4_cluster_series_-_yaml_everywhere_-_what_about_correctness">Raspberry Pi 4 cluster Series - YAML everywhere - what about correctness?</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#installling_the_go_language_binaries">Installling the Go Language binaries</a>
+    <li class="toctree-l3"><a class="reference internal" href="#installing_the_go_language_binaries">Installing the Go Language binaries</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#compiling_the_kubelinter_code">Compiling the KubeLinter code</a>
     </li>
@@ -128,7 +128,7 @@
 <p>When you dive deep into Kubernetes you will notice you cannot go around <a href="https://blog.stackpath.com/yaml/">YAML</a> [1] language. You hate it or love it, however, you better get used to it as it is part of the core of kubernetes.</p>
 <p>Writing YAML code from scratch is not a real pleasure, therefore, having a linter would be nice to avoid the low hanging fruit errors. We found a kubernetes linter tool called "<a href="https://github.com/stackrox/kube-linter">KubeLinter</a>" written in the Go language, however, there is no binary available for the Raspberry Pi4 architecture aarch64 on the <a href="https://github.com/stackrox/kube-linter/releases">release page of kube-linter</a>.</p>
 <p>Therefore, we decided to build it ourselves from the sources.</p>
-<h3 id="installling_the_go_language_binaries">Installling the Go Language binaries<a class="headerlink" href="#installling_the_go_language_binaries" title="Permanent link">&para;</a></h3>
+<h3 id="installing_the_go_language_binaries">Installing the Go Language binaries<a class="headerlink" href="#installing_the_go_language_binaries" title="Permanent link">&para;</a></h3>
 <p>On our node <em>n1</em> we installed the Go Language with the commands:</p>
 <pre><code class="language-bash">$ sudo apt  install golang-go
 $ sudo apt install make 
@@ -177,13 +177,13 @@ make: *** [Makefile:100: build] Error 2
 
 Error: found 6 lint errors
 </code></pre>
-<p>The recommendations are perhaps not really perfect for this example as we do need a writable file system to be able to perform an update and <code>root</code> permissions will be required as well. However, the test itself was successful as it produces a meaningfull output.</p>
+<p>The recommendations are perhaps not really perfect for this example as we do need a writable file system to be able to perform an update and <code>root</code> permissions will be required as well. However, the test itself was successful as it produces a meaningful output.</p>
 <p>For a more profound usage of <code>kube-linter</code> see the "<a href="https://docs.kubelinter.io/#/">KubeLinter documentation</a>" [4].</p>
 <h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <p>[1] <a href="https://blog.stackpath.com/yaml/">YAML Ain't Markup Language</a></p>
 <p>[2] <a href="https://github.com/gdha/kube-linter">Kube-Linter GitHub fork</a></p>
 <p>[3] <a href="https://github.com/gdha/k3s-upgrade-controller/blob/main/system-upgrade-controller.yaml">CRD system-upgrade-controller</a></p>
-<p>[4] <a href="https://docs.kubelinter.io/#/">KubeLinter Documenation</a></p>
+<p>[4] <a href="https://docs.kubelinter.io/#/">KubeLinter Documentation</a></p>
               
             </div>
           </div><footer>
