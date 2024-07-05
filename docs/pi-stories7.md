@@ -8,7 +8,7 @@ Writing YAML code from scratch is not a real pleasure, therefore, having a linte
 
 Therefore, we decided to build it ourselves from the sources.
 
-### Installling the Go Language binaries
+### Installing the Go Language binaries
 
 On our node *n1* we installed the Go Language with the commands:
 
@@ -76,7 +76,7 @@ $ kube-linter lint ../k3s-upgrade-controller/
 Error: found 6 lint errors
 ```
 
-The recommendations are perhaps not really perfect for this example as we do need a writable file system to be able to perform an update and `root` permissions will be required as well. However, the test itself was successful as it produces a meaningfull output.
+The recommendations are perhaps not really perfect for this example as we do need a writable file system to be able to perform an update and `root` permissions will be required as well. However, the test itself was successful as it produces a meaningful output.
 
 For a more profound usage of `kube-linter` see the "[KubeLinter documentation](https://docs.kubelinter.io/#/)" [4].
 
@@ -88,4 +88,4 @@ For a more profound usage of `kube-linter` see the "[KubeLinter documentation](h
 
 [3] [CRD system-upgrade-controller](https://github.com/gdha/k3s-upgrade-controller/blob/main/system-upgrade-controller.yaml)
 
-[4] [KubeLinter Documenation](https://docs.kubelinter.io/#/)
+[4] [KubeLinter Documentation](https://docs.kubelinter.io/#/)

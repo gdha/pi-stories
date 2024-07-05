@@ -255,7 +255,7 @@ Alright, now we can move on the grafana.
 
 ### Install grafana
 
-Our grafana pod will alos use a longhorn device as defined under file:
+Our grafana pod will also use a longhorn device as defined under file:
 
 ```bash
  cat grafana-pvc.yaml

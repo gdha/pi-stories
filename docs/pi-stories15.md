@@ -119,7 +119,7 @@ logging           loki-stack-promtail-nh2m7                             1/1     
 graphite          graphite-0                                            1/1     Running   
 ```
 
-Repeat these steps for the remining pods which are stuck:
+Repeat these steps for the remaining pods which are stuck:
 
 ```bash
 gdha@n1:~$ kubectl delete pod grafana-544f695579-g246k --grace-period=0 --force --namespace monitoring
@@ -267,7 +267,7 @@ NAME                      READY   STATUS             RESTARTS   AGE
 ntopng-6586866d8b-w668c   0/1     ImagePullBackOff   0          69m
 ```
 
-The first thing we think of is a missmatch of our GitHub Container Registry (ghrc) Personal Access Token (PAT). How can we verify that the PAT our kubernetes cluster knows is still the same as the one listed in our `~/.ghcr-token` file?
+The first thing we think of is a mismatch of our GitHub Container Registry (ghrc) Personal Access Token (PAT). How can we verify that the PAT our kubernetes cluster knows is still the same as the one listed in our `~/.ghcr-token` file?
 
 As we know in which namespace to look (in our case ntopng) we can start digging as follow:
 

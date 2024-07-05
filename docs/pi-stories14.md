@@ -172,7 +172,7 @@ In our case it is `http://10.43.220.29:3100`. Thereafter, it is kust a matter of
 
 In the side bar of Grafana click on the "Explore" button and select "Loki" in the upper left corner (of the service to use).
 
-Use Loki's "Log Lables" to select what you want to see - just play with it...
+Use Loki's "Log Labels" to select what you want to see - just play with it...
 
 ![](img/loki-log-labels.png) 
 

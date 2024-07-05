@@ -4,7 +4,7 @@
 
 ### Download the GitHub sources of ntopng
 
-We liked the [ntopng application](https://github.com/ntop/ntopng) [1] so we thought why not integrate it with our kubernetes cluster. However, the original project did not have the required code to integrate it with our kubernetes cluster, but we did find another [project](https://github.com/MySocialApp/kubernetes-helm-chart-ntopng.git) that provides a helm chart for ntopng. Yet another chalenge was building an image for arm64.
+We liked the [ntopng application](https://github.com/ntop/ntopng) [1] so we thought why not integrate it with our kubernetes cluster. However, the original project did not have the required code to integrate it with our kubernetes cluster, but we did find another [project](https://github.com/MySocialApp/kubernetes-helm-chart-ntopng.git) that provides a helm chart for ntopng. Yet another challenge was building an image for arm64.
 
 Therefore, we cloned these 2 projects into our [pi4-ntopng github project](https://github.com/gdha/pi4-ntopng) [2].
 
@@ -12,7 +12,7 @@ We have 2 ways to build a pi4_ntopng container. One with the `build.sh` script w
 
 ### Build pi4-ntopng with build.sh script (arm64)
 
-We builded the pi4_ntopng with the `build.sh` script that uses the ntopng executable provided by the operating system used by the container (in our case ubuntu 20). To test the image (version 3.8.190813) with docker (before trying to integrate it within kubernetes) we can do the following:
+We built the pi4_ntopng with the `build.sh` script that uses the ntopng executable provided by the operating system used by the container (in our case ubuntu 20). To test the image (version 3.8.190813) with docker (before trying to integrate it within kubernetes) we can do the following:
 
 ```bash
 $ docker run --net=host -t -p 3000:3000 ghcr.io/gdha/pi4-ntopng:v1.5

@@ -4,9 +4,9 @@
 
 As certificates are crucial in a kuberbetes cluster one of the first pods that one should install is [cert-manager](https://cert-manager.io/docs/installation/).
 
-### Installling cert-manager
+### Installing cert-manager
 
-Installaion is extremelt easy with the following command:
+Installation is extremelt easy with the following command:
 ```bash
 kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.11.0/cert-manager.yaml
 ```

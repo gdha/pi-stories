@@ -2,7 +2,7 @@
 
 ## Raspberry Pi 4 cluster Series - Upgrading k3s software on your cluster
 
-It is advisable to track the security vulnarabilities published by Rancher Labs around k3s. For example, in November 2020 a critical bug was detected in k3s (see [1]). Therefore, it is quite important to be able to update k3s without interupting the k3s cluster, hence this procedure from Rancher Labs.
+It is advisable to track the security vulnerabilities published by Rancher Labs around k3s. For example, in November 2020 a critical bug was detected in k3s (see [1]). Therefore, it is quite important to be able to update k3s without interrupting the k3s cluster, hence this procedure from Rancher Labs.
 
 ```bash
 $ kubectl get nodes

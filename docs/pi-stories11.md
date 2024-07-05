@@ -105,7 +105,7 @@ metadata:
 EOD
 ```
 
-According the procedure to [generate a new CRD resourse file](https://metallb.universe.tf/configuration/migration_to_crds/) we got:
+According the procedure to [generate a new CRD resource file](https://metallb.universe.tf/configuration/migration_to_crds/) we got:
 
 ```bash
 $ docker run -d -v $(pwd):/var/input quay.io/metallb/configmaptocrs
