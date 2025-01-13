@@ -53,6 +53,8 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories4/">Raspberry Pi 4 Install awesome kubectl aliases</a>
                   </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories4helm/">Raspberry Pi 4 Install helm</a>
+                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories5/">Raspberry Pi 4 Installing cert-manager on our cluster</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories6/">Raspberry Pi 4 Upgrading k3s software on your cluster</a>
@@ -261,7 +263,7 @@ ipaddresspools.metallb.io   2023-01-24T10:24:52Z
 </code></pre>
 <h3 id="install_nginx_ingress_controller">Install NGINX Ingress Controller<a class="headerlink" href="#install_nginx_ingress_controller" title="Permanent link">&para;</a></h3>
 <p>To verify the load-balancer is working we could execute [4]:</p>
-<pre><code class="language-bash">$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.5.1/deploy/static/provider/cloud/deploy.yaml
+<pre><code class="language-bash">$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0/deploy/static/provider/cloud/deploy.yaml
 namespace/ingress-nginx created
 serviceaccount/ingress-nginx created
 serviceaccount/ingress-nginx-admission created
@@ -341,7 +343,20 @@ traefik                   LoadBalancer   10.43.78.204    192.168.0.230   80:3116
 </code></pre>
 <p>We can also check the logs of traefik:</p>
 <pre><code class="language-bash">$ kubectl -n kube-system logs $(kubectl -n kube-system get pods --selector &quot;app.kubernetes.io/name=traefik&quot; --output=name)
-time=&quot;2023-01-24T13:23:31Z&quot; level=info msg=&quot;Configuration loaded from flags.&quot;
+2025-01-13T13:06:04Z INF Traefik version 3.2.2 built on 2024-12-10T14:53:02Z version=3.2.2
+2025-01-13T13:06:04Z INF Stats collection is enabled.
+2025-01-13T13:06:04Z INF Many thanks for contributing to Traefik's improvement by allowing us to receive anonymous information from your configuration.
+2025-01-13T13:06:04Z INF Help us improve Traefik by leaving this feature on :)
+2025-01-13T13:06:04Z INF More details on: https://doc.traefik.io/traefik/contributing/data-collection/
+2025-01-13T13:06:04Z INF Starting provider aggregator *aggregator.ProviderAggregator
+2025-01-13T13:06:04Z INF Starting provider *traefik.Provider
+2025-01-13T13:06:04Z INF Starting provider *crd.Provider
+2025-01-13T13:06:04Z INF Starting provider *ingress.Provider
+2025-01-13T13:06:04Z INF ingress label selector is: &quot;&quot; providerName=kubernetes
+2025-01-13T13:06:04Z INF label selector is: &quot;&quot; providerName=kubernetescrd
+2025-01-13T13:06:04Z INF Creating in-cluster Provider client providerName=kubernetes
+2025-01-13T13:06:04Z INF Creating in-cluster Provider client providerName=kubernetescrd
+2025-01-13T13:06:04Z INF Starting provider *acme.ChallengeTLSALPN
 </code></pre>
 <p>When we see above listed line the we are sure traefik is properly installed and configured.
 Now, we are ready to do some more tests with our new load-balancer and traefik.</p>
@@ -352,7 +367,7 @@ Now, we are ready to do some more tests with our new load-balancer and traefik.<
 <p>[4] <a href="https://kubernetes.github.io/ingress-nginx/deploy/#bare-metal">NGINX Ingress Controller</a></p>
 <h3 id="edit_history">Edit History<a class="headerlink" href="#edit_history" title="Permanent link">&para;</a></h3>
 <ul>
-<li>update with new metallb and NGINC Ingress Controller - 25/Jan/2023</li>
+<li>update with new metallb and NGINX Ingress Controller - 25/Jan/2023</li>
 </ul>
               
             </div>

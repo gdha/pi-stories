@@ -53,6 +53,8 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories4/">Raspberry Pi 4 Install awesome kubectl aliases</a>
                   </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../pi-stories4helm/">Raspberry Pi 4 Install helm</a>
+                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories5/">Raspberry Pi 4 Installing cert-manager on our cluster</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../pi-stories6/">Raspberry Pi 4 Upgrading k3s software on your cluster</a>
@@ -133,6 +135,16 @@
 <h2 id="raspberry_pi_4_cluster_series_-_installation_of_longhorn">Raspberry Pi 4 cluster Series - Installation of Longhorn<a class="headerlink" href="#raspberry_pi_4_cluster_series_-_installation_of_longhorn" title="Permanent link">&para;</a></h2>
 <h3 id="prepare_our_external_usb_block_devices">Prepare our external USB block devices<a class="headerlink" href="#prepare_our_external_usb_block_devices" title="Permanent link">&para;</a></h3>
 <p>On all our pi systems we added an USB block device of the same size and we are sure that they all put in the same USB port so that we are sure the all have the same block device name, e.g. /dev/sda</p>
+<p>We have to be 100% sure that /dev/sda is our free USB device on which we want longhorn to become active on. Therefore, double check with ansible:</p>
+<pre><code class="language-bash">$ ansible pi -b -m shell -a &quot;parted /dev/sda print&quot;
+n1 | CHANGED | rc=0 &gt;&gt;
+Model:  USB  SanDisk 3.2Gen1 (scsi)                                       
+Disk /dev/sda: 61.5GB
+Sector size (logical/physical): 512B/512B
+Partition Table: unknown
+Disk Flags: Error: /dev/sda: unrecognised disk label
+...
+</code></pre>
 <p>We create an <a href="https://github.com/gdha/pi4-longhorn/blob/main/prepare-usb-disk/readme.md">ansible playbook to prepare the USB block devices</a> and have it mounted on <code>/app/longhorn</code> on each node. E.g.</p>
 <pre><code class="language-bash">$ df /app/longhorn/
 Filesystem     1K-blocks  Used Available Use% Mounted on
