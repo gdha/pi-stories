@@ -166,7 +166,7 @@ ipaddresspools.metallb.io   2023-01-24T10:24:52Z
 To verify the load-balancer is working we could execute [4]:
 
 ```bash
-$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.5.1/deploy/static/provider/cloud/deploy.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0/deploy/static/provider/cloud/deploy.yaml
 namespace/ingress-nginx created
 serviceaccount/ingress-nginx created
 serviceaccount/ingress-nginx-admission created
@@ -270,7 +270,20 @@ We can also check the logs of traefik:
 
 ```bash
 $ kubectl -n kube-system logs $(kubectl -n kube-system get pods --selector "app.kubernetes.io/name=traefik" --output=name)
-time="2023-01-24T13:23:31Z" level=info msg="Configuration loaded from flags."
+2025-01-13T13:06:04Z INF Traefik version 3.2.2 built on 2024-12-10T14:53:02Z version=3.2.2
+2025-01-13T13:06:04Z INF Stats collection is enabled.
+2025-01-13T13:06:04Z INF Many thanks for contributing to Traefik's improvement by allowing us to receive anonymous information from your configuration.
+2025-01-13T13:06:04Z INF Help us improve Traefik by leaving this feature on :)
+2025-01-13T13:06:04Z INF More details on: https://doc.traefik.io/traefik/contributing/data-collection/
+2025-01-13T13:06:04Z INF Starting provider aggregator *aggregator.ProviderAggregator
+2025-01-13T13:06:04Z INF Starting provider *traefik.Provider
+2025-01-13T13:06:04Z INF Starting provider *crd.Provider
+2025-01-13T13:06:04Z INF Starting provider *ingress.Provider
+2025-01-13T13:06:04Z INF ingress label selector is: "" providerName=kubernetes
+2025-01-13T13:06:04Z INF label selector is: "" providerName=kubernetescrd
+2025-01-13T13:06:04Z INF Creating in-cluster Provider client providerName=kubernetes
+2025-01-13T13:06:04Z INF Creating in-cluster Provider client providerName=kubernetescrd
+2025-01-13T13:06:04Z INF Starting provider *acme.ChallengeTLSALPN
 ```
 
 When we see above listed line the we are sure traefik is properly installed and configured.
@@ -288,4 +301,4 @@ Now, we are ready to do some more tests with our new load-balancer and traefik.
 
 ### Edit History
 
-- update with new metallb and NGINC Ingress Controller - 25/Jan/2023
+- update with new metallb and NGINX Ingress Controller - 25/Jan/2023

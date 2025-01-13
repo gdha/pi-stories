@@ -6,6 +6,19 @@
 
 On all our pi systems we added an USB block device of the same size and we are sure that they all put in the same USB port so that we are sure the all have the same block device name, e.g. /dev/sda
 
+We have to be 100% sure that /dev/sda is our free USB device on which we want longhorn to become active on. Therefore, double check with ansible:
+
+```bash
+$ ansible pi -b -m shell -a "parted /dev/sda print"
+n1 | CHANGED | rc=0 >>
+Model:  USB  SanDisk 3.2Gen1 (scsi)                                       
+Disk /dev/sda: 61.5GB
+Sector size (logical/physical): 512B/512B
+Partition Table: unknown
+Disk Flags: Error: /dev/sda: unrecognised disk label
+...
+```
+
 We create an [ansible playbook to prepare the USB block devices](https://github.com/gdha/pi4-longhorn/blob/main/prepare-usb-disk/readme.md) and have it mounted on `/app/longhorn` on each node. E.g.
 
 ```bash

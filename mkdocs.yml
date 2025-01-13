@@ -19,6 +19,7 @@ nav:
     - 'Raspberry Pi 4 Prepare for kubernetes': 'pi-stories2.md'
     - 'Raspberry Pi 4 Installing k3s software': 'pi-stories3.md'
     - 'Raspberry Pi 4 Install awesome kubectl aliases': 'pi-stories4.md'
+    - 'Raspberry Pi 4 Install helm': 'pi-stories4helm.md'
     - 'Raspberry Pi 4 Installing cert-manager on our cluster': 'pi-stories5.md'
     - 'Raspberry Pi 4 Upgrading k3s software on your cluster': 'pi-stories6.md'
     - 'Raspberry Pi 4 YAML everywhere -what about correctness?': 'pi-stories7.md'

@@ -36,6 +36,9 @@ Successfully tagged ghcr.io/gdha/graphite:v1.2
 Pushing graphite:v1.2 to GitHub Docker Container registry
 ```
 
+In fact, you do not need to build it yourself as GitHub Actions of [Package pi4-grahite](https://github.com/gdha/pi4-graphite/pkgs/container/pi4-graphite) will do this for us.
+
+
 To start the graphite pod on our kubernetes cluster do the following:
 
 ```bash
@@ -44,14 +47,15 @@ $ kubectl apply -f ./graphite-namespace.yaml
 namespace/graphite created
 $ kubectl apply -f ./graphite-secret.yaml 
 secret/graphite created
-$ kubectl apply -f ./ghcr-secret.yaml secret/dockerconfigjson-github-com 
-created
-$ kubectl apply -f ./persistentvolumeclaim-graphite.yaml persistentvolumeclaim/graphite 
-created
-$ kubectl apply -f ./statefulset_graphite.yaml statefulset.apps/graphite 
-created
-$ kubectl apply -f ./service_graphite.yaml service/graphite-svc 
-created
+$ kubectl apply -f ./ghcr-secret.yaml
+secret/dockerconfigjson-github-com created
+## Be careful - longhorn has to be installed already before applying persistentvolumeclaim-graphite.yaml
+$ kubectl apply -f ./persistentvolumeclaim-graphite.yaml
+persistentvolumeclaim/graphite created
+$ kubectl apply -f ./statefulset_graphite.yaml
+statefulset.apps/graphite created
+$ kubectl apply -f ./service_graphite.yaml 
+service/graphite-svc created
 ```
 
 Open a browser with URL http://n1:30080 to see the result of the tests:
