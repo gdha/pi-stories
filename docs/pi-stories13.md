@@ -231,6 +231,28 @@ This should be clear, `metadata: -> namespace: monitoring`, we are telling it to
 
 The rest under `spec:` is basically telling what app the Service Monitor should "bind to". It’s looking for `app: longhorn-manager` in namespace `longhorn-system` and `port: manager`. This port could be a port number, but it also can have a name, so in this case it’s named manager.
 
+Okay, ket us add the longhorm monitor service:
+
+```bash
+$ kubectl get servicemonitors.monitoring.coreos.com -n monitoring
+NAME                 AGE
+kube-state-metrics   32m
+kubelet              9m34s
+node-exporter        39m
+traefik              8m57s
+
+$ kubectl apply -f longhorn-servicemonitor.yaml
+servicemonitor.monitoring.coreos.com/longhorn-prometheus-servicemonitor created
+
+$ kubectl get servicemonitors.monitoring.coreos.com -n monitoring
+NAME                                 AGE
+kube-state-metrics                   32m
+kubelet                              9m50s
+longhorn-prometheus-servicemonitor   3s
+node-exporter                        40m
+traefik                              9m13s
+```
+
 This is the longhorn-manager we are targeting.
 
 ```bash
@@ -241,7 +263,7 @@ longhorn-manager           5         5         5       5            5           
 longhorn-csi-plugin        5         5         5       5            5           <none>          48d
 ```
 
-To describea the daemonset of longhorn-manager execute:
+To describe the daemonset of longhorn-manager execute:
 
 ```bash
 $ kubectl describe daemonset longhorn-manager -n longhorn-system | grep Port
@@ -258,7 +280,7 @@ Alright, now we can move on the grafana.
 Our grafana pod will also use a longhorn device as defined under file:
 
 ```bash
- cat grafana-pvc.yaml
+$ cat grafana/grafana-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -307,6 +329,16 @@ grafana               LoadBalancer   10.43.108.229   192.168.0.233   3000:32251/
 Open a browser and use url http://192.168.0.233:3000/ and login with the default admin account with first time password admin.
 
 ![](img/grafana-home.png)
+
+The first thing we need to do is to add data sources, e.g. prometheus:
+
+![](img/add-data-source.png)
+
+and fill in the URL we found before:
+
+![](img/data-source-prometheus.png)
+
+To import grafana dashboards we need to follow this procedure:
 
 On the left pane we can import grafana graphs with "+" -> create -> import
 
