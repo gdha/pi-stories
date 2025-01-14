@@ -231,7 +231,7 @@ This should be clear, `metadata: -> namespace: monitoring`, we are telling it to
 
 The rest under `spec:` is basically telling what app the Service Monitor should "bind to". It’s looking for `app: longhorn-manager` in namespace `longhorn-system` and `port: manager`. This port could be a port number, but it also can have a name, so in this case it’s named manager.
 
-Okay, ket us add the longhorm monitor service:
+Okay, let us add the longhorm monitor service:
 
 ```bash
 $ kubectl get servicemonitors.monitoring.coreos.com -n monitoring
