@@ -301,7 +301,7 @@ prometheus-external   LoadBalancer   10.43.53.220    192.168.0.232   9090:31862/
 <p>As you can see, we are not talking to Kubernetes API (we are... but...), but to <code>apiVersion: monitoring.coreos.com/v1</code>, so we are basically telling Prometheus Operator to create something for us. In this case it’s kind: <code>ServiceMonitor</code>.</p>
 <p>This should be clear, <code>metadata: -&gt; namespace: monitoring</code>, we are telling it to deploy into our monitoring namespace.</p>
 <p>The rest under <code>spec:</code> is basically telling what app the Service Monitor should "bind to". It’s looking for <code>app: longhorn-manager</code> in namespace <code>longhorn-system</code> and <code>port: manager</code>. This port could be a port number, but it also can have a name, so in this case it’s named manager.</p>
-<p>Okay, ket us add the longhorm monitor service:</p>
+<p>Okay, let us add the longhorm monitor service:</p>
 <pre><code class="language-bash">$ kubectl get servicemonitors.monitoring.coreos.com -n monitoring
 NAME                 AGE
 kube-state-metrics   32m
